@@ -1,23 +1,47 @@
-"""
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
-
-Replace these with more appropriate tests for your application.
-"""
-
 from django.test import TestCase
+from tinygraph.apps.core.models import Device, Protocol
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+class DeviceTest(TestCase):
+    def test_unicode_name(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Tests that a Device displays its name correctly based upon the data
+        it has available.
         """
-        self.failUnlessEqual(1 + 1, 2)
+        
+        # Device has no data
+        device = Device()
+        self.failUnlessEqual(str(device), 'Device')
+        
+        # only IP address
+        device.address = '172.17.10.200'
+        self.failUnlessEqual(str(device), '172.17.10.200')
+        
+        # host name and IP address
+        device.host_name = 'server.domain'
+        self.failUnlessEqual(str(device),
+                             'server.domain (172.17.10.200)')
+        
+        # only host name
+        device.address = None
+        self.failUnlessEqual(str(device), 'server.domain')
+        
+        # has a "user given name" which overrides all determined values
+        device.user_given_name = 'My Server'
+        self.failUnlessEqual(str(device), 'My Server')
 
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
-
->>> 1 + 1 == 2
-True
-"""}
-
+class ProtocolTest(TestCase):
+    def test_unicode_name(self):
+        """
+        Tests that a Protocol displays its name correctly based upon the data
+        it has available
+        """
+        
+        protocol = Protocol(acronym='SNMP')
+        self.failUnlessEqual(str(protocol), 'SNMP')
+        
+        protocol.version = '2c'
+        self.failUnlessEqual(str(protocol), 'SNMPv2c')
+        
+        # Should still produce the same result as the previous test
+        protocol.name = 'Simple Network Management Protocol'
+        self.failUnlessEqual(str(protocol), 'SNMPv2c')
