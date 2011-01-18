@@ -46,11 +46,8 @@ class Rule(models.Model):
     def __unicode__(self):
         return '%s - %s' % (data_object, device)
 
-class Data(models.Model):
-    """Data collected for a Rule"""
-    
-    class Meta:
-        verbose_name_plural = 'Data'
+class DataInstance(models.Model):
+    """Data collected for a Rule regarding a DataObject"""
     
     rule = models.ForeignKey(Rule)
     value = models.CharField(blank=True, max_length=1024)
