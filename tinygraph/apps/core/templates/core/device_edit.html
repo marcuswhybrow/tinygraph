@@ -1,0 +1,19 @@
+{% extends "core/core_base.html" %}
+
+{% block content_title %}
+    {% if form.instance.pk %}
+        Edit {{ form.instance }}
+    {% else %}
+        Add New Device
+    {% endif %}
+{% endblock %}
+
+{% block content_area %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" name="submit" value="Save">
+    </form>
+    
+    <p><a href="{% url core.views.device_list %}">&#x2190; back</a></p>
+{% endblock %}

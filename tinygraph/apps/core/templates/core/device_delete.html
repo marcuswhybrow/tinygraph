@@ -1,0 +1,33 @@
+{% extends "core/core_base.html" %}
+
+{% block content_title %}
+    {% if deleted %}
+        {{ device }} Has Been Deleted
+    {% else %}
+        Confirm Deletion of {{ device }}
+    {% endif %}
+{% endblock %}
+
+{% block content_area %}
+    {% if deleted %}
+        <p>
+            <a href="{% url core.views.device_list %}">&#x2190; Back to the list of devices</a>
+        </p>
+    {% else %}
+        <p>
+            Are you sure you want to delete {{ device }}, <strong>you will also be deleting all data</strong> collected for {{ device }}.
+        </p>
+        
+        <p>
+            <strong>WARNING:</strong> Deletion of a device is permanent and irreversible.
+        </p>
+    
+        <form action="" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="delete" value="true">
+            <input type="submit" name="submit" value="Confirm Deletion">
+        </form>
+
+        <p><a href="{% url core.views.device_detail device_slug=device.slug %}">&#x2190; back</a></p>
+    {% endif %}
+{% endblock %}

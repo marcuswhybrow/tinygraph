@@ -1,5 +1,5 @@
 from django.test import TestCase
-from core.models import Device, Protocol
+from core.models import Device
 
 class DeviceTest(TestCase):
     def test_unicode_name(self):
@@ -28,20 +28,3 @@ class DeviceTest(TestCase):
         # has a "user given name" which overrides all determined values
         device.user_given_name = 'My Server'
         self.failUnlessEqual(str(device), 'My Server')
-
-class ProtocolTest(TestCase):
-    def test_unicode_name(self):
-        """
-        Tests that a Protocol displays its name correctly based upon the data
-        it has available
-        """
-        
-        protocol = Protocol(acronym='SNMP')
-        self.failUnlessEqual(str(protocol), 'SNMP')
-        
-        protocol.version = '2c'
-        self.failUnlessEqual(str(protocol), 'SNMPv2c')
-        
-        # Should still produce the same result as the previous test
-        protocol.name = 'Simple Network Management Protocol'
-        self.failUnlessEqual(str(protocol), 'SNMPv2c')
