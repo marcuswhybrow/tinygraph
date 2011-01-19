@@ -4,6 +4,11 @@ import os
 import sys
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+APP_DIR = os.path.join(SITE_ROOT, 'apps')
+
+# Add the "apps" folder to the path so I don't have to constants imports like
+# apps.myapp.file, now I can do just myapp.file
+sys.path.insert(0, APP_DIR)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

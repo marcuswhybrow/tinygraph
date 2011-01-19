@@ -1,5 +1,5 @@
 from django.contrib import admin
-from tinygraph.apps.core.models import Device, Rule, DataInstance, DataObject, Protocol, ProtocolVersion
+from core.models import Device, Rule, DataInstance, DataObject, Protocol, ProtocolVersion
 
 admin.site.register(Device)
 admin.site.register(Rule)

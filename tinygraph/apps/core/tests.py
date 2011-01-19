@@ -1,5 +1,5 @@
 from django.test import TestCase
-from tinygraph.apps.core.models import Device, Protocol
+from core.models import Device, Protocol
 
 class DeviceTest(TestCase):
     def test_unicode_name(self):

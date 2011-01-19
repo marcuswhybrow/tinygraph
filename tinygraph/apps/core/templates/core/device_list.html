@@ -5,7 +5,9 @@
 {% block content_area %}
     <ul>
         {% for device in devices %}
-            <li>{{ device }}</li>
+            <li><a href="{{ device.get_absolute_url }}">{{ device }}</a></li>
         {% endfor %}
     </ul>
+    
+    <p><a href="{% url core.views.device_edit %}">Add new device</a></p>
 {% endblock %}

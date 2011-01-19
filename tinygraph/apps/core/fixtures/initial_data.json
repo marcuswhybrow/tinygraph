@@ -1,21 +1,12 @@
 [
     {
         "pk": 1, 
-        "model": "core.protocol", 
+        "model": "core.device", 
         "fields": {
-            "acronym": "SNMP", 
-            "description": "SNMP exposes management data in the form of variables on the managed systems, which describe the system configuration. These variables can then be queried (and sometimes set) by managing applications.", 
-            "name": "Simple Network Management Protocol", 
-            "slug": "snmp"
-        }
-    }, {
-        "pk": 1, 
-        "model": "core.protocolversion", 
-        "fields": {
-            "version": "2c", 
-            "protocol": 1, 
-            "slug": "2c", 
-            "description": "SNMPv2c, revises version 1 and includes improvements in the areas of performance, security, confidentiality, and manager-to-manager communications. It introduced GetBulkRequest, an alternative to iterative GetNextRequests for retrieving large amounts of management data in a single request. However, the new party-based security system in SNMPv2, viewed by many as overly complex, was not widely accepted."
+            "slug": "vhost", 
+            "user_given_name": "vHost", 
+            "host_name": "vhost.whybrow.local", 
+            "address": "172.17.10.200"
         }
     }
 ]
