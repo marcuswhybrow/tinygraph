@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}Tiny Graph{% endblock %}</title>
+        <style type="text/css" media="screen">
+            body { width: 800px; margin: 0 auto; }
+            nav#main-nav ul li { display: inline; padding-right: 20px; }
+        </style>
+    </head>
+    <body>
+        <h1 id="tinygraph">TinyGraph</h1>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="{% url tinygraph.apps.core.views.device_list %}">Devices</a></li>
+                <li><a href="{% url tinygraph.apps.core.views.protocol_list %}">Protocols</a></li>
+            </ul>
+        </nav>
+        {% block content %}
+            
+        {% endblock %}
+    </body>
+</html>
