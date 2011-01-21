@@ -47,13 +47,14 @@
                         $.ajax({
                             url: PING_URL,
                             success: function(data) {
-                                var up = data['up'];
-                                if (data['sequence'] == sequence) {
-                                    if (up)
-                                        $('#target').html(data['address'] + ' is UP.');
-                                    else
-                                        $('#target').html(data['address'] + ' is DOWN.');
-                                }
+                                console.log(data);
+                                // var up = data['up'];
+                                // if (data['sequence'] == sequence) {
+                                //     if (up)
+                                //         $('#target').html(data['address'] + ' is UP.');
+                                //     else
+                                //         $('#target').html(data['address'] + ' is DOWN.');
+                                // }
                             },
                             dataType: 'json',
                             type: 'POST',

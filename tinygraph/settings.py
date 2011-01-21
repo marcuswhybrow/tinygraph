@@ -3,8 +3,19 @@
 import os
 import sys
 
+# An absolute path to the root directory of the Django project, this directory
+# is the one whoch would normally contain manage.py
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+
+# The directory within (for organisational convenience) which all Django apps
+# are situated.
 APP_DIR = os.path.join(SITE_ROOT, 'apps')
+
+# Absolute path to the directory which holds the static files
+STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
+
+# The URL at which static files should be served from
+STATIC_URL = '/static/'
 
 # Add the "apps" folder to the path so I don't have to constants imports like
 # apps.myapp.file, now I can do just myapp.file
@@ -75,6 +86,11 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
     # 'django.template.loaders.eggs.Loader',
+)
+
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+TEMPLATE_CONTEXT_PROCESSORS += (
+    'context_processors.static',
 )
 
 MIDDLEWARE_CLASSES = (
