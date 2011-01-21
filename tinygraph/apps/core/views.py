@@ -1,9 +1,11 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.views.generic.simple import direct_to_template
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from core.models import Device, DataObject
 from core.forms import DeviceForm
+import subprocess
+import simplejson
 
 def device_list(request):
     return direct_to_template(request, 'core/device_list.html', {
@@ -49,3 +51,20 @@ def device_delete(request, device_slug):
         'device': device,
         'deleted': deleted,
     })
+
+def ping(request):
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        address = address.split(' ')[0]
+        sequence = request.POST.get('sequence')
+        timeout = request.POST.get('timeout', 3000)
+        if address is not None and sequence is not None:
+            result = subprocess.call(['ping', '-c 1', '-W %s' % timeout, address])
+            data = {
+                'up': True if result == 0 else False,
+                'sequence': sequence,
+                'address': address,
+            }
+            
+            return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    raise Http404
