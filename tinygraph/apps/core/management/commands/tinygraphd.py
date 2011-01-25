@@ -7,7 +7,7 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         if len(args) == 1:
-            daemon = TinyGraphDaemon('/tmp/tinygraphd.pid')
+            daemon = TinyGraphDaemon(1, '/tmp/tinygraphd.pid')
             command = args[0]
             if 'start' == command:
                 daemon.start()
