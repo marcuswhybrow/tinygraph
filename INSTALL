@@ -2,3 +2,15 @@ Thanks for downloading TinyGraph.
 
 Installation is not yet possible. This feature will be added when the product
 is in a stable version.
+
+Requirements:
+
+The following python modules are dependencies and can be installed by running:
+
+    pip install -r requirements-txt
+    
+    * Django==1.2.3
+    * simplejson
+
+In addition TinyGraph requires the non-python net-snmp C library to be
+installed an compiled with python bindings.
