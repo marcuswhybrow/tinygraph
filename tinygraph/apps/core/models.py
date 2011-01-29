@@ -8,6 +8,7 @@ class DataObject(models.Model):
     identifier = models.CharField(max_length=255, db_index=True)
     derived_name = models.CharField(blank=True, max_length=255)
     user_given_name = models.CharField(blank=True, max_length=255)
+    parent = models.ForeignKey('DataObject', null=True, blank=True, db_index=True)
     
     def __unicode__(self):
         return self.user_given_name or self.derived_name or self.identifier
