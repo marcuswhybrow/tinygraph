@@ -7,5 +7,7 @@ urlpatterns = patterns('core.views',
     (r'^devices/(?P<device_slug>[^/]+)/delete/$', 'device_delete'),
     (r'^devices/(?P<device_slug>[^/]+)/edit/$', 'device_edit'),
     
-    (r'^ping/$', 'ping'),
+    (r'^data-objects/$', 'data_object_list'),
+    
+    (r'^$', 'index'),
 )

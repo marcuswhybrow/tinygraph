@@ -23,5 +23,6 @@ if settings.DEBUG:
     )
 
 urlpatterns += patterns('',
-    (r'', include('tinygraph.apps.core.urls')),
+    (r'^api/', include('api.urls')),
+    (r'', include('core.urls')),
 )

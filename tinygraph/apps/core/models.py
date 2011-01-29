@@ -2,13 +2,19 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.core.exceptions import ValidationError
 
+class DataObjectManager(models.Manager):
+    def root_only(self):
+        return DataObject.objects.filter(parent=None)
+
 class DataObject(models.Model):
     """A piece of data retrievable via a protocol from a host"""
     
     identifier = models.CharField(max_length=255, db_index=True)
     derived_name = models.CharField(blank=True, max_length=255)
     user_given_name = models.CharField(blank=True, max_length=255)
-    parent = models.ForeignKey('DataObject', null=True, blank=True, db_index=True)
+    parent = models.ForeignKey('DataObject', null=True, blank=True, db_index=True, related_name='children')
+    
+    objects = DataObjectManager()
     
     def __unicode__(self):
         return self.user_given_name or self.derived_name or self.identifier

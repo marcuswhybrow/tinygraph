@@ -1,4 +1,4 @@
-{% extends "core/core_base.html" %}
+{% extends "core/device/device_base.html" %}
 
 {% block content_title %}
     {% if form.instance.pk %}
@@ -25,7 +25,7 @@
     <script type="text/javascript" charset="utf-8">
         $(function() {
             
-            var PING_URL = '{% url core.views.ping %}';
+            var PING_URL = '{% url api.views.ping %}';
             
             var typewatch = (function() {
                 var timer = 0;

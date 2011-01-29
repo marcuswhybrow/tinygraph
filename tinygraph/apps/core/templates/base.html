@@ -34,13 +34,16 @@
         <script src="{{ STATIC_URL }}js/libs/modernizr-1.6.min.js"></script>
 </head>
 
-<body>
+<body id="{% block body_id %}{% endblock %}">
     <div id="container">
         <header>
-            <h1 id="tinygraph">TinyGraph</h1>
+            <div id="logo">
+                <a href="{% url core.views.index %}"><h1 id="tinygraph">TinyGraph</h1></a>
+            </div>
             <nav id="main-nav">
-                <ul>
-                    <li><a href="{% url core.views.device_list %}">Devices</a></li>
+                <ul class="clearfix">
+                    <li class="devices"><a href="{% url core.views.device_list %}">Devices</a></li>
+                    <li class="data-objects"><a href="{% url core.views.data_object_list %}">Data Objects</a></li>
                 </ul>
             </nav>
         </header>

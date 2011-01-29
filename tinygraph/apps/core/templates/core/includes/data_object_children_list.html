@@ -1,0 +1,13 @@
+{% load data_object_filters %}
+
+<ul>
+    {% for data_object in data_object_children %}
+        <li>
+            {% if data_object.children.count %}
+                <a id="{{ data_object.pk }}" href="#">{{ data_object.identifier|splitlast:"."}} - {{ data_object.derived_name|splitlast:"." }}</a>
+            {% else %}
+                {{ data_object.identifier|splitlast:"."}} - {{ data_object.derived_name|splitlast:"." }}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
