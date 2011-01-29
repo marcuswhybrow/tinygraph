@@ -53,7 +53,7 @@ def device_delete(request, device_slug):
     })
 
 def ping(request):
-    if request.method == 'POST':
+    if request.is_ajax() and request.method == 'POST':
         address = request.POST.get('address')
         address = address.split(' ')[0]
         sequence = request.POST.get('sequence')
@@ -68,3 +68,15 @@ def ping(request):
             
             return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     raise Http404
+
+def analyse(request):
+    if request.is_ajax() and request.method == 'POST' and 'device_pk' in request.method.POST:
+        device_pk = request.POST['device_pk']
+        try:
+            Device.objects.get(pk=device_pk)
+        except Device.DoesNotExist:
+            data = {'success': False}
+        else:
+            data = {'success': True}
+        
+        

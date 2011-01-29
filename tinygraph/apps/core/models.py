@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 class DataObject(models.Model):
     """A piece of data retrievable via a protocol from a host"""
     
-    identifier = models.CharField(max_length=255)
+    identifier = models.CharField(max_length=255, db_index=True)
     derived_name = models.CharField(blank=True, max_length=255)
     user_given_name = models.CharField(blank=True, max_length=255)
     
@@ -22,7 +22,7 @@ class Device(models.Model):
     # 45 characters is the maximum length of an IPv6 address
     address = models.CharField(max_length=45, help_text='An IP address for this device.')
 
-    slug = models.SlugField(unique=True, editable=False)
+    slug = models.SlugField(unique=True, editable=False, db_index=True)
 
     data_objects = models.ManyToManyField(DataObject, through='Rule')
 
@@ -42,8 +42,8 @@ class Device(models.Model):
 class Rule(models.Model):
     """Defines that a DataObject should be recorded for a particular Device"""
     
-    data_object = models.ForeignKey(DataObject)
-    device = models.ForeignKey(Device)
+    data_object = models.ForeignKey(DataObject, db_index=True)
+    device = models.ForeignKey(Device, db_index=True)
     created = models.DateTimeField(auto_now_add=True)
     
     def __unicode__(self):
@@ -53,8 +53,9 @@ class Rule(models.Model):
 class DataInstance(models.Model):
     """Data collected for a Rule regarding a DataObject"""
     
-    rule = models.ForeignKey(Rule)
+    rule = models.ForeignKey(Rule, db_index=True)
     value = models.CharField(blank=True, max_length=1024)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     
     def __unicode__(self):
         return '%s - %s' % (self.value, self.rule)
