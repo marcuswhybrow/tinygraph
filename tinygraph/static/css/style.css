@@ -317,6 +317,34 @@ body#data-objects #main-nav ul li.data-objects {
     text-decoration: underline;
 }
 
+#device-list {
+    margin-bottom: 20px;
+}
+
+#device-list .device {
+    float: left;
+    background-color: #eee;
+    padding: 15px 20px;
+    margin: 0 20px 20px 0;
+    border: 1px solid #ddd;
+    
+    width: 150px;
+    height: 200px;
+}
+
+#device-list .device dt {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+#device-list .device dt a {
+    text-decoration: none;
+}
+
+#device-list .device dt a:hover {
+    text-decoration: underline;
+}
+
 
 
 

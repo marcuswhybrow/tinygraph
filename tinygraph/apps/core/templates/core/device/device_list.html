@@ -3,11 +3,22 @@
 {% block content_title %}Your Devices{% endblock %}
 
 {% block content_area %}
-    <ul>
+    <div id="device-list" class="clearfix">
         {% for device in devices %}
-            <li><a href="{{ device.get_absolute_url }}">{{ device }}</a></li>
+            <div id="{{ device.pk }}" class="device">
+                <dl>
+                    <dt><a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a></dt>
+                    <dd>{{ device.host_name }}</dd>
+                    <dd>{{ device.address }}</dd>
+                </dl>
+                <br />
+                <dl>
+                    <dd>Other stats</dd>
+                    <dd>etc.</dd>
+                </dl>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
     
     <p><a href="{% url core.views.device_edit %}">Add new device</a></p>
 {% endblock %}
