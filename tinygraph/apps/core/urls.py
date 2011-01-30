@@ -8,6 +8,7 @@ urlpatterns = patterns('core.views',
     (r'^devices/(?P<device_slug>[^/]+)/edit/$', 'device_edit'),
     
     (r'^data-objects/$', 'data_object_list'),
+    (r'^data-objects/mibs/$', 'mib_upload_list'),
     
     (r'^$', 'index'),
 )

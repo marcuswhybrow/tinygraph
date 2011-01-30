@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2 id="">{% block content_title %}{% endblock %}</h1>
-    <div>
+    <div class="{% block content_class %}{% endblock %}">
         {% block content_area %}
             
         {% endblock %}

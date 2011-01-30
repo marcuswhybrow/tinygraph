@@ -1,7 +1,8 @@
 from django.core.management.base import NoArgsCommand
 from pysnmp.smi import builder, view
-from tinygraph.apps.core.models import DataObject
+from tinygraph.apps.core.models import DataObject, MibUpload
 from pysnmp.smi.error import NoSuchObjectError
+import os
 
 class Command(NoArgsCommand):
     help = 'Creates the DataType enteries in the database, from the python representation of common MIB files created by pysnmp'
@@ -14,13 +15,29 @@ class Command(NoArgsCommand):
             return
         
         print 'OK, This will take a minute or so (there\'s a lot)...'
-        mibBuilder = builder.MibBuilder().loadModules()
+        mibBuilder = builder.MibBuilder()
+        
+        # Remove the user MIB folder, preventing the sytem from owning the
+        # user uploaded MIBs
+        mib_paths = mibBuilder.getMibPath()
+        try:
+            i = mib_paths.index(os.environ['PYSNMP_MIB_DIR'])
+        except ValueError:
+            pass
+        else:
+            mib_paths = mib_paths[:i] + mib_paths[i+1:]
+            mibBuilder.setMibPath(*mib_paths)
+        
+        mibBuilder.loadModules()
         mibViewController = view.MibViewController(mibBuilder)
         
         oid, label, sufix = mibViewController.getFirstNodeName()
         
         # Remove existing objects
         DataObject.objects.all().delete()
+        
+        # Create the "system" MibUpload instance
+        system_upload, created = MibUpload.objects.get_or_create(system=True)
         
         while True:
             fields = {
@@ -29,15 +46,10 @@ class Command(NoArgsCommand):
             }
             
             try:
-                # Ask pysnmp to clarify the what the actual oid of our guessed
-                # guessed_parent_oid is.
+                # Ask pysnmp to clarify the what the actual oid of our guessed guessed_parent_oid is.
                 guessed_parent_oid = oid[:-1]
                 parent_oid, parent_label, parent_suffix = mibViewController.getNodeName(guessed_parent_oid)
-                # while parent_oid[-1] == 0:
-                #     parent_oid = parent_oid[:-1]
             except (IndexError, NoSuchObjectError):
-                # This the root node
-                # I think python syntax prevents an IndexError here actually
                 pass
             else:
                 parent_oid_str = '.'.join([str(i) for i in parent_oid])
@@ -47,7 +59,10 @@ class Command(NoArgsCommand):
                     except DataObject.DoesNotExist:
                         print 'WARNING: parent DataObject with oid %s could not be found' % parent_oid_str
                         
-            DataObject.objects.create(**fields)
+            data_object = DataObject.objects.create(**fields)
+            # Give the "system" MibUpload ownership of this DataObject
+            data_object.mib_uploads.add(system_upload)
+            
             try:
                 oid, label, suffix = mibViewController.getNextNodeName(oid)
             except NoSuchObjectError:

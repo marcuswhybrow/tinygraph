@@ -284,27 +284,6 @@ body#data-objects #main-nav ul li.data-objects {
     display: block;
 }
 
-#main {
-    padding: 20px 20px 20px;
-}
-
-#main h2 {
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-#main p {
-    margin-bottom: 10px;
-}
-
-#main label, input {
-    
-}
-
-#main form {
-    margin-bottom: 20px;
-}
-
 #data-object-list ul {
     list-style: none;
 }
@@ -343,6 +322,77 @@ body#data-objects #main-nav ul li.data-objects {
 
 #device-list .device dt a:hover {
     text-decoration: underline;
+}
+
+
+ul.mini-nav {
+    list-style: none;
+    margin: 0 0 20px 0;
+    padding: 0;
+}
+
+ul.mini-nav li {
+    float: left;
+    padding: 5px 10px;
+    border-right: 1px solid #ccc;
+}
+
+ul.mini-nav li:last-child {
+    border-right: none;
+}
+
+div.do-list ul.mini-nav li.do-list,
+div.do-mibs ul.mini-nav li.do-mibs,
+ul.mini-nav li:hover {
+    background-color: #eee;
+}
+
+
+
+form.little-form {
+    padding: 20px;
+    border: 1px solid #eee;
+    display: inline-block;
+}
+
+
+
+
+
+
+#main {
+    padding: 20px 20px 20px;
+}
+
+#main h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+#main h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+#main h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#main p {
+    margin-bottom: 10px;
+}
+
+#main label, input {
+    
+}
+
+#main form {
+    margin-bottom: 20px;
+}
+
+#main ul {
+    margin-bottom: 20px;
 }
 
 

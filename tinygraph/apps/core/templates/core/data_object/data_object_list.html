@@ -1,8 +1,9 @@
-{% extends "core/core_base.html" %}
+{% extends "core/data_object/data_object_base.html" %}
 
-{% block body_id %}data-objects{% endblock %}
+{% block content_class %}{{ block.super }} do-list{% endblock %}
 
 {% block content_area %}
+    {{ block.super }}
     <h2>The List!</h2>
     
     <div id="data-object-list">

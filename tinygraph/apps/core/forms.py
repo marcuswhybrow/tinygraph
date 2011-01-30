@@ -1,7 +1,7 @@
 from django.forms import Form, ModelForm, ValidationError
 from django.db.models import Q
 from django.template.defaultfilters import slugify
-from core.models import Device
+from core.models import Device, MibUpload
 
 class DeviceForm(ModelForm):
     class Meta:
@@ -16,3 +16,8 @@ class DeviceForm(ModelForm):
             return user_given_name
         else:
             raise ValidationError('This name is too similar to another devices name.')
+
+class MibUploadForm(ModelForm):
+    class Meta:
+        model = MibUpload
+        exclude = ('system',)

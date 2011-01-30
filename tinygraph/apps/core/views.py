@@ -2,8 +2,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
-from core.models import Device, DataObject
-from core.forms import DeviceForm
+from core.models import Device, DataObject, MibUpload
+from core.forms import DeviceForm, MibUploadForm
 
 def device_list(request):
     return direct_to_template(request, 'core/device/device_list.html', {
@@ -55,7 +55,23 @@ def index(request):
     return direct_to_template(request, 'core/index.html', {})
 
 def data_object_list(request):
-    return direct_to_template(request, 'core/data_object_list.html', {
+    return direct_to_template(request, 'core/data_object/data_object_list.html', {
         'root_data_object_list': DataObject.objects.root_only().select_related(),
     })
+
+def mib_upload_list(request):
+    if request.method == 'POST':
+        print request.POST
+        form = MibUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            mib_upload = form.save()
+            return direct_to_template(request, 'core/data_object/mib_upload_uploaded.html', {
+                'mib_upload': mib_upload,
+            })
+    else:
+        form = MibUploadForm()
     
+    return direct_to_template(request, 'core/data_object/mib_upload_list.html', {
+        'mib_uploads': MibUpload.objects.filter(system=False),
+        'form': form,
+    })
