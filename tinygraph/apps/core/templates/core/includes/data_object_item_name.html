@@ -1,0 +1,7 @@
+{% load data_object_filters %}
+
+{% if data_object.parent %}
+    {{ data_object.identifier|subtract:data_object.parent.identifier }} - {{ data_object.derived_name|splitlast:"." }}
+{% else %}
+    {{ data_object.identifier }} - {{ data_object.derived_name|splitlast:"." }}
+{% endif %}

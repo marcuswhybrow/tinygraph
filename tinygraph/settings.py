@@ -5,7 +5,7 @@ import sys
 
 # An absolute path to the root directory of the Django project, this directory
 # is the one whoch would normally contain manage.py
-SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+SITE_ROOT = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
 # The directory within (for organisational convenience) which all Django apps
 # are situated.
@@ -16,6 +16,8 @@ STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
 
 # The URL at which static files should be served from
 STATIC_URL = '/static/'
+
+MIB_ROOT = os.path.join(SITE_ROOT, 'mibs')
 
 # Add the "apps" folder to the path so I don't have to constants imports like
 # apps.myapp.file, now I can do just myapp.file
@@ -123,3 +125,6 @@ INSTALLED_APPS = (
     'core',
     'api',
 )
+
+# Tells pysnmp where the user uploaded (converted) mib files are
+os.environ['PYSNMP_MIB_DIR'] = MIB_ROOT

@@ -1,4 +1,4 @@
-from django.forms import ModelForm, ValidationError
+from django.forms import Form, ModelForm, ValidationError
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from core.models import Device

@@ -2,3 +2,5 @@
 *.db
 .DS_Store
 pip-log.txt
+media/
+mibs/
