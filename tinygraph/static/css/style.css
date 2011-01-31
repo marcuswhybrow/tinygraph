@@ -395,6 +395,31 @@ form.little-form {
     margin-bottom: 20px;
 }
 
+#main fieldset {
+    border: 1px solid #eee;
+    min-height: 40px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+#main fieldset legend {
+    background-color: white;
+    padding: 2px 4px;
+}
+
+#main fieldset label {
+    margin-right: 10px;
+    height: 30px;
+    display: block;
+}
+
+#main fieldset label.has-children {
+    font-weight: bold;
+}
+
+#main fieldset label input {
+    margin-right: 10px;
+}
 
 
 

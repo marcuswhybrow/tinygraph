@@ -1,18 +1,39 @@
 {% extends "core/device/device_base.html" %}
 
+{% load data_object_filters %}
+
 {% block content_title %}{{ device }}{% endblock %}
 
 {% block content_area %}
-
+    
+    <a href="{{ device.get_absolute_url }}"><h2>{{ device.user_given_name }}</h2></a>
+    
+    <p>
+        This is <code>{{ device.user_given_name }}</code>, with a host name of <code>{{ device.host_name }}</code> and an IP address of <code>{{ device.address }}</code>.
+        Currently the information in this paragraph is static and defined by the user (i.e. host name and IP address may not match).
+    </p>
+    
     <p>
         <a href="{% url core.views.device_edit device_slug=device.slug %}">edit</a>
         <a href="{% url core.views.device_delete device_slug=device.slug %}">delete</a>
     </p>
-
-    <dl>
-        <dd>{{ device.host_name }}</dd>
-        <dd>{{ device.address }}</dd>
-    </dl>
+    
+    <h3>Tracking</h3>
+    <h4>Common</h4>
+    <p>Attention: These are generated from the database, to a single level of depth and do nothing!</p>
+    <form action="" method="post" accept-charset="utf-8">
+        {% for name, data_object in data_objects %}
+            <fieldset>
+                <legend>{{ name }}</legend>
+                {% for data_object_child in data_object.children.all %}
+                    <label class="{% if not data_object_child.children.count %}has-children{% endif %}"><input type="checkbox" name="{{ data_object_child.pk }}">{{ data_object_child.derived_name|subtract:data_object.derived_name }}</label>
+                {% endfor %}
+            </fieldset>
+        {% endfor %}
+    </form>
+    
+    <h4>Advanced</h4>
+    <p></p>
     
     <p><a href="{% url core.views.device_list %}">&#x2190; back</a></p>
 {% endblock %}
