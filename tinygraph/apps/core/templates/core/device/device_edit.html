@@ -1,14 +1,14 @@
 {% extends "core/device/device_base.html" %}
 
-{% block content_title %}
-    {% if form.instance.pk %}
-        Edit {{ form.instance }}
-    {% else %}
-        Add New Device
-    {% endif %}
-{% endblock %}
-
 {% block content_area %}
+    <h2>
+        {% if form.instance.pk %}
+            Edit {{ form.instance }}
+        {% else %}
+            Add New Device
+        {% endif %}
+    </h2>
+
     <form action="" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
