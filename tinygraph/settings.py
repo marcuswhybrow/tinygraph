@@ -129,13 +129,6 @@ INSTALLED_APPS = (
 # Tells pysnmp where the user uploaded (converted) mib files are
 os.environ['PYSNMP_MIB_DIR'] = MIB_ROOT
 
-OIDS = (
-    ('System', '1.3.6.1.2.1.1'),
-    ('Interfaces', '1.3.6.1.2.1.2'),
-    ('Host', '1.3.6.1.2.1.25'),
-)
-
-
 # For debug toolbar.
 if DEBUG:
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
