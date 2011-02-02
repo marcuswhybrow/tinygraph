@@ -49,9 +49,10 @@ class Device(models.Model):
     user_given_name = models.CharField(unique=True, max_length=100, help_text='A friendly name for this device which you will understand.')
 
     # 255 characters is the maximum length of a host name for DNS
-    host_name = models.CharField(blank=True, max_length=255, help_text='A DNS name that will resolve to an IP address for this device.')
-    # 45 characters is the maximum length of an IPv6 address
-    address = models.CharField(max_length=45, help_text='An IP address for this device.')
+    user_given_address = models.CharField(max_length=255, help_text='An IP address or DNS name which will resolve into an IP address for this device.')
+    
+    ip_address = models.CharField(blank=True, max_length=39)
+    fqdn = models.CharField(blank=True, max_length=255)
 
     slug = models.SlugField(unique=True, editable=False, db_index=True)
 

@@ -1,12 +1,14 @@
-from django.forms import Form, ModelForm, ValidationError
+from django import forms
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from core.models import Device, MibUpload
+import re
+import socket
 
-class DeviceForm(ModelForm):
+class DeviceForm(forms.ModelForm):
     class Meta:
         model = Device
-        exclude = ('data_objects',)
+        exclude = ('data_objects', 'ip_address', 'fqdn')
     
     def clean_user_given_name(self):
         user_given_name = self.cleaned_data['user_given_name']
@@ -15,9 +17,9 @@ class DeviceForm(ModelForm):
         except Device.DoesNotExist:
             return user_given_name
         else:
-            raise ValidationError('This name is too similar to another devices name.')
+            raise forms.ValidationError('This name is too similar to another devices name.')
 
-class MibUploadForm(ModelForm):
+class MibUploadForm(forms.ModelForm):
     class Meta:
         model = MibUpload
         exclude = ('system',)

@@ -5,8 +5,9 @@
         "fields": {
             "slug": "vhost", 
             "user_given_name": "vHost", 
-            "host_name": "vhost.whybrow.local", 
-            "address": "172.17.10.200"
+            "user_given_address": "vhost",
+            "ip_address": "172.17.10.200",
+            "fqdn": "vhost.whybrow.local"
         }
     }
 ]

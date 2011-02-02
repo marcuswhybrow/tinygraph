@@ -1,0 +1,15 @@
+{% extends "core/device/device_base.html" %}
+
+{% block content_area %}
+    <h2>Data Objects For {{ device.user_given_name }}</h2>
+    
+    {% if new_device %}
+        <div>
+            So, you have just created <code>{{ device.user_given_name }}</code>, the next step is to start adding some <strong>Data Objects</strong> which you would like to track!
+        </div>
+    {% else %}
+        <div>
+            These are the <strong>Data Objects</strong> which <code>{{ device.user_given_name }}</code> is tracking.
+        </div>
+    {% endif %}
+{% endblock %}

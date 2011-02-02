@@ -8,8 +8,9 @@
             <div id="{{ device.pk }}" class="device">
                 <dl>
                     <dt><a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a></dt>
-                    <dd>{{ device.host_name }}</dd>
-                    <dd>{{ device.address }}</dd>
+                    <dd><strong>{{ device.user_given_address }}</strong></dd>
+                    <dd>{{ device.fqdn }}</dd>
+                    <dd>{{ device.ip_address }}</dd>
                 </dl>
                 <br />
                 <dl>
@@ -20,5 +21,5 @@
         {% endfor %}
     </div>
     
-    <p><a href="{% url core.views.device_edit %}">Add new device</a></p>
+    <p><a href="{% url core.views.device_add %}">Add new device</a></p>
 {% endblock %}

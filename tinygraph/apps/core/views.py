@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from core.models import Device, DataObject, MibUpload
 from core.forms import DeviceForm, MibUploadForm
 from django.conf import settings
+import urllib
 
 def device_list(request):
     return direct_to_template(request, 'core/device/device_list.html', {
@@ -72,7 +73,6 @@ def data_object_list(request):
 
 def mib_upload_list(request):
     if request.method == 'POST':
-        print request.POST
         form = MibUploadForm(request.POST, request.FILES)
         if form.is_valid():
             mib_upload = form.save()
@@ -85,4 +85,26 @@ def mib_upload_list(request):
     return direct_to_template(request, 'core/data_object/mib_upload_list.html', {
         'mib_uploads': MibUpload.objects.filter(system=False),
         'form': form,
+    })
+
+def device_add(request):
+    if request.method == 'POST':
+        form = DeviceForm(request.POST)
+        if form.is_valid():
+            device = form.save()
+            return HttpResponseRedirect('%s?new' % reverse('core.views.device_data_object_list', kwargs={
+                'device_slug': device.slug,
+            }))
+    else:
+        form = DeviceForm()
+    
+    return direct_to_template(request, 'core/device/device_add.html', {
+        'form': form
+    })
+
+def device_data_object_list(request, device_slug):
+    device = get_object_or_404(Device, slug=device_slug)
+    return direct_to_template(request, 'core/device/device_data_object_list.html', {
+        'device': device,
+        'new_device': 'new' in request.GET and request.GET['new'].lower() in ['', 'true'],
     })

@@ -1,0 +1,87 @@
+{% extends "core/device/device_base.html" %}
+
+{% block content_area %}
+    <h2>
+        Add New Device
+    </h2>
+
+    <form action="" method="POST">
+        
+        <ol>
+            {% for error in form.subject.errors %}
+                <li><strong>{{ error|escape }}</strong></li>
+            {% endfor %}
+        </ol>
+        
+        {% csrf_token %}
+        <div class="field">
+            {{ form.user_given_name.errors }}
+            {{ form.user_given_name.label_tag }} {{ form.user_given_name }}
+        </div>
+        
+        <div class="field">
+            {{ form.user_given_address.errors }}
+            {{ form.user_given_address.label_tag }} {{ form.user_given_address }} <span style="height:24px; display:inline-block" id="ping-notification"></span>
+        </div>
+        
+        <input type="submit" name="submit" value="Save">
+    </form>
+    
+    <div id="target"></div>
+    
+    <p><a href="{% url core.views.device_list %}">&#x2190; back</a></p>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            
+            var PING_URL = '{% url api.views.ping %}';
+            
+            var typewatch = (function() {
+                var timer = 0;
+                return function(callback, ms) {
+                    clearTimeout (timer);
+                    timer = setTimeout(callback, ms);
+                }  
+            })();
+            
+            var sequence = 0;
+            var $target = $('#target');
+            var previousAddress = null;
+            
+            $('#id_user_given_address').keyup(function() {
+                var address = this.value;
+                if ((previousAddress == null || address != previousAddress) && address != '') {
+                    typewatch(function() {
+                        var $note = $('#ping-notification');
+                        $.ajax({
+                            url: PING_URL,
+                            success: function(data) {
+                                // console.log(data);
+                                var up = data['up'];
+                                if (data['sequence'] == sequence) {
+                                    
+                                    if (up)
+                                        $note.html('<img src="{{ STATIC_URL }}/images/icons/sweetie-plus-v2/without-shadows/badge-circle-check-24-ns.png" heigh="24" width="24" />' + data['address'] + ' is running.');
+                                    else
+                                        $note.html('<img src="{{ STATIC_URL }}/images/icons/sweetie-plus-v2/without-shadows/badge-circle-cross-24-ns.png" heigh="24" width="24" />' + data['address'] + ' is not running.');
+                                }
+                            },
+                            dataType: 'json',
+                            type: 'POST',
+                            data: {
+                                address: address,
+                                csrfmiddlewaretoken: '{{ csrf_token }}',
+                                sequence: ++sequence,
+                                timeout: 1000
+                            }
+                        });
+                    }, 500);
+                }
+                previousAddress = address;
+            });
+        });
+    </script>
+{% endblock %}

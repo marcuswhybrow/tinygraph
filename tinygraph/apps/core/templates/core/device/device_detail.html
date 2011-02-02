@@ -18,6 +18,10 @@
         <a href="{% url core.views.device_delete device_slug=device.slug %}">delete</a>
     </p>
     
+    <p>
+        <a href="{% url core.views.device_data_object_list device_slug=device.slug %}">Data Objects</a>
+    </p>
+    
     <h3>Tracking</h3>
     <h4>Common</h4>
     <p>Attention: These are generated from the database, to a single level of depth and do nothing!</p>
