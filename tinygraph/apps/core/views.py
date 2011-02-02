@@ -108,3 +108,10 @@ def device_data_object_list(request, device_slug):
         'device': device,
         'new_device': 'new' in request.GET and request.GET['new'].lower() in ['', 'true'],
     })
+
+
+def package_detail(request, package_slug):
+    package = get_object_or_404(Package, slug=package_slug)
+    return direct_to_template(request, 'core/package/package_detail.html', {
+        'package': package,
+    })

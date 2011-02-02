@@ -12,4 +12,13 @@
             These are the <strong>Data Objects</strong> which <code>{{ device.user_given_name }}</code> is tracking.
         </div>
     {% endif %}
+    
+    <div clas="packages">
+        {% for package in device.packages.all %}
+            <div class="package">
+                <h5>{{ package.title }}</h5>
+                <p>{{ package.description }}</p>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

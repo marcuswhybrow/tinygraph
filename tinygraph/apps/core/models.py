@@ -24,24 +24,6 @@ class DataObject(models.Model):
     
     def __unicode__(self):
         return self.user_given_name or self.derived_name or self.identifier
-    
-    # def delete(self, mib_upload=None, *args, **kwargs):
-    #     if mib_upload is not None:
-    #         count = self.mib_uploads.filter(pk=mib_upload.pk).count()
-    #         if count:
-    #             self.mib_uploads.remove(mib_upload)
-    #             if count - 1:
-    #                 # If there are still other MIBs which need this DataObject
-    #                 # then do not delete it.
-    #                 return
-    #         else:
-    #             # The MibUpload has no right to delete this DataObject since
-    #             # it does not have ownership
-    #             return
-    #         # Cascade delete the children (with the mib_upload kwarg)
-    #         for data_object in self.children.all():
-    #             data_object.delete(mib_upload=mib_upload)
-    #     super(DataObject, self).delete(*args, **kwargs)
 
 class Device(models.Model):
     """A device on the network"""
@@ -56,7 +38,8 @@ class Device(models.Model):
 
     slug = models.SlugField(unique=True, editable=False, db_index=True)
 
-    data_objects = models.ManyToManyField(DataObject, through='Rule')
+    data_objects = models.ManyToManyField(DataObject, through='Rule', related_name='devices')
+    packages = models.ManyToManyField('Package', related_name='devices')
 
     def __unicode__(self):
         return self.user_given_name
@@ -88,6 +71,7 @@ class DataInstance(models.Model):
     rule = models.ForeignKey(Rule, db_index=True)
     value = models.CharField(blank=True, max_length=1024)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
+    from_schedule = models.BooleanField(default=True, db_index=True)
     
     def __unicode__(self):
         return '%s - %s' % (self.value, self.rule)
@@ -198,3 +182,27 @@ class MibUpload(models.Model):
                 data_object.delete()
         
         super(MibUpload, self).delete(*args, **kwargs)
+
+
+class Package(models.Model):
+    """
+    A package is a group of DataObjects which a user would frequently whish to
+    enable or disable in an atomic fashion.
+    
+    For example a package might contain all the OIDs relevant to logging
+    interface statistics for an entire machine.
+    """
+    title = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, editable=False, db_index=True)
+    data_objects = models.ManyToManyField(DataObject, related_name='packages')
+    description = models.TextField(blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    editable = models.BooleanField(default=True)
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(str(self.title))
+        super(Package, self).save(*args, **kwargs)
+    
+    def __unicode__(self):
+        return self.title
+    
