@@ -4,21 +4,57 @@
     <h2>Data Objects For {{ device.user_given_name }}</h2>
     
     {% if new_device %}
-        <div>
+        <p>
             So, you have just created <code>{{ device.user_given_name }}</code>, the next step is to start adding some <strong>Data Objects</strong> which you would like to track!
-        </div>
+        </p>
     {% else %}
-        <div>
+        <p>
             These are the <strong>Data Objects</strong> which <code>{{ device.user_given_name }}</code> is tracking.
-        </div>
+        </p>
     {% endif %}
     
-    <div clas="packages">
-        {% for package in device.packages.all %}
-            <div class="package">
-                <h5>{{ package.title }}</h5>
-                <p>{{ package.description }}</p>
-            </div>
-        {% endfor %}
+    <h3>Packages</h3>
+    
+    <p>
+        A package is a predefined group of data objects which makes enabling and disabling them a synch.
+    </p>
+    
+    <div class="packages">
+        {% with device.packages.all as device_packages %}
+            {% for package in packages %}
+                <div class="package {% if package in device_packages %}enabled{% endif %}">
+                    <input class="toggle" type="checkbox" name="{{ package.slug }}"{% if package in device_packages %} checked="true"{% endif %}>
+                    <h5>{{ package.title }}</h5>
+                    <p>{{ package.description }}</p>
+                    <p>
+                        <a href="{% url core.views.package_detail package_slug=package.slug %}">Read More</a>
+                    </p>
+                </div>
+            {% endfor %}
+        {% endwith %}
     </div>
+    
+    <h3>Individual Data Objects</h3>
+    
+    <p>
+        You can also add data objects to record individually.
+    </p>
+    
+    {% with device.data_objects.all as device_objects %}
+        {% include "core/includes/data_object_table.html" %}
+    {% endwith %}
+    
+    <p>
+        <a href="{% url core.views.device_detail device_slug=device.slug %}">&#x2190; Back</a> to {{ device.user_given_name }}
+    </p>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            $('.toggle:checkbox').change(function() {
+                $(this).closest('.package').toggleClass('enabled');
+            });
+        })
+    </script>
 {% endblock %}

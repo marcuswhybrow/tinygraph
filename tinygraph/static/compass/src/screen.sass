@@ -1,0 +1,207 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+//@import "compass/reset";
+@import "compass/css3/transition"
+@import "compass/utilities/general/clearfix"
+
+// Custom Mixins
+
+@mixin card($width, $height)
+    float: left
+    background-color: #eee
+    padding: 15px 20px
+    margin: 0 20px 20px 0
+    border: 1px solid #ddd
+
+    width: $width
+    height: $height
+
+    dt,
+    h5
+        font-size: 22px
+        margin-bottom: 10px
+
+        a
+            text-decoration: none
+
+            :hover
+                text-decoration: underline
+
+// The SASS
+
+#container
+    width: 800px
+    margin: 0 auto
+
+header
+    padding: 20px
+    border-bottom: 1px solid #eee
+
+    #logo
+        h1
+            font-size: 48px
+            margin-bottom: 20px
+
+        a
+            text-decoration: none
+            color: inherit
+
+#main-nav ul li
+    float: left
+    background-color: #eee
+    border: 1px solid #ddd
+    margin-right: 10px
+    text-shadow: 0 1px 0 #fff
+    color: #888
+    
+    @include transition(all, 0.2s, ease-in-out, 0)
+    
+    a
+        color: inherit
+        text-decoration: none
+        text-transform: uppercase
+        font-weight: bold
+        padding: 7px 10px 5px
+        display: block
+
+#main-nav ul li:hover,
+body#devices #main-nav ul li.devices,
+body#data-objects #main-nav ul li.data-objects,
+body#packages #main-nav ul li.packages,
+body#dashboard #main-nav ul li.dashboard
+    @include transition(all, 0.2s, ease-in-out, 0)
+    
+    background-color: #ddd
+    text-shadow: 0 1px 0 #eee
+    color: #333
+    border-color: #666
+
+#data-object-list
+    ul
+        list-style: none
+    a
+        text-decoration: none
+        
+        :hover
+            text-decoration: underline
+
+#device-list
+    margin-bottom: 20px
+
+    .device
+        @include card(150px, 200px)
+
+ul.mini-nav
+    list-style: none
+    margin: 0 0 20px 0
+    padding: 0
+
+    li
+        float: left
+        padding: 5px 10px
+        border-right: 1px solid #ccc
+
+        :last-child
+            border-right: none
+
+div.do-list ul.mini-nav li.do-list,
+div.do-mibs ul.mini-nav li.do-mibs,
+ul.mini-nav li:hover
+    background-color: #eee
+
+
+
+form.little-form
+    padding: 20px
+    border: 1px solid #eee
+    display: inline-block
+
+
+#main
+    padding: 20px 20px 20px
+
+    h2
+        font-size: 28px
+        margin-bottom: 20px
+
+    h3
+        font-size: 22px
+        margin-bottom: 10px
+
+    h4
+        font-size: 18px
+        margin-bottom: 10px
+
+    p
+        margin-bottom: 10px
+
+    form
+        margin-bottom: 20px
+
+    ul
+        margin-bottom: 20px
+
+    fieldset
+        border: 1px solid #eee
+        min-height: 40px
+        margin-bottom: 20px
+        padding: 20px
+
+        legend
+            background-color: white
+            padding: 2px 4px
+
+        label
+            margin-right: 10px
+            height: 30px
+            display: block
+            
+            input
+                margin-right: 10px
+
+        label.has-children
+            font-weight: bold
+    
+    table
+        margin-bottom: 20px
+        width: 100%
+        
+        border-top: 1px solid #ccc
+        
+        tr:nth-child(even)
+            background-color: #eee
+            
+        tr
+            border-bottom: 1px solid #ccc
+            td, th
+                padding: 10px 20px
+        
+        tr.information td
+            text-align: center
+            background-color: #eee
+        
+        .align-center
+            text-align: center
+        
+        .align-left
+            text-align: left
+
+
+.packages
+    @include clearfix
+    .package
+        @include card(150px, 200px)
+        position: relative
+        
+        .toggle
+            position: absolute
+            top: 20px
+            right: 20px
+        
+    .package.enabled
+        background-color: #beb
+        border-color: #8a8
+            

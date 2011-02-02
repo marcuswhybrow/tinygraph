@@ -22,22 +22,12 @@
         <a href="{% url core.views.device_data_object_list device_slug=device.slug %}">Data Objects</a>
     </p>
     
-    <h3>Tracking</h3>
-    <h4>Common</h4>
-    <p>Attention: These are generated from the database, to a single level of depth and do nothing!</p>
-    <form action="" method="post" accept-charset="utf-8">
-        {% for name, data_object in data_objects %}
-            <fieldset>
-                <legend>{{ name }}</legend>
-                {% for data_object_child in data_object.children.all %}
-                    <label class="{% if not data_object_child.children.count %}has-children{% endif %}"><input type="checkbox" name="{{ data_object_child.pk }}">{{ data_object_child.derived_name|subtract:data_object.derived_name }}</label>
-                {% endfor %}
-            </fieldset>
-        {% endfor %}
-    </form>
+    <h3>Overview</h3>
     
-    <h4>Advanced</h4>
-    <p></p>
+    <p>
+        This page will be an overview of the device in question, containing key information graphed by the fixed packages, and contain a list of events regarding this device.
+    </p>
     
-    <p><a href="{% url core.views.device_list %}">&#x2190; back</a></p>
+    
+    <p><a href="{% url core.views.device_list %}">&#x2190; back</a> to Devices</p>
 {% endblock %}

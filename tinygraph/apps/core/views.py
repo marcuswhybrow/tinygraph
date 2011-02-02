@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
-from core.models import Device, DataObject, MibUpload
+from core.models import Device, DataObject, MibUpload, Package
 from core.forms import DeviceForm, MibUploadForm
 from django.conf import settings
 import urllib
@@ -107,8 +107,14 @@ def device_data_object_list(request, device_slug):
     return direct_to_template(request, 'core/device/device_data_object_list.html', {
         'device': device,
         'new_device': 'new' in request.GET and request.GET['new'].lower() in ['', 'true'],
+        'packages': Package.objects.all().select_related('devices'),
     })
 
+def package_list(request):
+    return direct_to_template(request, 'core/package/package_list.html', {
+        'custom_packages': Package.objects.filter(editable=True),
+        'system_packages': Package.objects.filter(editable=False),
+    })
 
 def package_detail(request, package_slug):
     package = get_object_or_404(Package, slug=package_slug)

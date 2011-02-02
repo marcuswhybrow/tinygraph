@@ -1,0 +1,16 @@
+{% extends "core/package/package_base.html" %}
+
+{% block content_area %}
+    <h2>The {{ package.title }} Package</h2>
+    <p>
+        {{ package.description }}
+    </p>
+    
+    {% with package.data_objects.all as data_objects %}
+        {% include "core/includes/data_object_table.html" %}
+    {% endwith %}
+    
+    <p>
+        <a href="{% url core.views.package_list %}">&#x2190; Back</a> to Packages
+    </p>
+{% endblock %}
