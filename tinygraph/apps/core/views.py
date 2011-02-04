@@ -14,17 +14,9 @@ def device_list(request):
 
 def device_detail(request, device_slug):
     device = get_object_or_404(Device, slug=device_slug)
-    
-    data_objects = ()
-    for name, oid in settings.OIDS:
-        try:
-            data_objects += ((name, DataObject.objects.get(identifier=oid)),)
-        except DataObject.DoesNotExist:
-            pass
             
     return direct_to_template(request, 'core/device/device_detail.html', {
         'device': device,
-        'data_objects': data_objects,
     })
 
 def device_edit(request, device_slug=None):

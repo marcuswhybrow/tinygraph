@@ -7,6 +7,32 @@ from pysnmp.smi.error import NoSuchObjectError
 import subprocess
 import os
 
+SNMP_VERSIONS = (
+    ('1', '1'),
+    ('2', '2c'),
+    ('3', '3'),
+)
+
+DATA_VALUE_TYPES = (
+    # Primitive ASN.1 Types
+    ('integer', 'Integer'),
+    ('bit_string', 'Bit String'),
+    ('octet_string', 'Octet String'),
+    ('null', 'Null'),
+    ('object_identifier', 'Object Identifier'),
+    
+    # Constructed ASN.1 Types
+    ('sequence', 'Sequence'),
+    
+    # Primitive SNMP Application Types
+    ('ip_address', 'IP Address'),
+    ('counter', 'Counter'),
+    ('gauge', 'Gauge'),
+    ('time_ticks', 'Time Ticks'),
+    ('opaque', 'Opaque'),
+    ('nsap_address', 'Nsap Address'),
+)
+
 class DataObjectManager(models.Manager):
     def root_only(self):
         return DataObject.objects.filter(parent=None)
@@ -24,6 +50,9 @@ class DataObject(models.Model):
     
     def __unicode__(self):
         return self.user_given_name or self.derived_name or self.identifier
+    
+    def get_identifier_tuple(self):
+        return tuple([int(s) for s in self.identifier.split('.')])
 
 class Device(models.Model):
     """A device on the network"""
@@ -39,7 +68,10 @@ class Device(models.Model):
     slug = models.SlugField(unique=True, editable=False, db_index=True)
 
     data_objects = models.ManyToManyField(DataObject, through='Rule', related_name='devices')
-    packages = models.ManyToManyField('Package', related_name='devices')
+    packages = models.ManyToManyField('Package', through='PackageInstance', related_name='devices')
+    
+    snmp_version = models.CharField(max_length=1, choices=SNMP_VERSIONS)
+    snmp_port = models.PositiveIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return self.user_given_name
@@ -57,9 +89,15 @@ class Device(models.Model):
 class Rule(models.Model):
     """Defines that a DataObject should be recorded for a particular Device"""
     
-    data_object = models.ForeignKey(DataObject, db_index=True)
-    device = models.ForeignKey(Device, db_index=True)
+    data_object = models.ForeignKey(DataObject, db_index=True, related_name='rules')
+    device = models.ForeignKey(Device, db_index=True, related_name='rules')
     created = models.DateTimeField(auto_now_add=True)
+    enabled = models.BooleanField(default=True)
+    
+    package_instance = models.ForeignKey('PackageInstance', db_index=True, null=True, blank=True, related_name='rules')
+    
+    class Meta:
+        unique_together = ('data_object', 'device', 'package_instance')
     
     def __unicode__(self):
         return '%s - %s' % (self.data_object, self.device)
@@ -68,13 +106,27 @@ class Rule(models.Model):
 class DataInstance(models.Model):
     """Data collected for a Rule regarding a DataObject"""
     
-    rule = models.ForeignKey(Rule, db_index=True)
+    # The Rule this DataInstance was created by
+    # A Rule does reference a DataObject however many DataInstances may be
+    # found under a particular DataObject on the polled device
+    rule = models.ForeignKey(Rule, db_index=True, related_name='instances')
+    # The closest match in the systems representation of DataObjects which
+    # this data instance matches against
+    data_object = models.ForeignKey(DataObject, db_index=True, related_name='instances')
+    # The remaineder of the match against the database representation. This is
+    # often an index of an array of values for a particular OID on the polled
+    # device, or can incldue further unknwon hierarchy that is not held in the
+    # system representation.
+    suffix = models.CharField(max_length=255, db_index=True)
+    # The value for this DataInstance
     value = models.CharField(blank=True, max_length=1024)
+    # The time this DataIntance was created (very critical)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
-    from_schedule = models.BooleanField(default=True, db_index=True)
+    
+    value_type = models.CharField(max_length=100, choices=DATA_VALUE_TYPES)
     
     def __unicode__(self):
-        return '%s - %s' % (self.value, self.rule)
+        return '%s %s[%s] = %s' % (self.rule.device, self.data_object, self.suffix, self.value)
 
 
 class MibUpload(models.Model):
@@ -100,27 +152,34 @@ class MibUpload(models.Model):
             raise ValidationError('The "system" MibUpload can not have an associated MIB file.')
         if not self.system and not self.file:
             # If this is NOT the system instance and a file is NOT specified
-            raise ValidationError('You must provide a MIB file.')
+            raise ValidationError('You must provide a MIB file.')    
             
     
     def save(self, *args, **kwargs):
-        self.full_clean()
         super(MibUpload, self).save(*args, **kwargs)
         
-        if self.file is None or self.file.name is None:
+        if self.system or not self.file:
             return
+        
+        if self.file:
+            # Run the pysnmp MIB conversion
+            file_name = self.get_file_name()
+            path = os.path.join(settings.MEDIA_ROOT, self.file.name)
+            output_file = os.path.join(settings.MIB_ROOT, '%s.py' % file_name)
+            subprocess.call(['build-pysnmp-mib', '-o', output_file, path])
+
+            # Trying to load the same Mib twice results in a pysnmp.smi.error.SmiError
+            try:
+                view.MibViewController(builder.MibBuilder().loadModules())
+            except:
+                os.remove(output_file)
+                self.delete()
+                return
         
         # TODO move this blocking stuff out of the save method and into some
         #      sort of event queue, or separate phase.
         
-        # Run the pysnmp MIB conversion
-        path = os.path.join(settings.MEDIA_ROOT, self.file.name)
-        file_name = self.get_file_name()
-        output_file = os.path.join(settings.MIB_ROOT, '%s.py' % file_name)
-        subprocess.call(['build-pysnmp-mib', '-o', output_file, path])
-        
-        
-        mibBuilder = builder.MibBuilder().unloadModules().loadModules(file_name)
+        mibBuilder = builder.MibBuilder().unloadModules().loadModules(self.get_file_name())
         mibViewController = view.MibViewController(mibBuilder)
         
         ENTERPRISES_OID = (1,3,6,1,4,1)
@@ -170,10 +229,10 @@ class MibUpload(models.Model):
     
     def delete(self, *args, **kwargs):
         file_name, file_extention = os.path.splitext(os.path.basename(self.file.name))
-        os.remove(os.path.join(settings.MIB_ROOT, '%s.py' % file_name))
-        
-        # TODO Remove stuff from the database, without remove enteries in use
-        #      by remaining MIBs
+        try:
+            os.remove(os.path.join(settings.MIB_ROOT, '%s.py' % file_name))
+        except OSError:
+            pass
         
         data_objects = self.data_objects.all()
         for data_object in data_objects:
@@ -211,4 +270,27 @@ class Package(models.Model):
         return ('core.views.package_detail', (), {
             'package_slug': self.slug,
         })
+
+class PackageInstance(models.Model):
+    device = models.ForeignKey(Device, db_index=True)
+    package = models.ForeignKey(Package, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    enabled = models.BooleanField(default=True)
     
+    class Meta:
+        unique_together = ('device', 'package')
+    
+    def save(self, *args, **kwargs):
+        super(PackageInstance, self).save(*args, **kwargs)
+        for data_object in self.package.data_objects.all():
+            try:
+                rule = Rule.objects.get(device=self.device, data_object=data_object, package_instance=self)
+            except Rule.DoesNotExist:
+                rule = Rule.objects.create(device=self.device, data_object=data_object, package_instance=self, enabled=self.enabled)
+            else:
+                if rule.enabled != self.enabled:
+                    rule.enabled = self.enabled
+                    rule.save()
+    
+    def __unicode__(self):
+        return '%s for %s' % (self.package, self.device)

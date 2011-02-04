@@ -6,10 +6,10 @@ import logging
 import logging.handlers
 import time
 
-LOG_FILENAME = '/tmp/tinygraphd.log'
+LOG_FILENAME = '/var/log/tinygraphd.log'
 
 # Logging stuff
-logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO)
+logging.basicConfig(filename=LOG_FILENAME, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class PollDaemon(daemon.Daemon):
     
@@ -25,13 +25,14 @@ class PollDaemon(daemon.Daemon):
     def _function(self):
         self.this_time = datetime.datetime.now()
         if self.last_time is not None:
-            logging.info('%s Started poll, time elapsed since last poll: %s' %(self.this_time, self.this_time - self.last_time))
+            logging.info('Started poll, time elapsed since last poll: %s' % (self.this_time - self.last_time))
         else:
-            logging.info('%s Started poll' % self.this_time)
+            logging.info('Started poll')
         self.last_time = self.this_time
         
         # Call the all important (overriden) poll method
         self.poll()
+        logging.info('Finished poll')
     
     def run(self):
         # Sheduler stuff
@@ -42,7 +43,7 @@ class PollDaemon(daemon.Daemon):
         start_time = datetime.datetime(now.year, now.month, now.day, now.hour, now.minute, now.second)
         start_time = start_time + datetime.timedelta(seconds=1)
         
-        logging.info('%s Started Daemon' % now)
+        logging.info('Started Daemon')
         
         function_task = scheduler.Task(
             'poller',
@@ -57,6 +58,16 @@ class PollDaemon(daemon.Daemon):
         my_scheduler.join()
     
     def stop(self, *args, **kwargs):
-        print 'stopping'
-        logging.info('%s Stopping Daemon' % datetime.datetime.now())
+        print 'Stopping...'
+        logging.info('Stopping Daemon')
         super(PollDaemon, self).stop(*args, **kwargs)
+        print 'Stopped'
+    
+    def start(self, *args, **kwargs):
+        print 'Starting...\nStarted'
+        super(PollDaemon, self).start(*args, **kwargs)
+
+
+
+def get_mib_view_controller():
+    return MibViewController(MibBuilder().loadModules())

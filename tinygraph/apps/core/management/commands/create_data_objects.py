@@ -22,7 +22,7 @@ class Command(NoArgsCommand):
         mib_paths = mibBuilder.getMibPath()
         try:
             i = mib_paths.index(os.environ['PYSNMP_MIB_DIR'])
-        except ValueError:
+        except (KeyError, ValueError):
             pass
         else:
             mib_paths = mib_paths[:i] + mib_paths[i+1:]

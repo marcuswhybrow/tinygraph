@@ -22,4 +22,4 @@ class DeviceForm(forms.ModelForm):
 class MibUploadForm(forms.ModelForm):
     class Meta:
         model = MibUpload
-        exclude = ('system',)
+        exclude = ('system', 'already_existed')
