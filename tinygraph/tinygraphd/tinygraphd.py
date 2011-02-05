@@ -154,7 +154,6 @@ class TinyGraphDaemon(PollDaemon):
         
         # The children of the rule have no yet been exhausted, continue with
         # the bulk requests
-        logging.info('%2d returning True' % handle)
         return True
     
     def poll(self):
