@@ -2,3 +2,6 @@ Django==1.2.3
 simplejson
 pysnmp==4.1.15a
 pysnmp-mibs==0.0.8a
+
+twisted
+http://sourceforge.net/projects/twistedsnmp/files/twistedsnmp/0.3.13/TwistedSNMP-0.3.13.tar.gz/download
