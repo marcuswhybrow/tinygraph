@@ -61,6 +61,7 @@ class PollDaemon(daemon.Daemon):
         print 'Stopping...'
         logging.info('Stopping Daemon')
         super(PollDaemon, self).stop(*args, **kwargs)
+        logging.info('Stopped Daemon')
         print 'Stopped'
     
     def start(self, *args, **kwargs):

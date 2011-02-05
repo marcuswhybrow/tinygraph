@@ -6,6 +6,7 @@ from pyasn1.type import univ
 from pysnmp.smi.builder import MibBuilder
 from pysnmp.smi.view import MibViewController
 from pysnmp.smi.error import SmiError
+import socket
 
 class TinyGraphDaemon(PollDaemon):
     
@@ -44,10 +45,10 @@ class TinyGraphDaemon(PollDaemon):
     
     def poll(self):
         
-        def poll_rule(rule):
+        def poll_rule(rule, transport, authrntication):
             error_indication, error_status, error_index, var_bind_table = cmdgen.CommandGenerator().bulkCmd(
-                cmdgen.CommunityData('TinyGraph', 'Whybrow', int(rule.device.snmp_version)-1),
-                cmdgen.UdpTransportTarget((rule.device.user_given_address, rule.device.snmp_port or 161)),
+                authentication,
+                transport,
                 0,2000,
                 rule.data_object.get_identifier_tuple()
             )
@@ -136,6 +137,18 @@ class TinyGraphDaemon(PollDaemon):
                     value=str_value, value_type=value_type)
                     
         for device in Device.objects.all():
+            try:
+                transport = cmdgen.UdpTransportTarget((device.user_given_address, device.snmp_port or 161))
+            except socket.gaierror, e:
+                logging.error('Problem setting up the UDP transport for "%s": %s' % (device, e))
+                continue
+            
+            try:
+                authentication = cmdgen.CommunityData('TinyGraph', 'Whybrow', int(device.snmp_version)-1)
+            except Exception, e:
+                logging.error('Problem setting up the SNMP authentication for "%s": %s' % (device, e))
+                continue
+                
             for rule in device.rules.filter(enabled=True):
-                poll_rule(rule)
+                poll_rule(rule, transport, authentication)
                 
