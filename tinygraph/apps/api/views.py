@@ -22,16 +22,6 @@ def ping(request):
             return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     raise Http404
 
-def analyse(request):
-    if request.is_ajax() and request.method == 'POST' and 'device_pk' in request.POST:
-        device_pk = request.POST['device_pk']
-        try:
-            Device.objects.get(pk=device_pk)
-        except Device.DoesNotExist:
-            data = {'success': False}
-        else:
-            data = {'success': True}
-
 def data_object_children_list(request):
     if request.is_ajax() and request.method == 'POST' and 'data_object_pk' in request.POST:
         data_object_pk = request.POST['data_object_pk']

@@ -6,7 +6,9 @@ import logging
 import logging.handlers
 import time
 
-LOG_FILENAME = '/var/log/tinygraphd.log'
+from django.conf import settings
+
+LOG_FILENAME = getattr(settings, 'TINYGRAPH_TINYGRAPHD_LOG_FILENAME', '/var/log/tinygraphd.log')
 
 # Logging stuff
 logging.basicConfig(filename=LOG_FILENAME, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
