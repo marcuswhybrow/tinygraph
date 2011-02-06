@@ -98,7 +98,7 @@ TEMPLATE_CONTEXT_PROCESSORS += (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
@@ -137,3 +137,5 @@ if DEBUG:
     DEBUG_TOOLBAR_CONFIG = {'INTERCEPT_REDIRECTS': False}
 
 TINYGRAPH_SNMP_GETBULK_SIZE = 10
+TINYGRAPH_TINYGRAPH_LOG_FILENAME = '/tmp/tinygraph.log'
+TINYGRAPH_TINYGRAPHD_LOG_FILENAME = '/var/log/tinygraphd.log'

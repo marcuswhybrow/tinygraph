@@ -1,89 +1,16 @@
 from utils import PollDaemon, logging
 from core.models import DataInstance, Device, DataObject
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-from pysnmp.proto import rfc1902, rfc1905
-from pyasn1.type import univ
-from pysnmp.smi.builder import MibBuilder
-from pysnmp.smi.view import MibViewController
-from pysnmp.smi.error import SmiError
+from tinygraph.apps.core.utils import snmp_value_to_str, \
+     get_mib_view_controller, get_transport, get_authentication, \
+     snmp_name_to_str
+
 from django.conf import settings
 import socket
 
 SNMP_GETBULK_SIZE = getattr(settings, 'TINYGRAPH_SNMP_GETBULK_SIZE', 25)
 
 class TinyGraphDaemon(PollDaemon):
-    
-    def _get_mib_view_controller(self):
-        try:
-            # Try and load MIB modules even from the users uploads
-            mvc = MibViewController(MibBuilder().loadModules())
-        except SmiError:
-            # If somehow the user managed to bypass the validation and
-            # upload the same MIB twice an SmiError will be thrown.
-            logging.warning('The user has uploaded duplicate MIB files, ignoring all user upload MIB files!')
-            
-            # In which case we should try again without loading the user
-            # uploaded MIB files
-            mb = MibBuilder()
-            mib_paths = mb.getMibPath()
-            try:
-                # Identify the position of the user upload path
-                i = mib_paths.index(os.environ['PYSNMP_MIB_DIR'])
-            except (KeyError, ValueError):
-                return None
-            else:
-                # Remove the user upload path from the paths we are going
-                # to use.
-                mib_paths = mib_paths[:i] + mib_paths[i+1:]
-                mb.setMibPath(*mib_paths)
-                
-                # Try again
-                try:
-                    mvc = MibViewController(mb.loadModules())
-                except SmiError:
-                    # Nothing we can do now, its a problem with "pysnmp"
-                    logging.error('There is a problem with MIB store in "pysnmp".')
-                    return None
-        return mvc
-    
-    def _convert(self, value):
-        
-        def octet(v):
-            try:
-                return str(v)
-            except:
-                return ' '.join([str(ord(octet)) for octet in value])
-        
-        if isinstance(value, rfc1902.Integer):
-            return 'integer', str(value)
-        elif isinstance(value, rfc1902.Integer32):
-            return 'integer', str(value)
-        elif isinstance(value, rfc1902.OctetString):
-            return 'octet_string', octet(value)
-        elif isinstance(value, rfc1902.IpAddress):
-            return 'ip_address', octet(value)
-        elif isinstance(value, rfc1902.Counter32):
-            return 'counter', str(value)
-        elif isinstance(value, rfc1902.Gauge32):
-            return 'gauge', str(value)
-        elif isinstance(value, rfc1902.Unsigned32):
-            return 'integer', str(value)
-        elif isinstance(value, rfc1902.TimeTicks):
-            return 'time_ticks', str(value)
-        elif isinstance(value, rfc1902.Opaque):
-            return 'opaque', octet(value)
-        elif isinstance(value, rfc1902.Counter64):
-            return 'counter', str(value)
-        elif isinstance(value, rfc1902.Bits):
-            return 'bit_string', octet(value)
-
-        elif isinstance(value, univ.ObjectIdentifier):
-            return 'object_identifier', '.'.join([str(i) for i in value])
-            
-        elif isinstance(value, rfc1905.EndOfMibView):
-            return 'end_of_mib_view', None
-        
-        return None, None
     
     def _callback(self, handle, error_indication, error_status, error_index, var_bind_table, context):
         """
@@ -118,10 +45,9 @@ class TinyGraphDaemon(PollDaemon):
 
             oid, label, suffix = mvc.getNodeName(name)
 
-            # I have never seen a name which was not a ObjectName instance
-            if isinstance(name, rfc1902.ObjectName):
-                identifier = '.'.join([str(i) for i in name])
-            else:
+            identifier = snmp_name_to_str(name)
+            
+            if identifier is None:
                 logging.warning('pysnmp returned "%s" as a name. Its value was therefore not logged.' % name)
                 continue
 
@@ -139,7 +65,7 @@ class TinyGraphDaemon(PollDaemon):
             value_type = None
             str_value = None
 
-            value_type, str_value = self._convert(value)
+            value_type, str_value = snmp_value_to_str(value)
 
             if value_type == 'end_of_mib_view':
                 return False
@@ -159,20 +85,21 @@ class TinyGraphDaemon(PollDaemon):
     def poll(self):
         """Called once for each poll (say every 5 minutes)"""
         
-        mvc = self._get_mib_view_controller()
+        mvc = get_mib_view_controller()
         asyn_command_generator = cmdgen.AsynCommandGenerator()
                 
         for device in Device.objects.all():
-            try:
-                transport = cmdgen.UdpTransportTarget((device.user_given_address, device.snmp_port or 161))
-            except socket.gaierror, e:
-                logging.error('Problem setting up the UDP transport for "%s": %s' % (device, e))
-                continue
+            transport = get_transport(device)
+            authentication = get_authentication(device)
             
-            try:
-                authentication = cmdgen.CommunityData('TinyGraph', 'Whybrow', int(device.snmp_version)-1)
-            except Exception, e:
-                logging.error('Problem setting up the SNMP authentication for "%s": %s' % (device, e))
+            logging.info(authentication.__dict__)
+            
+            # If the transport could not be setup (usually a network error) or
+            # the authentication details for the device were provided
+            # incorrectly, then skip this device in the polling process
+            if transport is None or authentication is None:
+                # TODO Add an event which notifies the user that there auth
+                #      details might be incorrect
                 continue
             
             # Setup the asynchronous SNMP BULK requests (non blocking)
