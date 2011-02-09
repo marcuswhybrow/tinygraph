@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import Http404, HttpResponse
-from core.models import DataObject
+from data.models import DataObject
 import simplejson
 import subprocess
 

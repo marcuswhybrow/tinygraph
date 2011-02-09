@@ -2,7 +2,10 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.simple import direct_to_template
 from devices.models import Device
 from devices.forms import DeviceForm
-from core.models import Package
+from data.models import Package
+from core.presenters import Presenter, CounterPresenter
+
+import datetime
 
 def device_list(request):
     return direct_to_template(request, 'devices/device_list.html', {

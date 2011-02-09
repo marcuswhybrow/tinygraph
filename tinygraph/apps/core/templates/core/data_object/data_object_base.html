@@ -4,7 +4,7 @@
 
 {% block content_area %}
     <ul class="mini-nav clearfix">
-        <li class="do-list"><a href="{% url core.views.data_object_list %}">All Known Data Objects</a></li>
-        <li class="do-mibs"><a href="{% url core.views.mib_upload_list %}">Your MIBs</a></li>
+        <li class="do-list"><a href="{% url data.views.data_object_list %}">All Known Data Objects</a></li>
+        <li class="do-mibs"><a href="{% url data.views.mib_upload_list %}">Your MIBs</a></li>
     </ul>
 {% endblock %}

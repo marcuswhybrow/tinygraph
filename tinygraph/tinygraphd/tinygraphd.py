@@ -1,5 +1,6 @@
 from utils import PollDaemon, logging
-from core.models import DataInstance, DataObject
+from data.models import DataObject
+from core.models import DataInstance
 from devices.models import Device
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from tinygraph.apps.core.utils import snmp_value_to_str, \

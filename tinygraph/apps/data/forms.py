@@ -1,7 +1,5 @@
 from django import forms
-from core.models import MibUpload
-
-
+from data.models import MibUpload
 
 class MibUploadForm(forms.ModelForm):
     class Meta:

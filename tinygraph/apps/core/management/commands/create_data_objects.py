@@ -1,6 +1,6 @@
 from django.core.management.base import NoArgsCommand
 from pysnmp.smi import builder, view
-from tinygraph.apps.core.models import DataObject, MibUpload
+from data.models import DataObject, MibUpload
 from pysnmp.smi.error import NoSuchObjectError
 import os
 

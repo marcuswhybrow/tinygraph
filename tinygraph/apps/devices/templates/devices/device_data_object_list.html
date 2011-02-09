@@ -27,7 +27,7 @@
                     <h5>{{ package.title }}</h5>
                     <p>{{ package.description }}</p>
                     <p>
-                        <a href="{% url core.views.package_detail package_slug=package.slug %}">Read More</a>
+                        <a href="{% url data.views.package_detail package_slug=package.slug %}">Read More</a>
                     </p>
                 </div>
             {% endfor %}
