@@ -8,12 +8,6 @@ import subprocess
 import os
 import time
 
-SNMP_VERSIONS = (
-    ('1', '1'),
-    ('2', '2c'),
-    ('3', '3'),
-)
-
 DATA_VALUE_TYPES = (
     # Primitive ASN.1 Types
     ('integer', 'Integer'),
@@ -55,43 +49,11 @@ class DataObject(models.Model):
     def get_identifier_tuple(self):
         return tuple([int(s) for s in self.identifier.split('.')])
 
-class Device(models.Model):
-    """A device on the network"""
-
-    user_given_name = models.CharField(unique=True, max_length=100, help_text='A friendly name for this device which you will understand.')
-
-    # 255 characters is the maximum length of a host name for DNS
-    user_given_address = models.CharField(max_length=255, help_text='An IP address or DNS name which will resolve into an IP address for this device.')
-    
-    ip_address = models.CharField(blank=True, max_length=39)
-    fqdn = models.CharField(blank=True, max_length=255)
-
-    slug = models.SlugField(unique=True, editable=False, db_index=True)
-
-    data_objects = models.ManyToManyField(DataObject, through='Rule', related_name='devices')
-    packages = models.ManyToManyField('Package', through='PackageInstance', related_name='devices')
-    
-    snmp_version = models.CharField(max_length=1, choices=SNMP_VERSIONS)
-    snmp_port = models.PositiveIntegerField(blank=True, null=True)
-
-    def __unicode__(self):
-        return self.user_given_name
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ('core.views.device_detail', (), {
-            'device_slug': self.slug,
-        })
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(str(self.user_given_name))
-        super(Device, self).save(*args, **kwargs)
-
 class Rule(models.Model):
     """Defines that a DataObject should be recorded for a particular Device"""
     
-    data_object = models.ForeignKey(DataObject, db_index=True, related_name='rules')
-    device = models.ForeignKey(Device, db_index=True, related_name='rules')
+    data_object = models.ForeignKey('DataObject', db_index=True, related_name='rules')
+    device = models.ForeignKey('devices.Device', db_index=True, related_name='rules')
     created = models.DateTimeField(auto_now_add=True)
     enabled = models.BooleanField(default=True)
     
@@ -276,7 +238,7 @@ class Package(models.Model):
         })
 
 class PackageInstance(models.Model):
-    device = models.ForeignKey(Device, db_index=True)
+    device = models.ForeignKey('devices.Device', db_index=True)
     package = models.ForeignKey(Package, db_index=True)
     created = models.DateTimeField(auto_now_add=True)
     enabled = models.BooleanField(default=True)

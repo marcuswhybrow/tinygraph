@@ -1,13 +1,14 @@
 [
     {
         "pk": 1, 
-        "model": "core.device", 
+        "model": "devices.device", 
         "fields": {
             "slug": "vhost", 
             "user_given_name": "vHost", 
             "user_given_address": "vhost",
             "ip_address": "172.17.10.200",
-            "fqdn": "vhost.whybrow.local"
+            "fqdn": "vhost.whybrow.local",
+            "snmp_version": "2"
         }
     }
 ]

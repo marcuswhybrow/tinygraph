@@ -1,4 +1,4 @@
-{% extends "core/device/device_base.html" %}
+{% extends "devices/device_base.html" %}
 
 {% block content_title %}
     {% if deleted %}
@@ -11,7 +11,7 @@
 {% block content_area %}
     {% if deleted %}
         <p>
-            <a href="{% url core.views.device_list %}">&#x2190; Back to the list of devices</a>
+            <a href="{% url devices.views.device_list %}">&#x2190; Back to the list of devices</a>
         </p>
     {% else %}
         <p>
@@ -28,6 +28,6 @@
             <input type="submit" name="submit" value="Confirm Deletion">
         </form>
 
-        <p><a href="{% url core.views.device_detail device_slug=device.slug %}">&#x2190; back</a></p>
+        <p><a href="{% url devices.views.device_detail device_slug=device.slug %}">&#x2190; back</a></p>
     {% endif %}
 {% endblock %}

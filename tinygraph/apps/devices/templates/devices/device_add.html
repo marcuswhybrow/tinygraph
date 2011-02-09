@@ -1,23 +1,35 @@
-{% extends "core/device/device_base.html" %}
+{% extends "devices/device_base.html" %}
 
 {% block content_area %}
     <h2>
-        {% if form.instance.pk %}
-            Edit {{ form.instance }}
-        {% else %}
-            Add New Device
-        {% endif %}
+        Add New Device
     </h2>
 
     <form action="" method="POST">
+        
+        <ol>
+            {% for error in form.subject.errors %}
+                <li><strong>{{ error|escape }}</strong></li>
+            {% endfor %}
+        </ol>
+        
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="field">
+            {{ form.user_given_name.errors }}
+            {{ form.user_given_name.label_tag }} {{ form.user_given_name }}
+        </div>
+        
+        <div class="field">
+            {{ form.user_given_address.errors }}
+            {{ form.user_given_address.label_tag }} {{ form.user_given_address }} <span style="height:24px; display:inline-block" id="ping-notification"></span>
+        </div>
+        
         <input type="submit" name="submit" value="Save">
     </form>
     
     <div id="target"></div>
     
-    <p><a href="{% url core.views.device_list %}">&#x2190; back</a></p>
+    <p><a href="{% url devices.views.device_list %}">&#x2190; back</a></p>
 {% endblock %}
 
 {% block scripts %}
@@ -39,21 +51,22 @@
             var $target = $('#target');
             var previousAddress = null;
             
-            $('#id_address').keyup(function() {
+            $('#id_user_given_address').keyup(function() {
                 var address = this.value;
                 if ((previousAddress == null || address != previousAddress) && address != '') {
                     typewatch(function() {
-                        $target.html('Checking ...');
+                        var $note = $('#ping-notification');
                         $.ajax({
                             url: PING_URL,
                             success: function(data) {
                                 // console.log(data);
                                 var up = data['up'];
                                 if (data['sequence'] == sequence) {
+                                    
                                     if (up)
-                                        $('#target').html(data['address'] + ' is UP.');
+                                        $note.html('<img src="{{ STATIC_URL }}/images/icons/sweetie-plus-v2/without-shadows/badge-circle-check-24-ns.png" heigh="24" width="24" />' + data['address'] + ' is running.');
                                     else
-                                        $('#target').html(data['address'] + ' is DOWN.');
+                                        $note.html('<img src="{{ STATIC_URL }}/images/icons/sweetie-plus-v2/without-shadows/badge-circle-cross-24-ns.png" heigh="24" width="24" />' + data['address'] + ' is not running.');
                                 }
                             },
                             dataType: 'json',

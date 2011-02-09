@@ -27,5 +27,6 @@ if settings.DEBUG:
 
 urlpatterns += patterns('',
     (r'^api/', include('api.urls')),
+    (r'^devices/', include('devices.urls')),
     (r'', include('core.urls')),
 )

@@ -1,4 +1,4 @@
-{% extends "core/device/device_base.html" %}
+{% extends "devices/device_base.html" %}
 
 {% block content_title %}Your Devices{% endblock %}
 
@@ -21,5 +21,5 @@
         {% endfor %}
     </div>
     
-    <p><a href="{% url core.views.device_add %}">Add new device</a></p>
+    <p><a href="{% url devices.views.device_add %}">Add new device</a></p>
 {% endblock %}
