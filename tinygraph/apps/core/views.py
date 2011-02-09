@@ -121,15 +121,21 @@ def test(request):
     # Some device
     device = get_object_or_404(Device, pk=1)
     # ...11 = ifInUcastPkts, ...16 = ifOutOctets
-    oid = '1.3.6.1.2.1.2.2.1.11'
+    oid = '1.3.6.1.2.1.2.2.1.16'
     # vHost's 3rd interface (not the loopback - 1, or the other NIC - 2)
     suffix = '3'
-    # 10 minutes ago
-    cutoff = datetime.datetime.now() - datetime.timedelta(minutes=60)
+    
+    duration = 50*5+10 # mintues
+    granularity = 5 # minutes
+    
+    cutoff = datetime.datetime.now() - datetime.timedelta(minutes=duration)
+    new_minute = cutoff.minute - cutoff.minute % granularity
+    start_time = datetime.datetime(cutoff.year, cutoff.month, cutoff.day, cutoff.hour, new_minute)
+        
     # Get the data instances
     data_instances = DataInstance.objects.filter(data_object__identifier=oid, rule__device=device, suffix=suffix, created__gte=cutoff)
     
     # Return the data instances in a presentor
     return direct_to_template(request, 'core/test.html', {
-        'data_instances': CounterPresenter(data_instances),
+        'data_instances': CounterPresenter(data_instances, granularity=datetime.timedelta(minutes=granularity), start_time=start_time),
     })

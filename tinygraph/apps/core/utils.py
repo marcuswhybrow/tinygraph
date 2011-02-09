@@ -5,7 +5,9 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902, rfc1905
 from pyasn1.type import univ
 from django.conf import settings
+
 import logging
+import time
 
 LOG_FILENAME = getattr(settings, 'TINYGRAPH_TINYGRAPH_LOG_FILENAME', '/tmp/tinygraph.log')
 logging.basicConfig(filename=LOG_FILENAME, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -116,3 +118,7 @@ def get_authentication(device):
     except Exception, e:
         logging.error('Problem setting up version "%s" SNMP authentication for device "%s": %s' % (v, device, e))
     return None
+
+
+def datetime_to_timestamp(dt):
+    return time.mktime(dt.timetuple())

@@ -131,9 +131,6 @@ class DataInstance(models.Model):
     
     def __unicode__(self):
         return '%s %s[%s] = %s' % (self.rule.device, self.data_object, self.suffix, self.value)
-    
-    def get_timestamp(self):
-        return time.mktime(self.created.timetuple())
 
 
 class MibUpload(models.Model):

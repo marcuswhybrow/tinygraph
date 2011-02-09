@@ -1,5 +1,7 @@
 {% extends "core/core_base.html" %}
 
+{% load graphing %}
+
 {% block content_area %}
     <h2>Test Graph</h2>
     
@@ -12,6 +14,13 @@
     <script type="text/javascript" charset="utf-8">
         var data = [{% for point in data_instances.points %}[{{ point.x }}, {{ point.y }}]{% if not forloop.last %}, {% endif %}{% endfor %}];
         
-        $.plot($("#placeholder"), [data], { xaxis: { mode: "time" } });
+        $.plot($("#placeholder"), [data], {
+            xaxis: {
+                mode: "time",
+                {# min: {{ data_instances.start_time|timestamp }}, #}
+                {# max: {{ data_instances.end_time|timestamp }} #}
+            },
+            series: {lines: {steps: true}}
+        });
     </script>
 {% endblock %}
