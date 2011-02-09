@@ -125,7 +125,7 @@ def test(request):
     # vHost's 3rd interface (not the loopback - 1, or the other NIC - 2)
     suffix = '3'
     
-    duration = 50*5+10 # mintues
+    duration = 50*24+10 # mintues
     granularity = 5 # minutes
     
     cutoff = datetime.datetime.now() - datetime.timedelta(minutes=duration)
