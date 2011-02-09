@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from core.models import Device, DataObject, MibUpload, Package, DataInstance
 from core.forms import DeviceForm, MibUploadForm
 from django.conf import settings
-from core.presentors import Presenter, CounterPresenter
+from core.presenters import Presenter, CounterPresenter
 
 import datetime
 import urllib

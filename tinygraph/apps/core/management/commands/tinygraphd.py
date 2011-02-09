@@ -1,5 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from tinygraph.tinygraphd.tinygraphd import TinyGraphDaemon
+from django.conf import settings
+
+POLL_INTERVAL = getattr(settings, 'TINYGRAPH_POLL_INTERVAL', 5)
 
 class Command(BaseCommand):
     args = '<start|stop|restart>'
@@ -7,7 +10,7 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         if len(args) == 1:
-            daemon = TinyGraphDaemon(0.1, '/var/run/tinygraphd.pid')
+            daemon = TinyGraphDaemon(POLL_INTERVAL, '/var/run/tinygraphd.pid')
             command = args[0]
             if 'start' == command:
                 daemon.start()
