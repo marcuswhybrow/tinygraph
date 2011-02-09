@@ -14,5 +14,7 @@ urlpatterns = patterns('core.views',
     (r'^packages/$', 'package_list'),
     (r'^packages/(?P<package_slug>[-\w]+)/$', 'package_detail'),
     
+    (r'^test/$', 'test'),
+    
     (r'^$', 'index'),
 )

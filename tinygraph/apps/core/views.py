@@ -2,9 +2,12 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
-from core.models import Device, DataObject, MibUpload, Package
+from core.models import Device, DataObject, MibUpload, Package, DataInstance
 from core.forms import DeviceForm, MibUploadForm
 from django.conf import settings
+from core.presentors import Presenter, CounterPresenter
+
+import datetime
 import urllib
 
 def device_list(request):
@@ -112,4 +115,21 @@ def package_detail(request, package_slug):
     package = get_object_or_404(Package, slug=package_slug)
     return direct_to_template(request, 'core/package/package_detail.html', {
         'package': package,
+    })
+
+def test(request):
+    # Some device
+    device = get_object_or_404(Device, pk=1)
+    # ...11 = ifInUcastPkts, ...16 = ifOutOctets
+    oid = '1.3.6.1.2.1.2.2.1.11'
+    # vHost's 3rd interface (not the loopback - 1, or the other NIC - 2)
+    suffix = '3'
+    # 10 minutes ago
+    cutoff = datetime.datetime.now() - datetime.timedelta(minutes=10)
+    # Get the data instances
+    data_instances = DataInstance.objects.filter(data_object__identifier=oid, rule__device=device, suffix=suffix, created__gte=cutoff)
+    
+    # Return the data instances in a presentor
+    return direct_to_template(request, 'core/test.html', {
+        'data_instances': CounterPresenter(data_instances),
     })

@@ -6,6 +6,7 @@ from pysnmp.smi import builder, view
 from pysnmp.smi.error import NoSuchObjectError
 import subprocess
 import os
+import time
 
 SNMP_VERSIONS = (
     ('1', '1'),
@@ -125,8 +126,14 @@ class DataInstance(models.Model):
     
     value_type = models.CharField(max_length=100, choices=DATA_VALUE_TYPES)
     
+    class Meta:
+        get_latest_by = 'created'
+    
     def __unicode__(self):
         return '%s %s[%s] = %s' % (self.rule.device, self.data_object, self.suffix, self.value)
+    
+    def get_timestamp(self):
+        return time.mktime(self.created.timetuple())
 
 
 class MibUpload(models.Model):
