@@ -9,7 +9,7 @@
     <div id="data-object-list">
         {% if root_data_object_list %}
             {% with root_data_object_list as data_object_children %}
-                {% include "definitions/includesdata_object_children_list.html" %}
+                {% include "definitions/includes/data_object_children_list.html" %}
             {% endwith %}
         {% else %}
             <p>TinyGraph has no "<code>DataObject</code>" entries. Run "<code>python manage.py create_data_objects</code>" to populate the database.</p>

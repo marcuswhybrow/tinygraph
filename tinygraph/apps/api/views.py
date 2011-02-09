@@ -25,7 +25,7 @@ def ping(request):
 def data_object_children_list(request):
     if request.is_ajax() and request.method == 'POST' and 'data_object_pk' in request.POST:
         data_object_pk = request.POST['data_object_pk']
-        return direct_to_template(request, 'definitions/includesdata_object_children_list.html', {
+        return direct_to_template(request, 'definitions/includes//data_object_children_list.html', {
             'data_object_children': DataObject.objects.filter(parent__pk=data_object_pk),
         })
     raise Http404

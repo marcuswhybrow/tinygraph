@@ -3,8 +3,8 @@ from django.views.generic.simple import direct_to_template
 from devices.models import Device
 from devices.forms import DeviceForm
 from definitions.models import Package
-from rules.models import DataInstance
-from core.presenters import Presenter, CounterPresenter
+from data.models import DataInstance
+from data.presenters import Presenter, CounterPresenter
 
 import datetime
 

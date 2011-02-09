@@ -126,6 +126,7 @@ INSTALLED_APPS = (
     'devices',
     'definitions',
     'rules',
+    'data',
     'api',
 )
 
