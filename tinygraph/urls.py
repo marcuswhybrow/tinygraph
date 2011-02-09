@@ -5,9 +5,6 @@ from django.conf import settings
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^tinygraph/', include('tinygraph.foo.urls')),
-
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
@@ -28,6 +25,6 @@ if settings.DEBUG:
 urlpatterns += patterns('',
     (r'^api/', include('api.urls')),
     (r'^devices/', include('devices.urls')),
-    (r'^data/', include('data.urls')),
+    (r'^data/', include('definitions.urls')),
     (r'', include('core.urls')),
 )

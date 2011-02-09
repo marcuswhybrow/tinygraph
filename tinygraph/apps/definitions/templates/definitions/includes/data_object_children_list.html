@@ -1,0 +1,11 @@
+<ul>
+    {% for data_object in data_object_children %}
+        <li>
+            {% if data_object.children.count %}
+                <a id="{{ data_object.pk }}" href="#">{% include "definitions/includesdata_object_item_name.html" %}</a>
+            {% else %}
+                {% include "definitions/includesdata_object_item_name.html" %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

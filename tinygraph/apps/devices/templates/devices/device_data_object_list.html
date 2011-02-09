@@ -1,4 +1,4 @@
-{% extends "devices/device_base.html" %}
+{% extends "devices/devices_base.html" %}
 
 {% block content_area %}
     <h2>Data Objects For {{ device.user_given_name }}</h2>
@@ -27,7 +27,7 @@
                     <h5>{{ package.title }}</h5>
                     <p>{{ package.description }}</p>
                     <p>
-                        <a href="{% url data.views.package_detail package_slug=package.slug %}">Read More</a>
+                        <a href="{% url definitions.views.package_detail package_slug=package.slug %}">Read More</a>
                     </p>
                 </div>
             {% endfor %}
@@ -41,7 +41,7 @@
     </p>
     
     {% with device.data_objects.all as device_objects %}
-        {% include "core/includes/data_object_table.html" %}
+        {% include "definitions/includesdata_object_table.html" %}
     {% endwith %}
     
     <p>

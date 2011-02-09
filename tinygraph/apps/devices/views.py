@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.simple import direct_to_template
 from devices.models import Device
 from devices.forms import DeviceForm
-from data.models import Package
+from definitions.models import Package
+from rules.models import DataInstance
 from core.presenters import Presenter, CounterPresenter
 
 import datetime
@@ -93,7 +94,7 @@ def test(request):
     start_time = datetime.datetime(cutoff.year, cutoff.month, cutoff.day, cutoff.hour, new_minute)
 
     # Get the data instances
-    data_instances = DataInstance.objects.filter(data_object__identifier=oid, rule__device=device, suffix=suffix, created__gte=cutoff)
+    data_instances = DataInstance.objects.filter(data_object__identifier=oid, rule__device=device, suffix=suffix)#, created__gte=cutoff)
 
     # Return the data instances in a presentor
     return direct_to_template(request, 'devices/test.html', {

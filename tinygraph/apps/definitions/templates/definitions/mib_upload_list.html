@@ -1,0 +1,23 @@
+{% extends "definitions/definitions_base.html" %}
+
+{% block content_class %}{{ block.super }} do-mibs{% endblock %}
+
+{% block content_area %}
+    {{ block.super }}
+    <h2>Your Uploaded MIB Files</h2>
+    
+    <ul>
+        {% for mib_upload in mib_uploads %}
+            <li>{{ mib_upload.get_file_name }} {% if mib_upload.file %}
+                (<a href="{{ mib_upload.file.url }}">download</a>)
+            {% endif %}</li>
+        {% endfor %}
+    </ul>
+    
+    <h4>Upload a new MIB</h4>
+    <form class="little-form" action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="Upload"></p>
+    </form>
+{% endblock %}

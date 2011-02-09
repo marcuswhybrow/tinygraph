@@ -59,12 +59,12 @@ class Presenter(object):
         # be at a regular interval starting from the start_time value.
         if self.granularity is not None:
             # evaluate the queryset
-            if self.start_time is None:
+            if self.start_time is None and len(self.instances) > 0:
                 # Get the minute that the oldest time was recorded at
                 t = self.instances[0].created
                 self.start_time = datetime.datetime(t.year, t.month, t.day, t.hour, t.minute)
                 
-            if self.end_time is None:
+            if self.end_time is None and len(self.instances) > 0:
                 t = self.instances[len(self.instances)-1].created
                 self.end_time = datetime.datetime(t.year, t.month, t.day, t.hour, t.minute)
                 self.end_time += datetime.timedelta(minutes=1)
@@ -109,6 +109,9 @@ class CounterPresenter(Presenter):
         self._prev_obj = None
     
     def points(self):
+        if len(self.instances) <= 0:
+            return
+            
         if self.granularity:
             prev_average = None
             prev_period = None

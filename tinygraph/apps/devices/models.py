@@ -20,8 +20,8 @@ class Device(models.Model):
 
     slug = models.SlugField(unique=True, editable=False, db_index=True)
 
-    data_objects = models.ManyToManyField('data.DataObject', through='core.Rule', related_name='devices')
-    packages = models.ManyToManyField('data.Package', through='core.PackageInstance', related_name='devices')
+    data_objects = models.ManyToManyField('definitions.DataObject', through='rules.Rule', related_name='devices')
+    packages = models.ManyToManyField('definitions.Package', through='rules.PackageInstance', related_name='devices')
     
     snmp_version = models.CharField(max_length=1, choices=SNMP_VERSIONS)
     snmp_port = models.PositiveIntegerField(blank=True, null=True)

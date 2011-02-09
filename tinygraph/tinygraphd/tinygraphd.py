@@ -1,5 +1,5 @@
 from utils import PollDaemon, logging
-from data.models import DataObject
+from definitions.models import DataObject
 from core.models import DataInstance
 from devices.models import Device
 from pysnmp.entity.rfc3413.oneliner import cmdgen
