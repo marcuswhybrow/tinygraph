@@ -19,11 +19,11 @@ class Presenter(object):
         self.queryset = queryset
     
     def _get_data_point(self, data_instance):
-        return Presentor.DataPoint(data_instance.get_timestamp(), data_instance.value)
+        return Presenter.DataPoint(data_instance.get_timestamp() * 1000, data_instance.value)
         
     def points(self):
         for obj in self.queryset:
-            yield Presentor.DataPoint(obj.get_timestamp(), obj.value)
+            yield self._get_data_point(obj)
 
 class CounterPresenter(Presenter):
     """

@@ -10,10 +10,8 @@
 
 {% block scripts %}
     <script type="text/javascript" charset="utf-8">
-        var data = [{% for point in data_instances.points %}
-            [{{ point.x }}, {{ point.y }}]{% if not forloop.last %}, {% endif %}
-        {% endfor %}];
+        var data = [{% for point in data_instances.points %}[{{ point.x }}, {{ point.y }}]{% if not forloop.last %}, {% endif %}{% endfor %}];
         
-        $.plot($("#placeholder"), [data]);
+        $.plot($("#placeholder"), [data], { xaxis: { mode: "time" } });
     </script>
 {% endblock %}

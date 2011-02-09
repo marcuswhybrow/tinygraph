@@ -125,7 +125,7 @@ def test(request):
     # vHost's 3rd interface (not the loopback - 1, or the other NIC - 2)
     suffix = '3'
     # 10 minutes ago
-    cutoff = datetime.datetime.now() - datetime.timedelta(minutes=10)
+    cutoff = datetime.datetime.now() - datetime.timedelta(minutes=60)
     # Get the data instances
     data_instances = DataInstance.objects.filter(data_object__identifier=oid, rule__device=device, suffix=suffix, created__gte=cutoff)
     
