@@ -3,6 +3,7 @@ from pysnmp.smi import builder, view
 from pysnmp.smi.error import NoSuchObjectError
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.template.defaultfilters import slugify
 
 import subprocess
 import os
