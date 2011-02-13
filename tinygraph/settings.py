@@ -127,6 +127,7 @@ INSTALLED_APPS = (
     'definitions',
     'rules',
     'data',
+    'dashboard',
     'api',
 )
 

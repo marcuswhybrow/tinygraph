@@ -1,0 +1,13 @@
+[
+    {
+        "pk": 1, 
+        "model": "dashboard.board", 
+        "fields": {
+            "width_near": 3, 
+            "width_far": 3, 
+            "depth_near": 3, 
+            "depth_far": 3, 
+            "name": "Default"
+        }
+    }
+]
