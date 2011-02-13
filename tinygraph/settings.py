@@ -128,6 +128,8 @@ INSTALLED_APPS = (
     'rules',
     'data',
     'api',
+    
+    'cpserver',
 )
 
 # Tells pysnmp where the user uploaded (converted) mib files are
