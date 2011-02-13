@@ -4,10 +4,8 @@
 
 {% block content_area %}
 
-    <h3>Simply, Visually and Automatically</h3>
-    <p>
-        This is TinyGraph.
-    </p>
+    <h3>Loading Dashboard &#8230;</h3>
+    <noscript>JavaScript must be enabled.</noscript>
 {% endblock %}
 
 {% block meta %}
@@ -575,23 +573,10 @@
                 }
             }
 
-            // Draws the TinyGraph logo at the top left
-            var t = paper.text(20, 30, "TinyGraph");
-            t.attr({
-                'text-anchor': 'start',
-                'font-size': 20,
-                'fill': 'black'
-            });
-
-            var current = paper.text(20, 50, "SERVER");
+            var current = paper.text(30, $(window).height() - 30, "SERVER");
             current.attr({
                 'text-anchor': 'start',
                 'fill': 'black'
-            });
-
-            var info = paper.text(20, $(window).height() - 30, "Hold SPACE and drag to move the grid, click a tile to place a device.\nPress S to change the device type and C to draw a connection between two devices.");
-            info.attr({
-                'text-anchor': 'start'
             });
 
             // Updates the size of certain objects when the window
@@ -601,8 +586,8 @@
                     'width': $window.width(),
                     'height': $window.height()
                 });
-
-                info.attr({
+                
+                current.attr({
                     y: $(window).height() - 30
                 })
             });
@@ -734,10 +719,3 @@
         });
     </script>
 {% endblock %}
-    
-</head>
-
-<body id="body" onload="setTimeout(function() { window.scrollTo(0, 1) }, 100);">
-</body>
-
-</html>
