@@ -1,6 +1,4 @@
-{% extends "core/core_base.html" %}
-
-{% block body_id %}dashboard{% endblock %}
+{% extends "dashboard/dashboard_base.html" %}
 
 {% block content_area %}
 
@@ -90,8 +88,8 @@
                 yOffset = tileHeight - 20;
 
             // How many tiles there should be in the grid
-            var gridWidth = 6,
-                gridHeight = 6;
+            var gridWidth = {{ board.width_near }} + {{ board.width_far }},
+                gridHeight = {{ board.depth_near }} + {{ board.depth_far }};
 
             // The states the interface can be in
             var PLACING_DEVICES = 0,

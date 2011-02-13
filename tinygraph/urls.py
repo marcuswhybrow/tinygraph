@@ -26,5 +26,6 @@ urlpatterns += patterns('',
     (r'^api/', include('api.urls')),
     (r'^devices/', include('devices.urls')),
     (r'^data/', include('definitions.urls')),
-    (r'', include('core.urls')),
+    
+    (r'^$', 'dashboard.views.index'),
 )
