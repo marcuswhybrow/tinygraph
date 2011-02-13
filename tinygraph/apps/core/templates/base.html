@@ -15,6 +15,7 @@
         <title>{% block title %}Tiny Graph{% endblock %}</title>
         <meta name="description" content="">
         <meta name="author" content="">
+        {% block meta %}{% endblock %}
         
         <!--  Mobile viewport optimized: j.mp/bplateviewport -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,6 +30,7 @@
         <link href="{{ STATIC_URL }}css/compass/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
         <!--[if IE]><link href="{{ STATIC_URL }}css/compass/ie.css" media="screen, projection" rel="stylesheet" type="text/css" /><![endif]-->
         <link href="{{ STATIC_URL }}css/compass/print.css" media="print" rel="stylesheet" type="text/css" />
+        {% block links %}{% endblock %}
         
         <!-- Uncomment if you are specifically targeting less enabled mobile browsers
         <link rel="stylesheet" media="handheld" href="css/handheld.css?v=2">  -->
