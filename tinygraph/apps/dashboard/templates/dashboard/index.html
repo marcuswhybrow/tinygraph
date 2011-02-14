@@ -123,10 +123,10 @@
 
             function setHighlightedTile(tile) {
                 if (highlightedTile != null)
-                    highlightedTile.attr('opacity', 1);
+                    highlightedTile.image.attr('opacity', 1);
                 highlightedTile = tile;
                 if (highlightedTile != null)
-                    highlightedTile.attr('opacity', 0.5);
+                    highlightedTile.image.attr('opacity', 0.5);
             }
 
             // Create background rectangle. This should be one of
@@ -166,9 +166,9 @@
                     // Highligh which tile is under the mouse
                     $(tileNode)
                         .hover(function(e) {
-                            dashboardConfig.hoveredOverTile = this.raphael;    
+                            hoveredOverTile = this.raphael.wrapper;    
                         }, function() {
-                            dashboardConfig.hoveredOverTile = null;
+                            hoveredOverTile = null;
                         })
                         
                         .click(function(e) {
@@ -407,7 +407,7 @@
             // Returns a tile at the specified grid position
             // or null if it does not exist.
             function getTile(i, j) {
-                return i >= 0 && i < dashboardConfig.gridWidth && j >= 0 && j < gridHeight ? tiles[i][j] : null;
+                return i >= 0 && i < dashboardConfig.gridWidth && j >= 0 && j < dashboardConfig.gridHeight ? tiles[i][j] : null;
             }
 
             // Moves a device from is current tile to a new tile
@@ -548,22 +548,17 @@
                 // console.log(hoveredOverTile);
 
                 if (hoveredOverTile != null) {
-                    var top = hoveredOverTile.getTopPoint(),
-                        left = hoveredOverTile.getLeftPoint(),
-                        right = hoveredOverTile.getRightPoint(),
-                        bottom = hoveredOverTile.getBottomPoint(),
+                    var points = hoveredOverTile.getPoints(),
+                        gridPos = hoveredOverTile.getGridPos();
 
-                        tileX = hoveredOverTile.getGridX(),
-                        tileY = hoveredOverTile.getGridY();
-
-                    if (! isPointRightOfLine(left.x, left.y, top.x, top.y, e.pageX, e.pageY)) {
-                        setHighlightedTile(getTile(tileX, tileY - 1));
-                    } else if (! isPointRightOfLine(top.x, top.y, right.x, right.y, e.pageX, e.pageY)) {
-                        setHighlightedTile(getTile(tileX - 1, tileY));
-                    } else if (! isPointRightOfLine(right.x, right.y, bottom.x, bottom.y, e.pageX, e.pageY)) {
-                        setHighlightedTile(getTile(tileX, tileY + 1));
-                    } else if (! isPointRightOfLine(bottom.x, bottom.y, left.x, left.y, e.pageX, e.pageY)) {
-                        setHighlightedTile(getTile(tileX + 1, tileY));
+                    if (! isPointRightOfLine(points.left.x, points.left.y, points.top.x, points.top.y, e.pageX, e.pageY)) {
+                        setHighlightedTile(getTile(gridPos.x, gridPos.y - 1));
+                    } else if (! isPointRightOfLine(points.top.x, points.top.y, points.right.x, points.right.y, e.pageX, e.pageY)) {
+                        setHighlightedTile(getTile(gridPos.x - 1, gridPos.y));
+                    } else if (! isPointRightOfLine(points.right.x, points.right.y, points.bottom.x, points.bottom.y, e.pageX, e.pageY)) {
+                        setHighlightedTile(getTile(gridPos.x, gridPos.y + 1));
+                    } else if (! isPointRightOfLine(points.bottom.x, points.bottom.y, points.left.x, points.left.y, e.pageX, e.pageY)) {
+                        setHighlightedTile(getTile(gridPos.x + 1, gridPos.y));
                     } else {
                         setHighlightedTile(hoveredOverTile);
                     }

@@ -35,6 +35,9 @@ function Tile(paper, x, y) {
         dashboardConfig.tileHeight
     );
     
+    // Add a reference to the Raphael object back to this wrapper class
+    this.image.wrapper = this;
+    
     // This tile has no device on instantiation
     this.device = null;
     
