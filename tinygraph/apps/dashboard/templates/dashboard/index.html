@@ -46,15 +46,15 @@
     <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.device.js"></script>
     <script type="text/javascript" charset="utf-8">
 
-        var paper = Raphael(0, 0, '100%', '100%');
+        var paper = dashboardConfig.paper = Raphael(0, 0, '100%', '100%');
 
-        paper.customAttributes.originX = function(nx) {
-            return {x: nx - this.xOffset};
-        };
-
-        paper.customAttributes.originY = function(ny) {
-            return {y: ny - this.yOffset};
-        };
+        // dashboardConfig.paper.customAttributes.originX = function(nx) {
+        //     return {x: nx - this.xOffset};
+        // };
+        // 
+        // dashboardConfig.paper.customAttributes.originY = function(ny) {
+        //     return {y: ny - this.yOffset};
+        // };
         
         
         dashboardConfig.imagePath = '{{ STATIC_URL }}images/dashboard/';
@@ -81,11 +81,6 @@
         // }
 
         $(function() {
-
-            // var d = paper.serverDevice();
-            // console.log(d.attr('src'));
-            // console.log(d.thing());
-
             var $window = $(window);
 
             var sx = 0.5,
@@ -123,10 +118,10 @@
 
             function setHighlightedTile(tile) {
                 if (highlightedTile != null)
-                    highlightedTile.image.attr('opacity', 1);
+                    highlightedTile.raphaelObj.attr('opacity', 1);
                 highlightedTile = tile;
                 if (highlightedTile != null)
-                    highlightedTile.image.attr('opacity', 0.5);
+                    highlightedTile.raphaelObj.attr('opacity', 0.5);
             }
 
             // Create background rectangle. This should be one of
@@ -144,7 +139,7 @@
                 deviceLayer = paper.layer('deviceLayer');
 
             deviceLayer.add = function(device) {
-                this.addAtPosition(device, device.tile.gridX, device.tile.gridY);
+                this.addAtPosition(device);
             }
 
             // Add the tiles to the screen
@@ -157,11 +152,11 @@
                     // var xPos = $window.width() * sx,
                     //     yPos = $window.height() * sy;
                     
-                    tile = new Tile(paper, i, j);
+                    tile = new Tile(i, j);
                     tiles[i][j] = tile;
-                    tileLayer.bringToFront(tile.image);
+                    tileLayer.bringToFront(tile);
 
-                    var tileNode = tile.image.node;
+                    var tileNode = tile.raphaelObj.node;
 
                     // Highligh which tile is under the mouse
                     $(tileNode)
@@ -189,7 +184,7 @@
                                             // device and pick up the device on this tile (assuming
                                             // now that the tile exists and thus had a device.)
                                             movingDevice.moving = false;
-                                            movingDevice.lower();
+                                            movingDevice.setHighlighted(false);
 
                                             if (highlightedTile.device != movingDevice) {
                                                 // If the user clicks a tile other than that which
@@ -206,135 +201,38 @@
                                             }
                                         }
                                     } else if (highlightedTile.device == null) {
+                                        
+                                        var device = null;
+                                        
                                         // If the this tile does not have a device:
                                         if (placeSwitch == true) {
                                             // If we are currently placing Switches then
                                             // create a switch device and place it on the
                                             // current tile
-                                            highlightedTile.device = paper.image(
-                                                '{{ STATIC_URL }}/images/dashboard/switch.png',
-                                                0, // x set later
-                                                0, // y set later
-                                                90,
-                                                76
-                                            );
-
-                                            // Store the image specific co-ordinate offset
-                                            // information for use elsewhere
-                                            highlightedTile.device.xOffset = 45;
-                                            highlightedTile.device.yOffset = 47;
+                                            device = new SwitchDevice();
 
                                         } else if (placeServer == true) {
                                             // However if we are placing Servers right now, then
                                             // create a server device and place it on the current
                                             // tile.
-                                            highlightedTile.device = paper.image(
-                                                '{{ STATIC_URL }}/images/dashboard/server.png',
-                                                0, // x set later
-                                                0, // y set later
-                                                72,
-                                                96
-                                            );
-
-                                            // Again store the co-ordinate offset information
-                                            highlightedTile.device.xOffset = 37;
-                                            highlightedTile.device.yOffset = 74;
+                                            device = new ServerDevice();
                                         }
-
-                                        // Get a shorter reference for the device
-                                        var device = highlightedTile.device;
-
-                                        // Give the device a reference to its tile
-                                        device.tile = highlightedTile;
-                                        // All devices start off NOT moving
-                                        device.moving = false;
-                                        // All devices start with NO interfaces
-                                        device.interfaces = new Array();
-                                        device.numberOfInterfaces = 0;
-
-                                        // Here I am overriding the translate method in order
-                                        // to move any connections connected to an interface
-                                        // on this device whenever this device is translated.
-                                        device.translateOld = device.translate;
-                                        device.translate = function(cx, cy) {
-                                            for (var i = 0; i < this.numberOfInterfaces; i++) {
-                                                var connection = this.interfaces[i];
-
-                                                if (connection.deviceOne == this)
-                                                    connection.translate(cx, cy);
-                                            }
-                                            this.translateOld(cx, cy);
-                                        };
-
-                                        device.getGridX = function() {
-                                            return this.tile.getGridX();
-                                        };
-
-                                        device.getGridY = function() {
-                                            return this.tile.getGridY();
-                                        };
-
-                                        device.getOriginX = function() {
-                                            return this.attr('x') + this.xOffset;
-                                        };
-
-                                        device.getOriginY = function() {
-                                            return this.attr('y') + this.yOffset;
-                                        };
-
-                                        device.setOrigin = function(nx, ny) {
-                                            this.attr({
-                                                x: nx - this.xOffset,
-                                                y: ny - this.yOffset
-                                            });
-                                        };
-
-                                        device.raise = function() {
-                                            this.animate({
-                                                // y: this.attr('y') - MOVEMENT_HEIGHT,
-                                                opacity: 0.5
-                                                // scale: 1.5
-                                            }, 100);
-                                        };
-
-                                        device.lower = function() {
-                                            this.animate({
-                                                // y: this.attr('y') + MOVEMENT_HEIGHT,
-                                                opacity: 1
-                                                // scale: 1
-                                            }, 100);
-                                        };
-
-                                        device.updateConnections = function() {
-                                            for (var i in this.interfaces) {
-                                                var c = this.interfaces[i];
-
-                                                c.attr(
-                                                    'path',
-                                                    'M' + c.deviceOne.getOriginX() + ' ' + c.deviceOne.getOriginY() +
-                                                    'L' + c.deviceTwo.getOriginX() + ' ' + c.deviceTwo.getOriginY()
-                                                );
-                                            }
-                                        };
-
-                                        device.onAnimation(device.updateConnections);
-
-                                        device.setOrigin(device.tile.getOriginX(), device.tile.getOriginY());
+                                        
+                                        highlightedTile.addDevice(device);
 
                                         // If the device is hovered over with the mouse, I want
                                         // to pass this information down to the tile on which it
                                         // sits.
-                                        $(device.node).hover(function() {
-                                            $(this.raphael.tile.node).mouseenter();
-                                        }, function() {
-                                            $(this.raphael.tile.node).mouseout();
-                                        })
-
-                                        // If the device is clicked on pass the click down to the
-                                        // tile on which the device sits.
-                                        $(device.node).click(function(e) {
-                                            $(this.raphael.tile.node).trigger('click', [e.pageX, e.pageY]);
-                                        });
+                                        $(device.raphaelObj.node)
+                                            .hover(function() {
+                                                $(this.raphael.wrapper.tile.raphaelObj.node).mouseenter();
+                                            }, function() {
+                                                $(this.raphael.wrapper.tile.raphaelObj.node).mouseout();
+                                            })
+                                            .click(function(e) {
+                                                $(this.raphael.wrapper.tile.raphaelObj.node).trigger('click', [e.pageX, e.pageY]);
+                                            })
+                                        ;
 
                                         // ensures that the 3D illusion is maintained
                                         // by putting the device just above (SVG-wise)
@@ -359,12 +257,15 @@
                                             movingDevice = device;
 
                                             // Then visually pop the device up in the air
-                                            device.raise();
+                                            device.setHighlighted(true);
+                                        } else {
+                                            movingDevice = null;
+                                            device.setHighlighted(false);
                                         }
                                     }
 
                                     // Makes Chrome (maybe other browsers) redraw the SVG
-                                    $(window).resize();
+                                    $window.resize();
 
                                 } else if (state = DRAWING_CONNECTIONS) {
                                     // If we are drawing connections between devices:
@@ -383,7 +284,7 @@
                                             // selected devices to this currently selected
                                             // device.
                                             connectDevices(selectedDevice, device);
-                                            $(window).resize();
+                                            $window.resize();
 
                                             // and then start the process over again.
                                             selectedDevice = null;
@@ -399,15 +300,15 @@
 
             // Triggers the click event on a Tile
             function clickTile(i, j) {
-                var tile = getTile(i, j)
+                var tile = getTile(i, j);
                 if (tile != null)
-                    $(tile.node).click();
+                    $(tile.raphaelObj.node).click();
             }
 
             // Returns a tile at the specified grid position
             // or null if it does not exist.
             function getTile(i, j) {
-                return i >= 0 && i < dashboardConfig.gridWidth && j >= 0 && j < dashboardConfig.gridHeight ? tiles[i][j] : null;
+                return (i >= 0) && (i < dashboardConfig.gridWidth) && (j >= 0) && (j < dashboardConfig.gridHeight) ? tiles[i][j] : null;
             }
 
             // Moves a device from is current tile to a new tile
@@ -420,13 +321,13 @@
                 // device.attr('x', newTile.attr('x') + device.xOffset);
                 // device.attr('y', newTile.attr('y') + device.yOffset);
 
-                device.toFront();
+                device.raphaelObj.toFront();
 
-                device.animate({
+                device.raphaelObj.animate({
                     // originX: newTile.getOriginX(),
                     // originY: newTile.getOriginY(),
-                    x: newTile.attr('x') + newTile.xOffset - device.xOffset,
-                    y: newTile.attr('y') + newTile.yOffset - device.yOffset,
+                    x: newTile.raphaelObj.attr('x') + newTile.xOffset - device.xOffset,
+                    y: newTile.raphaelObj.attr('y') + newTile.yOffset - device.yOffset,
 
                     opacity: 1,
                     scale: 1
@@ -452,30 +353,8 @@
             }
 
             // Connects one device to another, visually and programmatically
-            function connectDevices(deviceOne, deviceTwo) {
-                var tileOne = deviceOne.tile,
-                    tileTwo = deviceTwo.tile;
-
-                var connection = paper.path(
-                    'M' + deviceOne.getOriginX() + ' ' + deviceOne.getOriginY() +
-                    'L' + deviceTwo.getOriginX() + ' ' + deviceTwo.getOriginY()
-                );
-
-                connection.attr({
-                    'stroke-width': 5,
-                    'stroke-linecap': 'round'
-                });
-
-                connection.deviceOne = deviceOne;
-                connection.deviceTwo = deviceTwo;
-
-                connection.getOtherDevice = function(device) {
-                    return this.deviceOne == device ? this.deviceTwo : this.deviceOne;
-                };
-
-                deviceOne.interfaces[deviceOne.numberOfInterfaces++] = connection;
-                deviceTwo.interfaces[deviceTwo.numberOfInterfaces++] = connection;
-
+            function connectDevices(fromDevice, toDevice) {
+                var connection = new Connection(fromDevice, toDevice);
                 connectionLayer.bringToFront(connection);
             }
 
@@ -503,7 +382,7 @@
 
             // Updates the size of certain objects when the window
             // resizes.
-            $(window).resize(function() {
+            $window.resize(function() {
                 rect.attr({
                     'width': $window.width(),
                     'height': $window.height()
@@ -535,7 +414,7 @@
             }
 
             // Whenever the mouse is moved:
-            $(window).mousemove(function(e) {
+            $window.mousemove(function(e) {
                 if (spaceIsDown && mouseIsDown && lastX != null) {
                     // If the space bar is currently held down then:
                     moveTiles(e.pageX, e.pageY);
@@ -565,12 +444,12 @@
                 }
             });
 
-            $(window).mousedown(function(e) {
+            $window.mousedown(function(e) {
                 mouseIsDown = true;
                 e.preventDefault();
             });
 
-            $(window).mouseup(function(e) {
+            $window.mouseup(function(e) {
                 mouseIsDown = false;
             });
 
@@ -593,7 +472,7 @@
                 lastY = touch.clientY;
             });
 
-            $(window).keydown(function(e) {
+            $window.keydown(function(e) {
                 var code = e.keyCode ? e.keyCode : e.which;
 
                 switch (code) {
@@ -605,7 +484,7 @@
                 }
             });
 
-            $(window).keyup(function(e) {
+            $window.keyup(function(e) {
                 var code = e.keyCode ? e.keyCode : e.which;
 
                 switch (code) {

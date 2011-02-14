@@ -3,23 +3,24 @@ Raphael.fn.layer = function(layerName) {
     layerEndMarker.hide();
     $(layerEndMarker.node).attr('layerId', layerName);
     
-    layerEndMarker.bringToFront = function(element) {
-        $(element.node).attr('layer', layerName);
-        element.insertBefore(this);
+    layerEndMarker.bringToFront = function(item) {
+        $(item.raphaelObj.node).attr('layer', layerName);
+        item.raphaelObj.insertBefore(this);
     };
     
-    layerEndMarker.addAtPosition = function(element) {
-        var $element = $(element.node);
+    layerEndMarker.addAtPosition = function(item) {
+        var $element = $(item.raphaelObj.node),
+            gridPos = item.getGridPos();
         $element
             .attr('layer', layerName)
-            .attr('level', element.getGridX() + element.getGridY());
+            .attr('level', gridPos.x + gridPos.y);
         
         $('*[layer="' + $element.attr('layer') + '"][level!="' + $element.attr('level') + '"]').each(function() {
             if (parseInt($(this).attr('level')) > parseInt($element.attr('level'))) {
-                element.insertBefore(this.raphael);
+                item.raphaelObj.insertBefore(this.raphael);
                 return false;
             } else {
-                element.insertAfter(this.raphael);
+                item.raphaelObj.insertAfter(this.raphael);
             }
         });
     }
