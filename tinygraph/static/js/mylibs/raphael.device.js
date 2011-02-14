@@ -45,7 +45,7 @@ function Tile(paper, x, y) {
 Tile.prototype = new Item();
 Tile.prototype.getPos = function() {
   return {
-      x: (this.x * dashboardConfig.xOffset) + (this.y * dashboardConfig.tileSeparation) - (this.x * dashboardConfig.tileSeparation) - (this.x * dashboardConfig.xOffset),
+      x: (this.y * dashboardConfig.xOffset) + (this.y * dashboardConfig.tileSeparation) - (this.x * dashboardConfig.tileSeparation) - (this.x * dashboardConfig.xOffset),
       y: (this.x * dashboardConfig.yOffset / 2) + (this.x * dashboardConfig.tileSeparation / 2)  + (this.y * dashboardConfig.tileSeparation / 2) + (this.y * dashboardConfig.yOffset / 2)
   };
 };
