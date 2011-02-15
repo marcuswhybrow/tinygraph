@@ -1,4 +1,4 @@
-var dashboardConfig = dc = function() {
+var dashboardConfig = function() {
     this.imagePath = '';
     
     // Tile size and spacing
@@ -27,9 +27,6 @@ function Item(paper) {
 
 Item.prototype.setRaphaelObj = function(raphaelObj) {
     this.raphaelObj = raphaelObj;
-    this.raphaelObj.onAnimation(function() {
-        this.wrapper.updateConnections();
-    });
     this.raphaelObj.wrapper = this;
 };
 Item.prototype.setPaper = function(paper) {
@@ -40,19 +37,52 @@ Item.prototype.setPaper = function(paper) {
 // Tile
 // ---------------------------------------------------------------------------
 
-function Tile(x, y) {
+function Tile(x, y, quadrant) {
     this.x = (x === undefined) ? null : x;
     this.y = (y === undefined) ? null : y;
+    this.quadrant = (quadrant === undefined) ? null : quadrant;
     
-    this.xPos = 0;
-    this.yPos = 0;
+    if (this.quadrant.xPositive === false)
+        this.x = -this.x;
+    if (this.quadrant.yPositive === false)
+        this.y = -this.y;
+    
+    this.offset = {x: 0, y: 0};
+    
+    this.xOffset = dashboardConfig.xOffset;
+    this.yOffset = dashboardConfig.yOffset;
     
     this.setRaphaelObj(dashboardConfig.paper.image(
         dashboardConfig.imagePath + 'tile.png',
-        this.getPos().x, this.getPos().y,
+        0,
+        0,
         dashboardConfig.tileWidth,
         dashboardConfig.tileHeight
     ));
+    
+    this.raphaelObj.node.class = "tile";
+    
+    var x = 0,
+        y = 0;
+    
+    x += this.x * dashboardConfig.xOffset;
+    y -= this.x * dashboardConfig.yOffset;
+    
+    x -= this.y * dashboardConfig.xOffset;
+    y -= this.y * dashboardConfig.yOffset;
+    
+    if (this.quadrant.xPositive === false && this.quadrant.yPositive === false)
+        y -= dashboardConfig.yOffset;
+    if (this.quadrant.xPositive === true && this.quadrant.yPositive === true)
+        y += dashboardConfig.yOffset;
+    if (this.quadrant.xPositive === false && this.quadrant.yPositive === true)
+        x += dashboardConfig.xOffset;
+    if (this.quadrant.xPositive === true && this.quadrant.yPositive === false)
+        x -= dashboardConfig.xOffset;
+    
+    this.setOriginPos(x, y);
+    
+    dashboardConfig.layers['tiles'].addAtPosition(this);
     
     // This tile has no device on instantiation
     this.device = null;
@@ -62,12 +92,6 @@ function Tile(x, y) {
 }
 
 Tile.prototype = new Item();
-Tile.prototype.getPos = function() {
-  return {
-      x: (this.y * dashboardConfig.xOffset) + (this.y * dashboardConfig.tileSeparation) - (this.x * dashboardConfig.tileSeparation) - (this.x * dashboardConfig.xOffset),
-      y: (this.x * dashboardConfig.yOffset / 2) + (this.x * dashboardConfig.tileSeparation / 2)  + (this.y * dashboardConfig.tileSeparation / 2) + (this.y * dashboardConfig.yOffset / 2)
-  };
-};
 Tile.prototype.translate = function(cx, cy) {
     if (this.device != null)
         this.device.translate(cx, cy);
@@ -84,27 +108,27 @@ Tile.prototype.getOriginPos = function() {
 };
 Tile.prototype.setOriginPos = function(x, y) {
     this.raphaelObj.attr({
-        x: x - this.xOffset,
-        y: y - this.yOffset
+        x: this.quadrant.x + x - this.xOffset,
+        y: this.quadrant.y + y - this.yOffset
     });
 }
 Tile.prototype.getPoints = function() {
     return {
         top: {
-            x: this.raphaelObj.attr('x') + this.xOffset,
+            x: this.raphaelObj.attr('x') + dashboardConfig.xOffset,
             y: this.raphaelObj.attr('y')
         },
         left: {
             x: this.raphaelObj.attr('x'),
-            y: this.raphaelObj.attr('y') + this.yOffset
+            y: this.raphaelObj.attr('y') + dashboardConfig.yOffset
         },
         bottom: {
-            x: this.raphaelObj.attr('x') + this.xOffset,
-            y: this.raphaelObj.attr('y') + 2 * this.yOffset
+            x: this.raphaelObj.attr('x') + dashboardConfig.xOffset,
+            y: this.raphaelObj.attr('y') + 2 * dashboardConfig.yOffset
         },
         right: {
-            x: this.raphaelObj.attr('x') + 2 * this.xOffset,
-            y: this.raphaelObj.attr('y') + this.yOffset
+            x: this.raphaelObj.attr('x') + 2 * dashboardConfig.xOffset,
+            y: this.raphaelObj.attr('y') + dashboardConfig.yOffset
         }
     };
 };
@@ -171,6 +195,9 @@ Device.prototype.updateConnections = function() {
         );
     }
 };
+Device.prototype.connectTo = function(toDevice) {
+    new Connection(this, toDevice);
+};
 
 
 // ServerDevice
@@ -185,6 +212,10 @@ function ServerDevice(tile) {
         0, 0,
         72, 96
     ));
+    
+    this.raphaelObj.onAnimation(function() {
+        this.wrapper.updateConnections();
+    });
     
     this.xOffset = 37;
     this.yOffset = 74;
@@ -206,6 +237,10 @@ function SwitchDevice(tile) {
         90, 76
     ));
     
+    this.raphaelObj.onAnimation(function() {
+        this.wrapper.updateConnections();
+    });
+    
     this.xOffset = 45;
     this.yOffset = 47;
 }
@@ -213,16 +248,35 @@ function SwitchDevice(tile) {
 SwitchDevice.prototype = new Device();
 
 
-// function Quadrant(width, height) {
-//     this.width = (width === undefined) ? null : width;
-//     this.height = (height === undefined) ? null : height;
-//     
-//     for (var i = 0; i < width; i++) {
-//         for (var j = 0; j < height; j++) {
-//             // Create each tile
-//         }
-//     }
-// }
+// Quadrant
+// ---------------------------------------------------------------------------
+
+function Quadrant(width, height, xPositive, yPositive) {
+    this.width = (width === undefined) ? null : width;
+    this.height = (height === undefined) ? null : height;
+    this.xPositive = (xPositive === undefined) ? null : xPositive;
+    this.yPositive = (yPositive === undefined) ? null : yPositive;
+    
+    this.tiles = new Array(this.width);
+    
+    this.x = dashboardConfig.origin.x;
+    this.y = dashboardConfig.origin.y;
+    
+    // Add the tiles to the screen
+    for (var x = 1; x <= this.width; x++) {
+        this.tiles[x] = new Array(this.height);
+        for (var y = 1; y <= this.height; y++)
+            this.tiles[x][y] = new Tile(x, y, this);
+    }
+}
+
+Quadrant.prototype.translate = function(cx, cy) {
+    for (var x in this.tiles)
+        for (var y in this.tiles[x])
+            this.tiles[x][y].translate(cx, cy);
+    this.x += cx;
+    this.y += cy;
+};
 
 
 // Connection
@@ -244,6 +298,8 @@ function Connection(fromDevice, toDevice) {
         'stroke-width': 5,
         'stroke-linecap': 'round'
     });
+    
+    dashboardConfig.layers['connections'].bringToFront(this);
     
     this.fromDevice.interfaces.push(this);
     this.toDevice.interfaces.push(this);

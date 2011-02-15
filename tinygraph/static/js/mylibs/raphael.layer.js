@@ -16,14 +16,14 @@ Raphael.fn.layer = function(layerName) {
             .attr('level', gridPos.x + gridPos.y);
         
         $('*[layer="' + $element.attr('layer') + '"][level!="' + $element.attr('level') + '"]').each(function() {
-            if (parseInt($(this).attr('level')) > parseInt($element.attr('level'))) {
+            if (parseInt($(this).attr('level')) < parseInt($element.attr('level'))) {
                 item.raphaelObj.insertBefore(this.raphael);
                 return false;
             } else {
                 item.raphaelObj.insertAfter(this.raphael);
             }
         });
-    }
+    };
     
     return layerEndMarker;
 };
