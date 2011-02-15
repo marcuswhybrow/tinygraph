@@ -62,8 +62,8 @@ function Tile(x, y, quadrant) {
     
     this.raphaelObj.node.class = "tile";
     
-    var x = 0,
-        y = 0;
+    var x = this.quadrant.x,
+        y = this.quadrant.y;
     
     x += this.x * dashboardConfig.xOffset;
     y -= this.x * dashboardConfig.yOffset;
@@ -86,9 +86,6 @@ function Tile(x, y, quadrant) {
     
     // This tile has no device on instantiation
     this.device = null;
-    
-    this.xOffset = dashboardConfig.xOffset;
-    this.yOffset = dashboardConfig.yOffset / 2;
 }
 
 Tile.prototype = new Item();
@@ -108,8 +105,8 @@ Tile.prototype.getOriginPos = function() {
 };
 Tile.prototype.setOriginPos = function(x, y) {
     this.raphaelObj.attr({
-        x: this.quadrant.x + x - this.xOffset,
-        y: this.quadrant.y + y - this.yOffset
+        x: x - this.xOffset,
+        y: y - this.yOffset
     });
 }
 Tile.prototype.getPoints = function() {
@@ -172,6 +169,7 @@ Device.prototype.getOriginPos = function() {
     };
 };
 Device.prototype.setOriginPos = function(x, y) {
+    console.log(x + ' ' + y);
     this.raphaelObj.attr({
         x: x - this.xOffset,
         y: y - this.yOffset
