@@ -209,6 +209,23 @@
                             }
                             
                             highlightedTile.addDevice(device);
+                            
+                            var deviceGridPos = device.getGridPos();
+                            
+                            $.ajax({
+                                url: '{% url api.views.dashboard_create_item %}',
+                                type: 'post',
+                                data: {item_x: deviceGridPos.x, item_y: deviceGridPos.y, item_type: 'server', item_board_pk: '{{ board.pk }}'},
+                                success: function(data) {
+                                    console.log('created');
+                                    console.log(data);
+                                },
+                                error: function(data) {
+                                    console.log('failed');
+                                    console.log(data);
+                                },
+                                dataType: 'json'
+                            });
 
                             // If the device is hovered over with the mouse, I want
                             // to pass this information down to the tile on which it

@@ -24,6 +24,12 @@ class Board(models.Model):
         return self.name
 
 class Item(models.Model):
+    class Meta:
+        unique_together = (
+            ('x', 'y', 'board'),
+            ('device', 'board'),
+        )
+    
     x = models.IntegerField()
     y = models.IntegerField()
     
