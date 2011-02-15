@@ -132,6 +132,7 @@ Tile.prototype.getPoints = function() {
 Tile.prototype.addDevice = function(device) {
     this.device = device;
     this.device.tile = this;
+    dashboardConfig.layers['devices'].addAtPosition(this.device);
     var tileOrigin = this.getOriginPos();
     this.device.setOriginPos(tileOrigin.x, tileOrigin.y);
 }
@@ -169,7 +170,6 @@ Device.prototype.getOriginPos = function() {
     };
 };
 Device.prototype.setOriginPos = function(x, y) {
-    console.log(x + ' ' + y);
     this.raphaelObj.attr({
         x: x - this.xOffset,
         y: y - this.yOffset
@@ -211,6 +211,9 @@ function ServerDevice(tile) {
         72, 96
     ));
     
+    if (this.tile != undefined)
+        dashboardConfig.layers['devices'].addAtPosition(this);
+    
     this.raphaelObj.onAnimation(function() {
         this.wrapper.updateConnections();
     });
@@ -238,6 +241,9 @@ function SwitchDevice(tile) {
     this.raphaelObj.onAnimation(function() {
         this.wrapper.updateConnections();
     });
+    
+    if (this.tile != undefined)
+        dashboardConfig.layers['devices'].addAtPosition(this);
     
     this.xOffset = 45;
     this.yOffset = 47;

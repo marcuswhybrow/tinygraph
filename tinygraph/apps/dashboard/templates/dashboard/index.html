@@ -88,8 +88,6 @@
             dashboardConfig.quadrants['topLeft'] = new Quadrant({{ board.width_near }}, {{ board.depth_far }}, false, true);
             dashboardConfig.quadrants['bottomRight'] = new Quadrant({{ board.width_far}}, {{ board.depth_near }}, true, false);
             dashboardConfig.quadrants['bottomLeft'] = new Quadrant({{ board.width_near }}, {{ board.depth_near }}, false, false);
-            
-            dashboardConfig.paper.circle(dashboardConfig.origin.x, dashboardConfig.origin.y ,1);
 
             // dashboardConfig.paper.customAttributes.originX = function(nx) {
             //     return {x: nx - this.xOffset};

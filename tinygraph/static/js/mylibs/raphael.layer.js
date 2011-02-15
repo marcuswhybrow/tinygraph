@@ -9,20 +9,27 @@ Raphael.fn.layer = function(layerName) {
     };
     
     layerEndMarker.addAtPosition = function(item) {
+        // console.log($(item.raphaelObj.node).attr('layer'));
+        // console.log(item);
         var $element = $(item.raphaelObj.node),
             gridPos = item.getGridPos();
         $element
             .attr('layer', layerName)
             .attr('level', gridPos.x + gridPos.y);
         
-        $('*[layer="' + $element.attr('layer') + '"][level!="' + $element.attr('level') + '"]').each(function() {
-            if (parseInt($(this).attr('level')) < parseInt($element.attr('level'))) {
-                item.raphaelObj.insertBefore(this.raphael);
-                return false;
-            } else {
-                item.raphaelObj.insertAfter(this.raphael);
-            }
-        });
+        var $items = $('*[layer="' + $element.attr('layer') + '"][level!="' + $element.attr('level') + '"]');
+        
+        if ($items.length == 0)
+            return item.raphaelObj.insertBefore(this);
+        else
+            $items.each(function() {
+                if (parseInt($(this).attr('level')) < parseInt($element.attr('level'))) {
+                    item.raphaelObj.insertBefore(this.raphael);
+                    return false;
+                } else {
+                    item.raphaelObj.insertAfter(this.raphael);
+                }
+            });
     };
     
     return layerEndMarker;
