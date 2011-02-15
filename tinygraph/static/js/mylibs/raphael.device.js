@@ -154,15 +154,10 @@ Device.prototype.setOriginPos = function(x, y) {
     });
 };
 Device.prototype.setHighlighted = function(highlight) {
-    if (highlight) {
-        this.raphaelObj.animate({
-            opactiy: 0.5
-        }, 100);
-    } else {
-        this.raphaelObj.animate({
-            opactiy: 1.0
-        }, 100);
-    }
+    if (highlight)
+        this.raphaelObj.animate({opacity: 0.5}, 100);
+    else
+        this.raphaelObj.animate({opacity: 1}, 100);
 };
 Device.prototype.updateConnections = function() {
     for (var i in this.interfaces) {
