@@ -88,22 +88,10 @@
             dashboardConfig.quadrants['topLeft'] = new Quadrant({{ board.width_near }}, {{ board.depth_far }}, false, true);
             dashboardConfig.quadrants['bottomRight'] = new Quadrant({{ board.width_far}}, {{ board.depth_near }}, true, false);
             dashboardConfig.quadrants['bottomLeft'] = new Quadrant({{ board.width_near }}, {{ board.depth_near }}, false, false);
-
-            // dashboardConfig.paper.customAttributes.originX = function(nx) {
-            //     return {x: nx - this.xOffset};
-            // };
-            // 
-            // dashboardConfig.paper.customAttributes.originY = function(ny) {
-            //     return {y: ny - this.yOffset};
-            // };
-
-            // 
-            // paper.customAttributes.originY = function(y) {
-            //     if (y == undefined)
-            //         return this.attr('y') + this.yOffset;
-            //     else
-            //         return {y: this.attr('y') + this.yOffset};
-            // }
+            
+            {% for item in board.items.all %}
+                getTile({{ item.x }},{{ item.y }}).addDevice(new ServerDevice());
+            {% endfor %}
 
             // debug stuff
             DRAW_COORDINATES = false;
@@ -142,16 +130,6 @@
                 if (highlightedTile != null)
                     highlightedTile.raphaelObj.attr('opacity', 0.5);
             }
-            
-            // for (var name in dashboardConfig.quadrants) {
-            //     var quardrant = dashboardConfig.quadrants[name];
-            //     for (var x in quadrant.tiles) {
-            //         for (var y in quadrant.tiles[x]) {
-            //             var tile = quadrant.tiles[x][y];
-            //             $(tile.rphaelObj.node).hover
-            //         }
-            //     }
-            // }
             
             $('svg image[layer="tiles"]').hover(function() {
                 hoveredOverTile = this.raphael.wrapper;
@@ -327,10 +305,6 @@
 
                 if (newTile == null || newTile.device != null) return false;
 
-                // Set the new position of the device
-                // device.attr('x', newTile.attr('x') + device.xOffset);
-                // device.attr('y', newTile.attr('y') + device.yOffset);
-
                 device.raphaelObj.toFront();
 
                 device.raphaelObj.animate({
@@ -396,12 +370,6 @@
                     y: $(window).height() - 30
                 })
             });
-
-            // var dragging = false;
-            // 
-            // $(window).click(function() {
-            //     dragging = ! dragging;
-            // }) ;
 
             function moveTiles(x, y) {
                 // Get the diffence in position since the last frame
