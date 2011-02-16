@@ -92,6 +92,25 @@
             {% for item in board.items.all %}
                 getTile({{ item.x }},{{ item.y }}).addDevice(new ServerDevice());
             {% endfor %}
+            
+            var current = dashboardConfig.paper.text(30, $window.height() - 30, "SERVER");
+            current.attr({
+                'text-anchor': 'start',
+                'fill': 'black'
+            });
+            
+            var status = dashboardConfig.paper.text($window.width() - 30, $window.height() - 30, '');
+            status.attr({
+                'text-anchor': 'end',
+            });
+            
+            // Greater than 1 when someting is being saved to the database
+            var saving = 0;
+            
+            function updateSaving(isPositiveIncrement) {
+                saving += isPositiveIncrement ? 1 : -1;
+                status.attr('text', saving <= 0 ? '' : 'Saving ...');
+            }
 
             // debug stuff
             DRAW_COORDINATES = false;
@@ -190,6 +209,9 @@
                             
                             var deviceGridPos = device.getGridPos();
                             
+                            // Indicate that some database interaction is going on.
+                            updateSaving(true);
+                            
                             $.ajax({
                                 url: '{% url api.views.dashboard_create_item %}',
                                 type: 'post',
@@ -197,10 +219,12 @@
                                 success: function(data) {
                                     console.log('created');
                                     console.log(data);
+                                    updateSaving(false);
                                 },
                                 error: function(data) {
                                     console.log('failed');
                                     console.log(data);
+                                    updateSaving(false);
                                 },
                                 dataType: 'json'
                             });
@@ -352,12 +376,6 @@
                 }
             }
 
-            var current = paper.text(30, $(window).height() - 30, "SERVER");
-            current.attr({
-                'text-anchor': 'start',
-                'fill': 'black'
-            });
-
             // Updates the size of certain objects when the window
             // resizes.
             $window.resize(function() {
@@ -368,6 +386,11 @@
                 
                 current.attr({
                     y: $(window).height() - 30
+                })
+                
+                status.attr({
+                    x: $window.width() - 30,
+                    y: $window.height() - 30
                 })
             });
 
