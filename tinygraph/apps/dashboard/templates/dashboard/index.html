@@ -116,9 +116,11 @@
             DRAW_COORDINATES = false;
 
             // The states the interface can be in
-            var PLACING_DEVICES = 0,
-                DRAWING_CONNECTIONS = 1,
-                state = PLACING_DEVICES;
+            var VIEWING = 0
+                EDITING = 1,
+                PLACING_DEVICES = 2,
+                DRAWING_CONNECTIONS = 3,
+                state = VIEWING;
 
             // PLACING_DEVICES variables
             var movingDevice = null,
@@ -128,9 +130,6 @@
 
             // DRAWING_CONNECTIONS variables
             var selectedDevice = null;
-
-            // A 2 dimensional array holding the grid of tiles
-            var tiles = new Array(dashboardConfig.gridWidth);
 
             var spaceIsDown = false,
                 mouseIsDown = false;
@@ -370,16 +369,6 @@
             // a line defined by two other co-ordinates
             function isPointRightOfLine(ax, ay, bx, by, px, py) {
                 return (bx - ax) * (by - ay) < (px - ax) * (py - ay) + (bx - px) * (by - py) + (bx - px) * (py - ay) * 2;
-            }
-
-            // Draws co-ordinates over the top of each tile for debugging
-            if (DRAW_COORDINATES) {
-                for (var i = 0; i < dashboardConfig.gridWidth; i++) {
-                    for (var j = 0; j < dashboardConfig.gridHeight; j++) {
-                        var tile = tiles[i][j];
-                        paper.text(tile.attr('x') + xOffset, tile.attr('y') + yOffset, '(' + tile.gridX + ',' + tile.gridY + ')');
-                    }
-                }
             }
 
             // Updates the size of certain objects when the window
