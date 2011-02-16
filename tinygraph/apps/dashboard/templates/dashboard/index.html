@@ -150,6 +150,12 @@
                     highlightedTile.raphaelObj.attr('opacity', 0.5);
             }
             
+            $('svg image[layer="devices"]').hover(function() {
+                $(this.raphael.wrapper.tile.raphaelObj.node).mouseenter();
+            }, function() {
+                $(this.raphael.wrapper.tile.raphaelObj.node).mouseout();
+            });
+            
             $('svg image[layer="tiles"]').hover(function() {
                 hoveredOverTile = this.raphael.wrapper;
             }, function() {
@@ -433,22 +439,29 @@
                 if (hoveredOverTile != null) {
                     var points = hoveredOverTile.getPoints(),
                         gridPos = hoveredOverTile.getGridPos();
+                    
+                    var northWest = false,
+                        northEast = false,
+                        southEast = false,
+                        southWest = false;
                         
-                    if (! isPointRightOfLine(points.left.x, points.left.y, points.top.x, points.top.y, e.pageX, e.pageY)) {
-                        // North-West
+                    northWest = ! isPointRightOfLine(points.left.x, points.left.y, points.top.x, points.top.y, e.pageX, e.pageY);
+                    northEast = ! isPointRightOfLine(points.top.x, points.top.y, points.right.x, points.right.y, e.pageX, e.pageY);
+                    southEast = ! isPointRightOfLine(points.right.x, points.right.y, points.bottom.x, points.bottom.y, e.pageX, e.pageY);
+                    southWest = ! isPointRightOfLine(points.bottom.x, points.bottom.y, points.left.x, points.left.y, e.pageX, e.pageY);
+                    
+                    if (northEast === true && northWest === true)
+                        setHighlightedTile(getTile(incSkipZero(gridPos.x), incSkipZero(gridPos.y)));
+                    else if (northWest === true)
                         setHighlightedTile(getTile(gridPos.x, incSkipZero(gridPos.y)));
-                    } else if (! isPointRightOfLine(points.top.x, points.top.y, points.right.x, points.right.y, e.pageX, e.pageY)) {
-                        // North-East
+                    else if (northEast === true)
                         setHighlightedTile(getTile(incSkipZero(gridPos.x), gridPos.y));
-                    } else if (! isPointRightOfLine(points.right.x, points.right.y, points.bottom.x, points.bottom.y, e.pageX, e.pageY)) {
-                        // South-East
+                    else if (southWest === true)
                         setHighlightedTile(getTile(gridPos.x, decSkipZero(gridPos.y)));
-                    } else if (! isPointRightOfLine(points.bottom.x, points.bottom.y, points.left.x, points.left.y, e.pageX, e.pageY)) {
-                        // South-West
+                    else if (southEast === true)
                         setHighlightedTile(getTile(decSkipZero(gridPos.x), gridPos.y));
-                    } else {
+                    else
                         setHighlightedTile(hoveredOverTile);
-                    }
                 }
             });
 
