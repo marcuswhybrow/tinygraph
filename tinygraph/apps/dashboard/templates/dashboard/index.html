@@ -40,6 +40,8 @@
 {% endblock %}
 
 {% block scripts %}
+    <!-- <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/jquery.statebindings.js"></script> -->
+    <script type="text/javascript" src="https://github.com/marcuswhybrow/jquery-state-bindings/raw/master/jquery.statebindings.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/libs/raphael-min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.layer.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.device.js"></script>
@@ -112,16 +114,6 @@
                 status.attr('text', saving <= 0 ? '' : 'Saving ...');
             }
 
-            // debug stuff
-            DRAW_COORDINATES = false;
-
-            // The states the interface can be in
-            var VIEWING = 0
-                EDITING = 1,
-                PLACING_DEVICES = 2,
-                DRAWING_CONNECTIONS = 3,
-                state = VIEWING;
-
             // PLACING_DEVICES variables
             var movingDevice = null,
                 placeSwitch = false,
@@ -149,158 +141,182 @@
                     highlightedTile.raphaelObj.attr('opacity', 0.5);
             }
             
-            $('svg image[layer="devices"]').hover(function() {
+            var $devices = $('svg image[layer="devices"]');
+            
+            $devices.live('mouseenter', function() {
                 $(this.raphael.wrapper.tile.raphaelObj.node).mouseenter();
-            }, function() {
+            }).live('mouseeout', function() {
                 $(this.raphael.wrapper.tile.raphaelObj.node).mouseout();
+            }).live('click', function(e) {
+                $(this.raphael.wrapper.tile.raphaelObj.node).trigger('click', [e.pageX, e.pageY]);
             });
             
-            $('svg image[layer="tiles"]').hover(function() {
+            
+            var $tiles = $('svg image[layer="tiles"]');
+            
+            $tiles.hover(function() {
                 hoveredOverTile = this.raphael.wrapper;
             }, function() {
                 hoveredOverTile = null;
-            }).click(function(e) {
-                if (! spaceIsDown) {
-                    if (state == PLACING_DEVICES) {
-                        if (movingDevice != null) {
-                            // If a device is currently being moved try and
-                            // move it to this tile
-                            if (moveDeviceToTile(movingDevice, highlightedTile)) {
-                                // If the device was moved then there is no
-                                // device currently moving
-                                movingDevice = null;
-                            } else {
-                                // If the device could not be moved to this tile
-                                // (the tile already has a device, or the tile does
-                                // not exist) then put down the currently moving
-                                // device and pick up the device on this tile (assuming
-                                // now that the tile exists and thus had a device.)
-                                movingDevice.moving = false;
-                                movingDevice.setHighlighted(false);
-
-                                if (highlightedTile.device != movingDevice) {
-                                    // If the user clicks a tile other than that which
-                                    // holds the currently moving device, then make the
-                                    // device on this tile the moving device (picking it up)
-                                    movingDevice = highlightedTile.device;
-                                    movingDevice.moving = true;
-                                    movingDevice.raise();
-                                } else {
-                                    // If the this tile contains the currently moving
-                                    // device (the user clicked on it again) then don't
-                                    // pick up this device again
-                                    movingDevice = null;
-                                }
-                            }
-                        } else if (highlightedTile.device == null) {
-                            
-                            var device = null;
-                            
-                            // If the this tile does not have a device:
-                            if (placeSwitch == true) {
-                                // If we are currently placing Switches then
-                                // create a switch device and place it on the
-                                // current tile
-                                device = new SwitchDevice();
-
-                            } else if (placeServer == true) {
-                                // However if we are placing Servers right now, then
-                                // create a server device and place it on the current
-                                // tile.
-                                device = new ServerDevice();
-                            }
-                            
-                            highlightedTile.addDevice(device);
-                            
-                            var deviceGridPos = device.getGridPos();
-                            
-                            // Indicate that some database interaction is going on.
-                            updateSaving(true);
-                            
-                            $.ajax({
-                                url: '{% url api.views.dashboard_create_item %}',
-                                type: 'post',
-                                data: {item_x: deviceGridPos.x, item_y: deviceGridPos.y, item_type: 'server', item_board_pk: '{{ board.pk }}'},
-                                success: function(data) {
-                                    console.log('created');
-                                    console.log(data);
-                                    updateSaving(false);
-                                },
-                                error: function(data) {
-                                    console.log('failed');
-                                    console.log(data);
-                                    updateSaving(false);
-                                },
-                                dataType: 'json'
-                            });
-
-                            // If the device is hovered over with the mouse, I want
-                            // to pass this information down to the tile on which it
-                            // sits.
-                            $(device.raphaelObj.node)
-                                .hover(function() {
-                                    $(this.raphael.wrapper.tile.raphaelObj.node).mouseenter();
-                                }, function() {
-                                    $(this.raphael.wrapper.tile.raphaelObj.node).mouseout();
-                                })
-                                .click(function(e) {
-                                    $(this.raphael.wrapper.tile.raphaelObj.node).trigger('click', [e.pageX, e.pageY]);
-                                })
-                            ;
-
-                            dashboardConfig.layers['devices'].addAtPosition(device);
-                        } else {
-                            // If this tile DOES HAVE a device:
-
-                            // Get a shorter reference to the device again
-                            var device = highlightedTile.device;
-
-                            // Toggle whether the device is moving or not
-                            device.moving = ! device.moving;
-
-                            if (device.moving) {
-                                // If the device is now moving, update the
-                                // global movingDevice reference
-                                movingDevice = device;
-
-                                // Then visually pop the device up in the air
-                                device.setHighlighted(true);
-                            } else {
-                                movingDevice = null;
-                                device.setHighlighted(false);
-                            }
-                        }
-
-                        // Makes Chrome (maybe other browsers) redraw the SVG
-                        $window.resize();
-
-                    } else if (state = DRAWING_CONNECTIONS) {
-                        // If we are drawing connections between devices:
-
-                        // Get a shorter reference to the devices on this tile
-                        var device = highlightedTile.device;
-
-                        if (device != null) {
-                            // If this tile DOES have a device:
-                            if (selectedDevice == null) {
-                                // If an initial device as not been selected
-                                // then this is that device
-                                selectedDevice = device;
-                            } else {
-                                // Otherwise draw a line from that previously
-                                // selected devices to this currently selected
-                                // device.
-                                selectedDevice.connectTo(device);
-                                
-                                $window.resize();
-
-                                // and then start the process over again.
-                                selectedDevice = null;
-                            }
-                        }
+            });
+            
+            $tiles.stateBindings({
+                viewing: {
+                    click: function(e) {
+                        // do nothing at the moment
+                    },
+                },
+                editing: {
+                    click: function(e) {
+                        // do nothing
                     }
                 }
-            }); // END click event;
+            });
+            
+            $.stateBindings.setState('editing');
+            
+            // .click(function(e) {
+            //                 if (! spaceIsDown) {
+            //                     if (state == PLACING_DEVICES) {
+            //                         if (movingDevice != null) {
+            //                             // If a device is currently being moved try and
+            //                             // move it to this tile
+            //                             if (moveDeviceToTile(movingDevice, highlightedTile)) {
+            //                                 // If the device was moved then there is no
+            //                                 // device currently moving
+            //                                 movingDevice = null;
+            //                             } else {
+            //                                 // If the device could not be moved to this tile
+            //                                 // (the tile already has a device, or the tile does
+            //                                 // not exist) then put down the currently moving
+            //                                 // device and pick up the device on this tile (assuming
+            //                                 // now that the tile exists and thus had a device.)
+            //                                 movingDevice.moving = false;
+            //                                 movingDevice.setHighlighted(false);
+            // 
+            //                                 if (highlightedTile.device != movingDevice) {
+            //                                     // If the user clicks a tile other than that which
+            //                                     // holds the currently moving device, then make the
+            //                                     // device on this tile the moving device (picking it up)
+            //                                     movingDevice = highlightedTile.device;
+            //                                     movingDevice.moving = true;
+            //                                     movingDevice.raise();
+            //                                 } else {
+            //                                     // If the this tile contains the currently moving
+            //                                     // device (the user clicked on it again) then don't
+            //                                     // pick up this device again
+            //                                     movingDevice = null;
+            //                                 }
+            //                             }
+            //                         } else if (highlightedTile.device == null) {
+            //                             
+            //                             var device = null;
+            //                             
+            //                             // If the this tile does not have a device:
+            //                             if (placeSwitch == true) {
+            //                                 // If we are currently placing Switches then
+            //                                 // create a switch device and place it on the
+            //                                 // current tile
+            //                                 device = new SwitchDevice();
+            // 
+            //                             } else if (placeServer == true) {
+            //                                 // However if we are placing Servers right now, then
+            //                                 // create a server device and place it on the current
+            //                                 // tile.
+            //                                 device = new ServerDevice();
+            //                             }
+            //                             
+            //                             highlightedTile.addDevice(device);
+            //                             
+            //                             var deviceGridPos = device.getGridPos();
+            //                             
+            //                             // Indicate that some database interaction is going on.
+            //                             updateSaving(true);
+            //                             
+            //                             $.ajax({
+            //                                 url: '{% url api.views.dashboard_create_item %}',
+            //                                 type: 'post',
+            //                                 data: {item_x: deviceGridPos.x, item_y: deviceGridPos.y, item_type: 'server', item_board_pk: '{{ board.pk }}'},
+            //                                 success: function(data) {
+            //                                     console.log('created');
+            //                                     console.log(data);
+            //                                     updateSaving(false);
+            //                                 },
+            //                                 error: function(data) {
+            //                                     console.log('failed');
+            //                                     console.log(data);
+            //                                     updateSaving(false);
+            //                                 },
+            //                                 dataType: 'json'
+            //                             });
+            // 
+            //                             // If the device is hovered over with the mouse, I want
+            //                             // to pass this information down to the tile on which it
+            //                             // sits.
+            //                             $(device.raphaelObj.node)
+            //                                 .hover(function() {
+            //                                     $(this.raphael.wrapper.tile.raphaelObj.node).mouseenter();
+            //                                 }, function() {
+            //                                     $(this.raphael.wrapper.tile.raphaelObj.node).mouseout();
+            //                                 })
+            //                                 .click(function(e) {
+            //                                     $(this.raphael.wrapper.tile.raphaelObj.node).trigger('click', [e.pageX, e.pageY]);
+            //                                 })
+            //                             ;
+            // 
+            //                             dashboardConfig.layers['devices'].addAtPosition(device);
+            //                         } else {
+            //                             // If this tile DOES HAVE a device:
+            // 
+            //                             // Get a shorter reference to the device again
+            //                             var device = highlightedTile.device;
+            // 
+            //                             // Toggle whether the device is moving or not
+            //                             device.moving = ! device.moving;
+            // 
+            //                             if (device.moving) {
+            //                                 // If the device is now moving, update the
+            //                                 // global movingDevice reference
+            //                                 movingDevice = device;
+            // 
+            //                                 // Then visually pop the device up in the air
+            //                                 device.setHighlighted(true);
+            //                             } else {
+            //                                 movingDevice = null;
+            //                                 device.setHighlighted(false);
+            //                             }
+            //                         }
+            // 
+            //                         // Makes Chrome (maybe other browsers) redraw the SVG
+            //                         $window.resize();
+            // 
+            //                     } else if (state = DRAWING_CONNECTIONS) {
+            //                         // If we are drawing connections between devices:
+            // 
+            //                         // Get a shorter reference to the devices on this tile
+            //                         var device = highlightedTile.device;
+            // 
+            //                         if (device != null) {
+            //                             // If this tile DOES have a device:
+            //                             if (selectedDevice == null) {
+            //                                 // If an initial device as not been selected
+            //                                 // then this is that device
+            //                                 selectedDevice = device;
+            //                             } else {
+            //                                 // Otherwise draw a line from that previously
+            //                                 // selected devices to this currently selected
+            //                                 // device.
+            //                                 selectedDevice.connectTo(device);
+            //                                 
+            //                                 $window.resize();
+            // 
+            //                                 // and then start the process over again.
+            //                                 selectedDevice = null;
+            //                             }
+            //                         }
+            //                     }
+            //                 }
+            //             }); // END click event;
 
             // Triggers the click event on a Tile
             function clickTile(i, j) {
