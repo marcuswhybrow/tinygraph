@@ -40,61 +40,81 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{{ STATIC_URL }}/js/mylibs/raphael-min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}/js/mylibs/raphael.layer.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}/js/mylibs/interface.js"></script>
-    <!-- <script type="text/javascript" src="{{ STATIC_URL }}/js/mylibs/raphael.device.js"></script> -->
+    <!-- <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/jquery.statebindings.js"></script> -->
+    <script type="text/javascript" src="https://github.com/marcuswhybrow/jquery-state-bindings/raw/master/jquery.statebindings.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/libs/raphael-min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.layer.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.device.js"></script>
     <script type="text/javascript" charset="utf-8">
 
-        var paper = Raphael(0, 0, '100%', '100%');
-
-        paper.customAttributes.originX = function(nx) {
-            return {x: nx - this.xOffset};
-        };
-
-        paper.customAttributes.originY = function(ny) {
-            return {y: ny - this.yOffset};
-        };
-
-        // 
-        // paper.customAttributes.originY = function(y) {
-        //     if (y == undefined)
-        //         return this.attr('y') + this.yOffset;
-        //     else
-        //         return {y: this.attr('y') + this.yOffset};
-        // }
+        var paper = dashboardConfig.paper = Raphael(0, 0, '100%', '100%');
 
         $(function() {
-
-            // var d = paper.serverDevice();
-            // console.log(d.attr('src'));
-            // console.log(d.thing());
-
             var $window = $(window);
-
-            var sx = 0.5,
-                sy = 0.5;
-
-            // debug stuff
-            DRAW_COORDINATES = false;
-
+            
+            dashboardConfig.imagePath = '{{ STATIC_URL }}images/dashboard/';
+            
+            // Set the origin of the initial board as the center of the screen
+            dashboardConfig.origin = {x: $window.width() / 2, y: $window.height() / 2};
+            
+            // Create background rectangle. This should be one of
+            // the first elements in the SVG since it should be
+            // rendered last.
+            var rect = paper.rect(0, 0, $window.width(), $window.height());
+            rect.attr({
+                'stroke': '#999',
+                'stroke-width': 10,
+                'fill': '#fefefe'
+            });
+            
+            dashboardConfig.layers = {
+                'tiles': dashboardConfig.paper.layer('tiles'),
+                'connections': dashboardConfig.paper.layer('connections'),
+                'devices': dashboardConfig.paper.layer('devices')
+            };
+            
             // Tile size and spacing
-            var tileWidth = 128,
-                tileHeight = 100,
-                tileSeparation = 2;
+            dashboardConfig.tileWidth = 128;
+            dashboardConfig.tileHeight = 100;
+            dashboardConfig.tileSeparation = 2;
 
             // These should only change if the tile shape is redisigned
-            var xOffset = tileWidth / 2,
-                yOffset = tileHeight - 20;
+            dashboardConfig.xOffset = dashboardConfig.tileWidth / 2;
+            dashboardConfig.yOffset = (dashboardConfig.tileHeight - 20) / 2;
 
             // How many tiles there should be in the grid
-            var gridWidth = {{ board.width_near }} + {{ board.width_far }},
-                gridHeight = {{ board.depth_near }} + {{ board.depth_far }};
+            dashboardConfig.gridWidth = {{ board.width_near }} + {{ board.width_far }};
+            dashboardConfig.gridHeight = {{ board.depth_near }} + {{ board.depth_far }};
 
-            // The states the interface can be in
-            var PLACING_DEVICES = 0,
-                DRAWING_CONNECTIONS = 1,
-                state = PLACING_DEVICES;
+            dashboardConfig.quadrants = {
+                'topRight': new Quadrant({{ board.width_far}}, {{ board.depth_far }}, true, true),
+                'topLeft': new Quadrant({{ board.width_near }}, {{ board.depth_far }}, false, true),
+                'bottomRight': new Quadrant({{ board.width_far}}, {{ board.depth_near }}, true, false),
+                'bottomLeft': new Quadrant({{ board.width_near }}, {{ board.depth_near }}, false, false)
+            };
+            
+            {% for item in board.items.all %}
+                getTile({{ item.x }},{{ item.y }}).addDevice(new ServerDevice());
+            {% endfor %}
+            
+            var current = dashboardConfig.paper.text(30, $window.height() - 30, '');
+            current.attr({
+                'text-anchor': 'start',
+                'fill': 'black'
+            });
+            
+            var status = dashboardConfig.paper.text($window.width() - 30, $window.height() - 30, '');
+            status.attr({
+                'text-anchor': 'end',
+            });
+            
+            // Greater than 1 when someting is being saved to the database
+            var saving = 0;
+            
+            function updateSaving(isPositiveIncrement) {
+                saving += isPositiveIncrement ? 1 : -1;
+                status.attr('text', saving <= 0 ? '' : 'Saving ...');
+            }
 
             // PLACING_DEVICES variables
             var movingDevice = null,
@@ -105,385 +125,150 @@
             // DRAWING_CONNECTIONS variables
             var selectedDevice = null;
 
-            // A 2 dimensional array holding the grid of tiles
-            var tiles = new Array(gridWidth);
-
             var spaceIsDown = false,
                 mouseIsDown = false;
 
             // The x and y values the mouse was at last frame
             var lastX = null,
-                lastY = null;
+                lastY = null,
+                xChange = null,
+                yChange = null;
 
             var highlightedTile = null,
                 hoveredOverTile = null;
 
             function setHighlightedTile(tile) {
                 if (highlightedTile != null)
-                    highlightedTile.attr('opacity', 1);
+                    highlightedTile.raphaelObj.attr('opacity', 1);
                 highlightedTile = tile;
                 if (highlightedTile != null)
-                    highlightedTile.attr('opacity', 0.5);
+                    highlightedTile.raphaelObj.attr('opacity', 0.5);
             }
-
-            // Create background rectangle. This should be one of
-            // the first elements in the SVG since it should be
-            // rendered last.
-            var rect = paper.rect(0, 0, $window.width(), $window.height());
-            rect.attr({
-                'stroke': '#999',
-                'stroke-width': 10,
-                'fill': '#fefefe'
+            
+            var $devices = $('svg image[layer="devices"]');
+            
+            $devices.live('mouseenter', function() {
+                $(this.raphael.wrapper.tile.raphaelObj.node).mouseenter();
+            }).live('mouseeout', function() {
+                $(this.raphael.wrapper.tile.raphaelObj.node).mouseout();
+            }).live('click', function(e) {
+                $(this.raphael.wrapper.tile.raphaelObj.node).trigger('click', [e.pageX, e.pageY]);
             });
+            
+            
+            var $tiles = $('svg image[layer="tiles"]');
+            
+            $tiles.hover(function() {
+                hoveredOverTile = this.raphael.wrapper;
+            }, function() {
+                hoveredOverTile = null;
+            });
+            
+            $tiles.stateBindings({
+                viewing: {
+                    click: function(e) {
+                        // do nothing at the moment
+                    },
+                },
+                placingDevices: {
+                    click: function(e) {
+                        if (movingDevice !== null && highlightedTile.device === null) {
+                            if (moveDeviceToTile(movingDevice, highlightedTile)) {
+                                movingDevice = null;
+                            }
+                        } else if (highlightedTile.device === null) {
+                            var device = null;
+                            if ($.stateBindings.activeStates.contains('placingSwitch')) {
+                                device = new SwitchDevice();
+                            } else if ($.stateBindings.activeStates.contains('placingServer')) {
+                                device = new ServerDevice();
+                            }
+                            highlightedTile.addDevice(device);
+                            var deviceGridPos = device.getGridPos();
+                            // Indicate that some database interaction is going on.
+                            updateSaving(true);
+                            $.ajax({
+                                url: '{% url api.views.dashboard_create_item %}',
+                                type: 'post',
+                                data: {item_x: deviceGridPos.x, item_y: deviceGridPos.y, item_type: 'server', item_board_pk: '{{ board.pk }}'},
+                                success: function(data) {
+                                    console.log('created');
+                                    console.log(data);
+                                    updateSaving(false);
+                                },
+                                error: function(data) {
+                                    console.log('failed');
+                                    console.log(data);
+                                    updateSaving(false);
+                                },
+                                dataType: 'json'
+                            });
+                        } else {
+                            var device = highlightedTile.device;
+                            device.moving = ! device.moving;
+                            
+                            if (device.moving) {
+                                // If the device is now moving, update the
+                                // global movingDevice reference
+                                if (movingDevice !== null)
+                                    movingDevice.setHighlighted(false);
+                                movingDevice = device;
 
-            var tileLayer = paper.layer('tileLayer'),
-                connectionLayer = paper.layer('connectionLayer'),
-                deviceLayer = paper.layer('deviceLayer');
-
-            deviceLayer.add = function(device) {
-                this.addAtPosition(device, device.tile.gridX, device.tile.gridY);
-            }
-
-            // Add the tiles to the screen
-            for (var i = 0; i < gridWidth; i++) {
-                tiles[i] = new Array(gridHeight);
-
-                for (var j = 0; j < gridHeight; j++) {
-
-                    // The origin of the grid system           
-                    var xPos = $window.width() * sx,
-                        yPos = $window.height() * sy;
-
-                    // Add the new tile
-                    tiles[i][j] = paper.image(
-                        '{{ STATIC_URL }}/images/dashboard/tile.png',
-                        xPos + j * xOffset + j * tileSeparation - i * tileSeparation - i * xOffset,
-                        yPos + i * yOffset/2 + i * tileSeparation/2  + j * tileSeparation/2 + j * yOffset/2,
-                        tileWidth,
-                        tileHeight
-                    );
-
-                    var tile = tiles[i][j];
-
-                    tileLayer.bringToFront(tile);
-
-                    // Each tile can have one device
-                    tile.device = null;
-                    // Store the tiles grid position
-                    tile.gridX = i;
-                    tile.gridY = j;
-
-                    tile.xOffset = xOffset;
-                    tile.yOffset = yOffset/2;
-
-                    // Override the translate method of the tile such that
-                    // when it is translated, it also translates its device.
-                    tile.translateOld = tile.translate;
-                    tile.translate = function(cx, cy) {
-                        if (this.device != undefined) {
-                            this.device.translate(cx, cy);
-                        }
-                        this.translateOld(cx, cy);
-                    };
-
-                    tile.getGridX = function() {
-                        return this.gridX;
-                    };
-
-                    tile.getGridY = function() {
-                        return this.gridY;
-                    };
-
-                    tile.getOriginX = function() {
-                        return this.attr('x') + this.xOffset;
-                    };
-
-                    tile.getOriginY = function() {
-                        return this.attr('y') + this.yOffset;
-                    };
-
-                    tile.setOrigin = function(nx, ny) {
-                        this.attr({
-                            x: nx - this.xOffset,
-                            y: ny - this.yOffset
-                        });
-                    };
-
-                    tile.getTopPoint = function() {
-                        return {
-                            x: this.attr('x') + this.xOffset,
-                            y: this.attr('y')
-                        };
-                    };
-
-                    tile.getLeftPoint = function() {
-                        return {
-                            x: this.attr('x'),
-                            y: this.attr('y') + this.yOffset
-                        };
-                    };
-
-                    tile.getBottomPoint = function() {
-                        return {
-                            x: this.attr('x') + this.xOffset,
-                            y: this.attr('y') + 2 * this.yOffset
-                        };
-                    };
-
-                    tile.getRightPoint = function() {
-                        return {
-                            x: this.attr('x') + 2 * this.xOffset,
-                            y: this.attr('y') + this.yOffset
-                        };
-                    };
-
-                    var tileNode = tile.node;
-
-                    // Highligh which tile is under the mouse
-                    $(tileNode).hover(function(e) {
-                        hoveredOverTile = this.raphael;    
-                    }, function() {
-                        hoveredOverTile = null;
-                    });
-
-                    // When a tile is clicked on:
-                    $(tileNode).click(function(e) {
-
-                        if (! spaceIsDown) {
-                            if (state == PLACING_DEVICES) {
-                                if (movingDevice != null) {
-                                    // If a device is currently being moved try and
-                                    // move it to this tile
-                                    if (moveDeviceToTile(movingDevice, highlightedTile)) {
-                                        // If the device was moved then there is no
-                                        // device currently moving
-                                        movingDevice = null;
-                                    } else {
-                                        // If the device could not be moved to this tile
-                                        // (the tile already has a device, or the tile does
-                                        // not exist) then put down the currently moving
-                                        // device and pick up the device on this tile (assuming
-                                        // now that the tile exists and thus had a device.)
-                                        movingDevice.moving = false;
-                                        movingDevice.lower();
-
-                                        if (highlightedTile.device != movingDevice) {
-                                            // If the user clicks a tile other than that which
-                                            // holds the currently moving device, then make the
-                                            // device on this tile the moving device (picking it up)
-                                            movingDevice = highlightedTile.device;
-                                            movingDevice.moving = true;
-                                            movingDevice.raise();
-                                        } else {
-                                            // If the this tile contains the currently moving
-                                            // device (the user clicked on it again) then don't
-                                            // pick up this device again
-                                            movingDevice = null;
-                                        }
-                                    }
-                                } else if (highlightedTile.device == null) {
-                                    // If the this tile does not have a device:
-                                    if (placeSwitch == true) {
-                                        // If we are currently placing Switches then
-                                        // create a switch device and place it on the
-                                        // current tile
-                                        highlightedTile.device = paper.image(
-                                            '{{ STATIC_URL }}/images/dashboard/switch.png',
-                                            0, // x set later
-                                            0, // y set later
-                                            90,
-                                            76
-                                        );
-
-                                        // Store the image specific co-ordinate offset
-                                        // information for use elsewhere
-                                        highlightedTile.device.xOffset = 45;
-                                        highlightedTile.device.yOffset = 47;
-
-                                    } else if (placeServer == true) {
-                                        // However if we are placing Servers right now, then
-                                        // create a server device and place it on the current
-                                        // tile.
-                                        highlightedTile.device = paper.image(
-                                            '{{ STATIC_URL }}/images/dashboard/server.png',
-                                            0, // x set later
-                                            0, // y set later
-                                            72,
-                                            96
-                                        );
-
-                                        // Again store the co-ordinate offset information
-                                        highlightedTile.device.xOffset = 37;
-                                        highlightedTile.device.yOffset = 74;
-                                    }
-
-                                    // Get a shorter reference for the device
-                                    var device = highlightedTile.device;
-
-                                    // Give the device a reference to its tile
-                                    device.tile = highlightedTile;
-                                    // All devices start off NOT moving
-                                    device.moving = false;
-                                    // All devices start with NO interfaces
-                                    device.interfaces = new Array();
-                                    device.numberOfInterfaces = 0;
-
-                                    // Here I am overriding the translate method in order
-                                    // to move any connections connected to an interface
-                                    // on this device whenever this device is translated.
-                                    device.translateOld = device.translate;
-                                    device.translate = function(cx, cy) {
-                                        for (var i = 0; i < this.numberOfInterfaces; i++) {
-                                            var connection = this.interfaces[i];
-
-                                            if (connection.deviceOne == this)
-                                                connection.translate(cx, cy);
-                                        }
-                                        this.translateOld(cx, cy);
-                                    };
-
-                                    device.getGridX = function() {
-                                        return this.tile.getGridX();
-                                    };
-
-                                    device.getGridY = function() {
-                                        return this.tile.getGridY();
-                                    };
-
-                                    device.getOriginX = function() {
-                                        return this.attr('x') + this.xOffset;
-                                    };
-
-                                    device.getOriginY = function() {
-                                        return this.attr('y') + this.yOffset;
-                                    };
-
-                                    device.setOrigin = function(nx, ny) {
-                                        this.attr({
-                                            x: nx - this.xOffset,
-                                            y: ny - this.yOffset
-                                        });
-                                    };
-
-                                    device.raise = function() {
-                                        this.animate({
-                                            // y: this.attr('y') - MOVEMENT_HEIGHT,
-                                            opacity: 0.5
-                                            // scale: 1.5
-                                        }, 100);
-                                    };
-
-                                    device.lower = function() {
-                                        this.animate({
-                                            // y: this.attr('y') + MOVEMENT_HEIGHT,
-                                            opacity: 1
-                                            // scale: 1
-                                        }, 100);
-                                    };
-
-                                    device.updateConnections = function() {
-                                        for (var i in this.interfaces) {
-                                            var c = this.interfaces[i];
-
-                                            c.attr(
-                                                'path',
-                                                'M' + c.deviceOne.getOriginX() + ' ' + c.deviceOne.getOriginY() +
-                                                'L' + c.deviceTwo.getOriginX() + ' ' + c.deviceTwo.getOriginY()
-                                            );
-                                        }
-                                    };
-
-                                    device.onAnimation(device.updateConnections);
-
-                                    device.setOrigin(device.tile.getOriginX(), device.tile.getOriginY());
-
-                                    // If the device is hovered over with the mouse, I want
-                                    // to pass this information down to the tile on which it
-                                    // sits.
-                                    $(device.node).hover(function() {
-                                        $(this.raphael.tile.node).mouseenter();
-                                    }, function() {
-                                        $(this.raphael.tile.node).mouseout();
-                                    })
-
-                                    // If the device is clicked on pass the click down to the
-                                    // tile on which the device sits.
-                                    $(device.node).click(function(e) {
-                                        $(this.raphael.tile.node).trigger('click', [e.pageX, e.pageY]);
-                                    });
-
-                                    // ensures that the 3D illusion is maintained
-                                    // by putting the device just above (SVG-wise)
-                                    // the tile it is resting on.
-                                    // device.insertAfter(this.raphael);
-                                    // 
-                                    // deviceLayer.bringToFront(device);
-
-                                    deviceLayer.add(device);
-                                } else {
-                                    // If this tile DOES HAVE a device:
-
-                                    // Get a shorter reference to the device again
-                                    var device = highlightedTile.device;
-
-                                    // Toggle whether the device is moving or not
-                                    device.moving = ! device.moving;
-
-                                    if (device.moving) {
-                                        // If the device is now moving, update the
-                                        // global movingDevice reference
-                                        movingDevice = device;
-
-                                        // Then visually pop the device up in the air
-                                        device.raise();
-                                    }
-                                }
-
-                                // Makes Chrome (maybe other browsers) redraw the SVG
-                                $(window).resize();
-
-                            } else if (state = DRAWING_CONNECTIONS) {
-                                // If we are drawing connections between devices:
-
-                                // Get a shorter reference to the devices on this tile
-                                var device = highlightedTile.device;
-
-                                if (device != null) {
-                                    // If this tile DOES have a device:
-                                    if (selectedDevice == null) {
-                                        // If an initial device as not been selected
-                                        // then this is that device
-                                        selectedDevice = device;
-                                    } else {
-                                        // Otherwise draw a line from that previously
-                                        // selected devices to this currently selected
-                                        // device.
-                                        connectDevices(selectedDevice, device);
-                                        $(window).resize();
-
-                                        // and then start the process over again.
-                                        selectedDevice = null;
-                                    }
-                                }
+                                // Then visually highlight the device
+                                device.setHighlighted(true);
+                            } else {
+                                movingDevice = null;
+                                device.setHighlighted(false);
                             }
                         }
-                    });
-                }   
-            }
+                    }
+                },
+                drawingConnections: {
+                    click: function(e) {
+                        var device = highlightedTile.device;
+                    
+                        console.log('working');
 
-            // paper.circle(tiles[0][0].getOriginX(), tiles[0][0].getOriginY(), 2);
+                        if (device !== null) {
+                            if (selectedDevice == null) {
+                                selectedDevice = device;
+                            } else {
+                                selectedDevice.connectTo(device);
+                            
+                                $window.resize();
+
+                                // and then start the process over again.
+                                selectedDevice = null;
+                            }
+                        }
+                    }
+                }
+            });
 
             // Triggers the click event on a Tile
             function clickTile(i, j) {
-                var tile = getTile(i, j)
+                var tile = getTile(i, j);
                 if (tile != null)
-                    $(tile.node).click();
+                    $(tile.raphaelObj.node).click();
             }
 
             // Returns a tile at the specified grid position
             // or null if it does not exist.
-            function getTile(i, j) {
-                return i >= 0 && i < gridWidth && j >= 0 && j < gridHeight ? tiles[i][j] : null;
+            function getTile(x, y) {
+                if (x > {{ board.width_far }} || x < -{{ board.width_near }} || y > {{ board.depth_far }} || y < -{{ board.depth_near }})
+                    return null;
+                
+                var posX = Math.abs(x),
+                    posY = Math.abs(y);
+                if (x > 0 && y > 0) {
+                    return dashboardConfig.quadrants['topRight'].tiles[posX][posY];
+                } else if (x < 0 && y > 0) {
+                    return dashboardConfig.quadrants['topLeft'].tiles[posX][posY];
+                } else if (x > 0 && y < 0) {
+                    return dashboardConfig.quadrants['bottomRight'].tiles[posX][posY];
+                } else if (x < 0 && y < 0) {
+                    return dashboardConfig.quadrants['bottomLeft'].tiles[posX][posY];
+                }
             }
 
             // Moves a device from is current tile to a new tile
@@ -492,17 +277,13 @@
 
                 if (newTile == null || newTile.device != null) return false;
 
-                // Set the new position of the device
-                // device.attr('x', newTile.attr('x') + device.xOffset);
-                // device.attr('y', newTile.attr('y') + device.yOffset);
+                device.raphaelObj.toFront();
 
-                device.toFront();
-
-                device.animate({
+                device.raphaelObj.animate({
                     // originX: newTile.getOriginX(),
                     // originY: newTile.getOriginY(),
-                    x: newTile.attr('x') + newTile.xOffset - device.xOffset,
-                    y: newTile.attr('y') + newTile.yOffset - device.yOffset,
+                    x: newTile.raphaelObj.attr('x') + newTile.xOffset - device.xOffset,
+                    y: newTile.raphaelObj.attr('y') + newTile.yOffset - device.yOffset,
 
                     opacity: 1,
                     scale: 1
@@ -519,40 +300,12 @@
                     device.moving = false;
 
                     // Ensure that the device is layered correctly visually
-                    deviceLayer.add(device);
+                    dashboardConfig.layers['devices'].addAtPosition(device);
 
                     device.updateConnections();
                 });
 
                 return true;
-            }
-
-            // Connects one device to another, visually and programmatically
-            function connectDevices(deviceOne, deviceTwo) {
-                var tileOne = deviceOne.tile,
-                    tileTwo = deviceTwo.tile;
-
-                var connection = paper.path(
-                    'M' + deviceOne.getOriginX() + ' ' + deviceOne.getOriginY() +
-                    'L' + deviceTwo.getOriginX() + ' ' + deviceTwo.getOriginY()
-                );
-
-                connection.attr({
-                    'stroke-width': 5,
-                    'stroke-linecap': 'round'
-                });
-
-                connection.deviceOne = deviceOne;
-                connection.deviceTwo = deviceTwo;
-
-                connection.getOtherDevice = function(device) {
-                    return this.deviceOne == device ? this.deviceTwo : this.deviceOne;
-                };
-
-                deviceOne.interfaces[deviceOne.numberOfInterfaces++] = connection;
-                deviceTwo.interfaces[deviceTwo.numberOfInterfaces++] = connection;
-
-                connectionLayer.bringToFront(connection);
             }
 
             // Calculates whether a co-ordinate is to the right of
@@ -561,25 +314,9 @@
                 return (bx - ax) * (by - ay) < (px - ax) * (py - ay) + (bx - px) * (by - py) + (bx - px) * (py - ay) * 2;
             }
 
-            // Draws co-ordinates over the top of each tile for debugging
-            if (DRAW_COORDINATES) {
-                for (var i = 0; i < gridWidth; i++) {
-                    for (var j = 0; j < gridHeight; j++) {
-                        var tile = tiles[i][j];
-                        paper.text(tile.attr('x') + xOffset, tile.attr('y') + yOffset/2, '(' + tile.gridX + ',' + tile.gridY + ')');
-                    }
-                }
-            }
-
-            var current = paper.text(30, $(window).height() - 30, "SERVER");
-            current.attr({
-                'text-anchor': 'start',
-                'fill': 'black'
-            });
-
             // Updates the size of certain objects when the window
             // resizes.
-            $(window).resize(function() {
+            $window.resize(function() {
                 rect.attr({
                     'width': $window.width(),
                     'height': $window.height()
@@ -588,131 +325,172 @@
                 current.attr({
                     y: $(window).height() - 30
                 })
+                
+                status.attr({
+                    x: $window.width() - 30,
+                    y: $window.height() - 30
+                })
             });
+            
+            function incSkipZero(val) {
+                var newVal = val + 1;
+                if (newVal == 0)
+                    return 1;
+                return newVal;
+            }
+            
+            function decSkipZero(val) {
+                var newVal = val - 1;
+                if (newVal == 0)
+                    return -1;
+                return newVal;
+            }
+            
+            $window.stateBindings({
+                movingTiles: {
+                    mousemove: function(e) {
+                        if (xChange !== null && yChange !== null) {
+                            // and translate the position of all tiles based upon
+                            // the movement of the mouse since the last frame
+                            for (var name in dashboardConfig.quadrants) {
+                                dashboardConfig.quadrants[name].translate(xChange, yChange);
+                            }
+                        }
+                    }
+                },
+                isInteractive: {
+                    mousemove: function(e) {
+                        if (hoveredOverTile != null) {
+                            var points = hoveredOverTile.getPoints(),
+                                gridPos = hoveredOverTile.getGridPos();
 
-            // var dragging = false;
-            // 
-            // $(window).click(function() {
-            //     dragging = ! dragging;
-            // }) ;
+                            var northWest = false,
+                                northEast = false,
+                                southEast = false,
+                                southWest = false;
 
-            function moveTiles(x, y) {
-                // Get the diffence in position since the last frame
-                var xOffset = x - lastX;
-                var yOffset = y - lastY;
+                            northWest = ! isPointRightOfLine(points.left.x, points.left.y, points.top.x, points.top.y, e.pageX, e.pageY);
+                            northEast = ! isPointRightOfLine(points.top.x, points.top.y, points.right.x, points.right.y, e.pageX, e.pageY);
+                            southEast = ! isPointRightOfLine(points.right.x, points.right.y, points.bottom.x, points.bottom.y, e.pageX, e.pageY);
+                            southWest = ! isPointRightOfLine(points.bottom.x, points.bottom.y, points.left.x, points.left.y, e.pageX, e.pageY);
 
-                // and translate the position of all tiles based upon
-                // the movement of the mouse since the last frame
-                for (var i = 0; i < gridWidth; i++) {
-                    for (var j = 0; j < gridHeight; j++) {
-                        tiles[i][j].translate(xOffset, yOffset);
+                            if (northEast === true && northWest === true)
+                                setHighlightedTile(getTile(incSkipZero(gridPos.x), incSkipZero(gridPos.y)));
+                            else if (northWest === true)
+                                setHighlightedTile(getTile(gridPos.x, incSkipZero(gridPos.y)));
+                            else if (northEast === true)
+                                setHighlightedTile(getTile(incSkipZero(gridPos.x), gridPos.y));
+                            else if (southWest === true)
+                                setHighlightedTile(getTile(gridPos.x, decSkipZero(gridPos.y)));
+                            else if (southEast === true)
+                                setHighlightedTile(getTile(decSkipZero(gridPos.x), gridPos.y));
+                            else
+                                setHighlightedTile(hoveredOverTile);
+                        }
+                    },
+                    keydown: function(e) {
+                        var code = e.keyCode ? e.keyCode : e.which;
+
+                        switch (code) {
+                            // Space
+                            case 32:
+                                spaceIsDown = true;
+                                $('html').css('cursor', 'move');
+                                break;
+                        }
+                    },
+                    keyup: function(e) {
+                        var code = e.keyCode ? e.keyCode : e.which;
+
+                        switch (code) {
+                            // space
+                            case 32:
+                                spaceIsDown = false;
+                                $('html').css('cursor', 'default');
+                                break;
+                        }
+                    }
+                },
+                editing: {
+                    keyup: function(e) {
+                        var code = e.keyCode ? e.keyCode : e.which;
+
+                        switch (code) {
+                            // s
+                            case 83:
+                                $.stateBindings.toggleState('placingSwitch');
+                                $.stateBindings.toggleState('placingServer');
+
+                                current.attr('text', $.stateBindings.activeStates.contains('placingSwitch') ? 'SWITCH' : 'SERVER');
+                                break;
+
+                            // c
+                            case 67:
+                                $.stateBindings.toggleState('drawingConnections');
+                                $.stateBindings.toggleState('placingDevices');
+                                
+                                $('html').css('cursor', $.stateBindings.activeStates.contains('drawingConnections') ? 'crosshair' : 'default');
+                                current.attr('text',
+                                    $.stateBindings.activeStates.contains('drawingConnections') ? 'CONNECTIONS' :
+                                    $.stateBindings.activeStates.contains('placingSwitch') ? 'SWITCH' :
+                                    'SERVER'
+                                );
+                                console.log($.stateBindings.activeStates);
+                                break;
+                        }
                     }
                 }
-            }
+            });
 
-            // Whenever the mouse is moved:
-            $(window).mousemove(function(e) {
-                if (spaceIsDown && mouseIsDown && lastX != null) {
-                    // If the space bar is currently held down then:
-                    moveTiles(e.pageX, e.pageY);
+            $window.keyup(function(e) {
+                var code = e.keyCode ? e.keyCode : e.which;
+
+                switch (code) {
+                    // m
+                    case 77:
+                        $.stateBindings.toggleState('editing');
+                        $.stateBindings.toggleState('viewing');
+                        $('header').css('background-color', $.stateBindings.activeStates.contains('viewing') ? 'white' : 'blue');
+                        
+                        // Clean up states
+                        if (! $.stateBindings.activeStates.contains('editing')) {
+                            // $.stateBindings.removeState('placingSwitch');
+                            // $.stateBindings.removeState('placingServer');
+                            current.attr('text', '');
+                        } else {
+                            current.attr('text', $.stateBindings.activeStates.contains('placingSwitch') ? 'SWITCH' : 'SERVER');
+                            $.stateBindings.addState('placingDevices');
+                            $.stateBindings.addState('placingServer');
+                        }
+                        
+                        break;
                 }
-
-                // update the x and y values for use in the next frame.
+            });
+            
+            $window.mousemove(function(e) {
+                
+                if (lastX !== null && lastY !== null) {
+                    // Get the diffence in position since the last frame
+                    xChange = e.pageX - lastX;
+                    yChange = e.pageY - lastY;
+                }
+                
                 lastX = e.pageX;
                 lastY = e.pageY;
-
-                // console.log(hoveredOverTile);
-
-                if (hoveredOverTile != null) {
-                    var top = hoveredOverTile.getTopPoint(),
-                        left = hoveredOverTile.getLeftPoint(),
-                        right = hoveredOverTile.getRightPoint(),
-                        bottom = hoveredOverTile.getBottomPoint(),
-
-                        tileX = hoveredOverTile.getGridX(),
-                        tileY = hoveredOverTile.getGridY();
-
-                    if (! isPointRightOfLine(left.x, left.y, top.x, top.y, e.pageX, e.pageY)) {
-                        setHighlightedTile(getTile(tileX, tileY - 1));
-                    } else if (! isPointRightOfLine(top.x, top.y, right.x, right.y, e.pageX, e.pageY)) {
-                        setHighlightedTile(getTile(tileX - 1, tileY));
-                    } else if (! isPointRightOfLine(right.x, right.y, bottom.x, bottom.y, e.pageX, e.pageY)) {
-                        setHighlightedTile(getTile(tileX, tileY + 1));
-                    } else if (! isPointRightOfLine(bottom.x, bottom.y, left.x, left.y, e.pageX, e.pageY)) {
-                        setHighlightedTile(getTile(tileX + 1, tileY));
-                    } else {
-                        setHighlightedTile(hoveredOverTile);
-                    }
-                }
             });
 
-            $(window).mousedown(function(e) {
-                mouseIsDown = true;
+            $window.mousedown(function(e) {
+                if (spaceIsDown === true) {
+                    $.stateBindings.addState('movingTiles');
+                }
                 e.preventDefault();
             });
 
-            $(window).mouseup(function(e) {
-                mouseIsDown = false;
+            $window.mouseup(function(e) {
+                $.stateBindings.removeState('movingTiles');
             });
-
-            $(document).bind('touchmove', function(e) {
-                e.preventDefault();
-                var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-
-                if (lastX != null) {
-                    moveTiles(touch.clientX, touch.clientY);
-                }
-
-                lastX = touch.clientX;
-                lastY = touch.clientY;
-            });
-
-            $(document).bind('touchstart', function(e) {
-                var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-
-                lastX = touch.clientX;
-                lastY = touch.clientY;
-            });
-
-            $(window).keydown(function(e) {
-                var code = e.keyCode ? e.keyCode : e.which;
-
-                switch (code) {
-                    // Space
-                    case 32:
-                        spaceIsDown = true;
-                        $('html').css('cursor', 'move');
-                        break;
-                }
-            });
-
-            $(window).keyup(function(e) {
-                var code = e.keyCode ? e.keyCode : e.which;
-
-                switch (code) {
-                    // space
-                    case 32:
-                        spaceIsDown = false;
-                        $('html').css('cursor', 'default');
-                        break;
-
-                    // s
-                    case 83:
-                        placeSwitch = ! placeSwitch;
-                        placeServer = ! placeServer;
-
-                        current.attr('text', placeSwitch ? 'SWITCH' : 'SERVER');
-                        break;
-
-                    // c
-                    case 67:
-                        state = state == DRAWING_CONNECTIONS ? PLACING_DEVICES : DRAWING_CONNECTIONS;
-                        $('html').css('cursor', state == DRAWING_CONNECTIONS ? 'crosshair' : 'default');
-                        current.attr('text', state == DRAWING_CONNECTIONS ? 'CONNECTIONS' : placeSwitch ? 'SWITCH' : 'SERVER');
-
-                        break;
-                }
-            });
+            
+            $.stateBindings.setState('viewing isInteractive');
 
         });
     </script>
