@@ -60,8 +60,6 @@ function Tile(x, y, quadrant) {
         dashboardConfig.tileHeight
     ));
     
-    this.raphaelObj.node.class = "tile";
-    
     var x = this.quadrant.x,
         y = this.quadrant.y;
     
