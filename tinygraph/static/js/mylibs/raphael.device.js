@@ -151,7 +151,7 @@ function Device(tile) {
 Device.prototype = new Item();
 Device.prototype.translate = function(cx, cy) {
     // Translate all the connectiosn for which this device is the root.
-    for (var i in this.interfaces) {
+    for (var i = 0; i < this.interfaces.length; i++) {
         var connection = this.interfaces[i];
         
         if (connection.fromDevice === this)
@@ -182,7 +182,7 @@ Device.prototype.setHighlighted = function(highlight) {
         this.raphaelObj.animate({opacity: 1}, 100);
 };
 Device.prototype.updateConnections = function() {
-    for (var i in this.interfaces) {
+    for (var i = 0; i < this.interfaces.length; i++) {
         var connection = this.interfaces[i],
             fromPoint = connection.fromDevice.getOriginPos(),
             toPoint = connection.toDevice.getOriginPos();
@@ -275,9 +275,11 @@ function Quadrant(width, height, xPositive, yPositive) {
 }
 
 Quadrant.prototype.translate = function(cx, cy) {
-    for (var x in this.tiles)
-        for (var y in this.tiles[x])
+    for (var x = 1; x <= this.width; x++) {
+        for (var y = 1; y <= this.height; y++) {
             this.tiles[x][y].translate(cx, cy);
+        }
+    }
     this.x += cx;
     this.y += cy;
 };

@@ -67,10 +67,11 @@
                 'fill': '#fefefe'
             });
             
-            dashboardConfig.layers = new Array();
-            dashboardConfig.layers['tiles'] = dashboardConfig.paper.layer('tiles');
-            dashboardConfig.layers['connections'] = dashboardConfig.paper.layer('connections'),
-            dashboardConfig.layers['devices'] = dashboardConfig.paper.layer('devices');
+            dashboardConfig.layers = {
+                'tiles': dashboardConfig.paper.layer('tiles'),
+                'connections': dashboardConfig.paper.layer('connections'),
+                'devices': dashboardConfig.paper.layer('devices')
+            };
             
             // Tile size and spacing
             dashboardConfig.tileWidth = 128;
@@ -85,11 +86,12 @@
             dashboardConfig.gridWidth = {{ board.width_near }} + {{ board.width_far }};
             dashboardConfig.gridHeight = {{ board.depth_near }} + {{ board.depth_far }};
 
-            dashboardConfig.quadrants = new Array();
-            dashboardConfig.quadrants['topRight'] = new Quadrant({{ board.width_far}}, {{ board.depth_far }}, true, true);
-            dashboardConfig.quadrants['topLeft'] = new Quadrant({{ board.width_near }}, {{ board.depth_far }}, false, true);
-            dashboardConfig.quadrants['bottomRight'] = new Quadrant({{ board.width_far}}, {{ board.depth_near }}, true, false);
-            dashboardConfig.quadrants['bottomLeft'] = new Quadrant({{ board.width_near }}, {{ board.depth_near }}, false, false);
+            dashboardConfig.quadrants = {
+                'topRight': new Quadrant({{ board.width_far}}, {{ board.depth_far }}, true, true),
+                'topLeft': new Quadrant({{ board.width_near }}, {{ board.depth_far }}, false, true),
+                'bottomRight': new Quadrant({{ board.width_far}}, {{ board.depth_near }}, true, false),
+                'bottomLeft': new Quadrant({{ board.width_near }}, {{ board.depth_near }}, false, false)
+            };
             
             {% for item in board.items.all %}
                 getTile({{ item.x }},{{ item.y }}).addDevice(new ServerDevice());
@@ -173,7 +175,7 @@
                 }
             });
             
-            $.stateBindings.setState('editing');
+            $.stateBindings.setState('viewing');
             
             // .click(function(e) {
             //                 if (! spaceIsDown) {
@@ -412,8 +414,9 @@
 
                 // and translate the position of all tiles based upon
                 // the movement of the mouse since the last frame
-                for (var name in dashboardConfig.quadrants)
+                for (var name in dashboardConfig.quadrants) {
                     dashboardConfig.quadrants[name].translate(xChange, yChange);
+                }
             }
             
             function incSkipZero(val) {
@@ -534,6 +537,17 @@
                         $('html').css('cursor', state == DRAWING_CONNECTIONS ? 'crosshair' : 'default');
                         current.attr('text', state == DRAWING_CONNECTIONS ? 'CONNECTIONS' : placeSwitch ? 'SWITCH' : 'SERVER');
 
+                        break;
+                    
+                    // m
+                    case 77:
+                        if ($.stateBindings.state === 'editing') {
+                            $.stateBindings.setState('viewing');
+                            $('header').css('background-color', 'white');
+                        } else {
+                            $.stateBindings.setState('editing');
+                            $('header').css('background-color', 'blue');
+                        }
                         break;
                 }
             });
