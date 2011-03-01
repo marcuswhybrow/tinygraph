@@ -23,7 +23,7 @@ if settings.DEBUG:
     )
 
 urlpatterns += patterns('',
-    (r'^api/', include('api.urls')),
+    (r'^api/', include('api.urls.urls')),
     (r'^devices/', include('devices.urls')),
     (r'^data/', include('definitions.urls')),
     

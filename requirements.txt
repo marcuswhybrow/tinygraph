@@ -2,3 +2,4 @@ Django==1.2.3
 simplejson
 pysnmp==4.1.15a
 pysnmp-mibs==0.0.8a
+django-piston==0.2.2
