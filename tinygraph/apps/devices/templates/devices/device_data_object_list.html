@@ -27,7 +27,7 @@
                     <h5>{{ package.title }}</h5>
                     <p>{{ package.description }}</p>
                     <p>
-                        <a href="{% url definitions.views.package_detail package_slug=package.slug %}">Read More</a>
+                        <a href="{% url definitions:package_detail package_slug=package.slug %}">Read More</a>
                     </p>
                 </div>
             {% endfor %}
@@ -45,7 +45,7 @@
     {% endwith %}
     
     <p>
-        <a href="{% url devices.views.device_detail device_slug=device.slug %}">&#x2190; Back</a> to {{ device.user_given_name }}
+        <a href="{% url devices:device_detail device_slug=device.slug %}">&#x2190; Back</a> to {{ device.user_given_name }}
     </p>
 {% endblock %}
 

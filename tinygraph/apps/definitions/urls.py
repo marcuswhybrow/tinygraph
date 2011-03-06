@@ -1,10 +1,10 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('definitions.views',
-    (r'^mibs/$', 'mib_upload_list'),
+    url(r'^mibs/$', 'mib_upload_list', name='mib_upload_list'),
     
-    (r'^packages/$', 'package_list'),
-    (r'^packages/(?P<package_slug>[-\w]+)/$', 'package_detail'),
+    url(r'^packages/$', 'package_list', name='package_list'),
+    url(r'^packages/(?P<package_slug>[-\w]+)/$', 'package_detail', name='package_detail'),
 
-    (r'^$', 'data_object_list'),
+    url(r'^$', 'data_object_list', name='data_object_list'),
 )

@@ -31,7 +31,7 @@ class Device(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('devices.views.device_detail', (), {
+        return ('devices:device_detail', (), {
             'device_slug': self.slug,
         })
 

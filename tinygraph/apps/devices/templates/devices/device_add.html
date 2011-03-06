@@ -29,7 +29,7 @@
     
     <div id="target"></div>
     
-    <p><a href="{% url devices.views.device_list %}">&#x2190; back</a></p>
+    <p><a href="{% url devices:device_list %}">&#x2190; back</a></p>
 {% endblock %}
 
 {% block scripts %}
@@ -37,7 +37,7 @@
     <script type="text/javascript" charset="utf-8">
         $(function() {
             
-            var PING_URL = '{% url api.views.core.ping %}';
+            var PING_URL = '{% url api:core:ping %}';
             
             var typewatch = (function() {
                 var timer = 0;

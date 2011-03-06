@@ -44,14 +44,14 @@
     <div id="container">
         <header>
             <div id="logo">
-                <a href="{% url dashboard.views.index %}"><h1 id="tinygraph">TinyGraph</h1></a>
+                <a href="{% url dashboard:index %}"><h1 id="tinygraph">TinyGraph</h1></a>
             </div>
             <nav id="main-nav">
                 <ul class="clearfix">
-                    <li class="dashboard"><a href="{% url dashboard.views.index %}">Dashboard</a></li>
-                    <li class="devices"><a href="{% url devices.views.device_list %}">Devices</a></li>
-                    <li class="data-objects"><a href="{% url definitions.views.data_object_list %}">Data Objects</a></li>
-                    <li class="packages"><a href="{% url definitions.views.package_list %}">Packages</a></li>
+                    <li class="dashboard"><a href="{% url dashboard:index %}">Dashboard</a></li>
+                    <li class="devices"><a href="{% url devices:device_list %}">Devices</a></li>
+                    <li class="data-objects"><a href="{% url definitions:data_object_list %}">Data Objects</a></li>
+                    <li class="packages"><a href="{% url definitions:package_list %}">Packages</a></li>
                 </ul>
             </nav>
         </header>

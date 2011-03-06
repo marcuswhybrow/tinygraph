@@ -23,9 +23,9 @@ if settings.DEBUG:
     )
 
 urlpatterns += patterns('',
-    (r'^api/', include('api.urls.urls')),
-    (r'^devices/', include('devices.urls')),
-    (r'^data/', include('definitions.urls')),
+    (r'^api/', include('api.urls.urls', namespace='api')),
+    (r'^devices/', include('devices.urls', namespace='devices')),
+    (r'^data/', include('definitions.urls', namespace='definitions')),
     
-    (r'^$', 'dashboard.views.index'),
+    url(r'^', include('dashboard.urls', namespace='dashboard')),
 )

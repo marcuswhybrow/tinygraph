@@ -22,7 +22,7 @@
     {{ block.super }}
     <script type="text/javascript" charset="utf-8">
         $(function() {
-            var URL = '{% url api.views.core.data_object_children_list %}';
+            var URL = '{% url api:core:data_object_children_list %}';
             
             $('#data-object-list').delegate('a', 'click', function() {
                 var a = $(this);

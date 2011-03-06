@@ -7,12 +7,12 @@ item_handler = Resource(ItemHandler)
 connection_handler = Resource(ConnectionHandler)
 
 urlpatterns = patterns('',
-    (r'^board/$', board_handler),
-    (r'^board/(?P<id>\d+)/$', board_handler),
+    url(r'^board/$', board_handler, name='board'),
+    url(r'^board/(?P<id>\d+)/$', board_handler, name='board'),
     
-    (r'^item/$', item_handler),
-    (r'^item/(?P<id>\d+)/$', item_handler),
+    url(r'^item/$', item_handler, name='item'),
+    url(r'^item/(?P<id>\d+)/$', item_handler, name='item'),
     
-    (r'^connection/$', connection_handler),
-    (r'^connection/(?P<id>\d+)/$', connection_handler),
+    url(r'^connection/$', connection_handler, name='connection'),
+    url(r'^connection/(?P<id>\d+)/$', connection_handler, name='connection'),
 )

@@ -188,9 +188,13 @@
                             // Indicate that some database interaction is going on.
                             updateSaving(true);
                             $.ajax({
-                                url: '{% url api.views.core.dashboard_create_item %}',
-                                type: 'post',
-                                data: {item_x: deviceGridPos.x, item_y: deviceGridPos.y, item_type: 'server', item_board_pk: '{{ board.pk }}'},
+                                url: '{% url api:dashboard:item %}',
+                                type: 'put',
+                                data: {
+                                    x: deviceGridPos.x,
+                                    y: deviceGridPos.y,
+                                    type: 'server',
+                                    board_id: '{{ board.pk }}'},
                                 success: function(data) {
                                     console.log('created');
                                     console.log(data);

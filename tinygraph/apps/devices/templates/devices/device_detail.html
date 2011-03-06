@@ -14,12 +14,12 @@
     </p>
     
     <p>
-        <a href="{% url devices.views.device_edit device_slug=device.slug %}">edit</a>
-        <a href="{% url devices.views.device_delete device_slug=device.slug %}">delete</a>
+        <a href="{% url devices:device_edit device_slug=device.slug %}">edit</a>
+        <a href="{% url devices:device_delete device_slug=device.slug %}">delete</a>
     </p>
     
     <p>
-        <a href="{% url devices.views.device_data_object_list device_slug=device.slug %}">Data Objects</a>
+        <a href="{% url devices:device_data_object_list device_slug=device.slug %}">Data Objects</a>
     </p>
     
     <h3>Overview</h3>
@@ -29,5 +29,5 @@
     </p>
     
     
-    <p><a href="{% url devices.views.device_list %}">&#x2190; back</a> to Devices</p>
+    <p><a href="{% url devices:device_list %}">&#x2190; back</a> to Devices</p>
 {% endblock %}
