@@ -46,6 +46,8 @@
     <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.layer.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.device.js"></script>
     <script type="text/javascript" charset="utf-8">
+    
+        var CSRF_TOKEN = '{{ csrf_token }}';
 
         var paper = dashboardConfig.paper = Raphael(0, 0, '100%', '100%');
 
@@ -194,7 +196,9 @@
                                     x: deviceGridPos.x,
                                     y: deviceGridPos.y,
                                     type: 'server',
-                                    board: '{{ board.pk }}'},
+                                    board: '{{ board.pk }}',
+                                    csrf_token: CSRF_TOKEN
+                                },
                                 success: function(data) {
                                     console.log('created');
                                     console.log(data);
