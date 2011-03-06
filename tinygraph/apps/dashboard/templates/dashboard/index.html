@@ -189,12 +189,12 @@
                             updateSaving(true);
                             $.ajax({
                                 url: '{% url api:dashboard:item %}',
-                                type: 'put',
+                                type: 'post',
                                 data: {
                                     x: deviceGridPos.x,
                                     y: deviceGridPos.y,
                                     type: 'server',
-                                    board_id: '{{ board.pk }}'},
+                                    board: '{{ board.pk }}'},
                                 success: function(data) {
                                     console.log('created');
                                     console.log(data);

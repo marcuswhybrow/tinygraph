@@ -12,3 +12,4 @@ class ItemHandler(BaseHandler):
 class ConnectionHandler(BaseHandler):
     allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
     model = Connection
+    

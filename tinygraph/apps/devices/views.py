@@ -30,7 +30,7 @@ def device_edit(request, device_slug=None):
         if form.is_valid():
             # Note "device" will be None if creating a new Device
             saved_device = form.save()
-            return HttpResponseRedirect(reverse('devices.views.device_detail', kwargs={
+            return HttpResponseRedirect(reverse('devices:device_detail', kwargs={
                 'device_slug': saved_device.slug,
             }))
     else:
@@ -60,7 +60,7 @@ def device_add(request):
         form = DeviceForm(request.POST)
         if form.is_valid():
             device = form.save()
-            return HttpResponseRedirect('%s?new' % reverse('devices.views.device_data_object_list', kwargs={
+            return HttpResponseRedirect('%s?new' % reverse('devices:device_data_object_list', kwargs={
                 'device_slug': device.slug,
             }))
     else:
