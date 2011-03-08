@@ -97,7 +97,14 @@
             
             var device = null;
             {% for item in board.items.all %}
-                getTile({{ item.x }},{{ item.y }}).addDevice(new ServerDevice({{ item.pk }}));
+                {% if item.type == 'server' %}
+                    device = new ServerDevice({{ item.pk }});
+                {% else %}
+                    {% if item.type == 'switch' %}
+                        device = new SwitchDevice({{ item.pk }});
+                    {% endif %}
+                {% endif %}
+                getTile({{ item.x }},{{ item.y }}).addDevice(device);
             {% endfor %}
             
             var current = dashboardConfig.paper.text(30, $window.height() - 30, '');
@@ -193,24 +200,22 @@
                             $.ajax({
                                 url: '{% url api:dashboard:items %}',
                                 type: 'post',
-                                contentType: 'application/x-www-form-urlencoded',
-                                mimeType: 'application/x-www-form-urlencoded',
+                                context: device,
                                 data: {
                                     x: deviceGridPos.x,
                                     y: deviceGridPos.y,
-                                    type: 'server',
+                                    type: $.stateBindings.activeStates.contains('placingServer') ? 'server' :
+                                        $.stateBindings.activeStates.contains('placingSwitch') ? 'switch' :
+                                        'error',
                                     board: '{{ board.pk }}',
                                     csrfmiddlewaretoken: CSRF_TOKEN
                                 },
                                 success: function(data) {
-                                    console.log('created');
-                                    console.log(data);
+                                    this.pk = data['id'];
                                     updateSaving(false);
                                 },
                                 error: function(data) {
-                                    console.log('failed');
-                                    console.log(data);
-                                    console.log(data.response);
+                                    
                                     updateSaving(false);
                                 },
                                 dataType: 'json'
@@ -320,8 +325,6 @@
                     updateSaving(true);
                     $.ajax({
                         url: '{% url api:dashboard:items %}' + device.pk + '/',
-                        contentType: 'application/x-www-form-urlencoded',
-                        mimeType: 'application/x-www-form-urlencoded',
                         type: 'PUT',
                         data: {
                             x: newTile.x,

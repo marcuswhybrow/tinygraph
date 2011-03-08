@@ -2,4 +2,5 @@ Django==1.2.3
 simplejson
 pysnmp==4.1.15a
 pysnmp-mibs==0.0.8a
-django-piston==0.2.2
+
+https://bitbucket.org/jespern/django-piston/get/c4b2d21db51a.tar.gz

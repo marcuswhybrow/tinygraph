@@ -225,8 +225,10 @@ ServerDevice.prototype = new Device();
 // SwitchDevice
 // ---------------------------------------------------------------------------
 
-function SwitchDevice(tile) {
+function SwitchDevice(pk) {
     this.interfaces = new Array();
+    
+    this.pk = pk;
     
     // Device.call(this, tile);
     this.setRaphaelObj(dashboardConfig.paper.image(
@@ -238,9 +240,6 @@ function SwitchDevice(tile) {
     this.raphaelObj.onAnimation(function() {
         this.wrapper.updateConnections();
     });
-    
-    if (this.tile != undefined)
-        dashboardConfig.layers['devices'].addAtPosition(this);
     
     this.xOffset = 45;
     this.yOffset = 47;
