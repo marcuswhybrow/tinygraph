@@ -23,6 +23,9 @@ var dashboardConfig = function() {
 
 function Item(paper) {
     this.setPaper(paper);
+    
+    // The primary key of this item in the database
+    this.pk = null;
 }
 
 Item.prototype.setRaphaelObj = function(raphaelObj) {
@@ -141,9 +144,7 @@ Tile.prototype.addDevice = function(device) {
 
 function Device(tile) {
     this.tile = (tile === undefined) ? null : tile;
-    
     this.moving = false;
-    
     this.raphaelObj = null;
 }
 Device.prototype = new Item();
@@ -199,18 +200,16 @@ Device.prototype.connectTo = function(toDevice) {
 // ServerDevice
 // ---------------------------------------------------------------------------
 
-function ServerDevice(tile) {
+function ServerDevice(pk) {
     this.interfaces = new Array();
     
-    // Device.call(this, tile);
+    this.pk = pk;
+    
     this.setRaphaelObj(dashboardConfig.paper.image(
         dashboardConfig.imagePath + 'server.png',
         0, 0,
         72, 96
     ));
-    
-    if (this.tile != undefined)
-        dashboardConfig.layers['devices'].addAtPosition(this);
     
     this.raphaelObj.onAnimation(function() {
         this.wrapper.updateConnections();

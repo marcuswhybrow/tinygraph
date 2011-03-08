@@ -7,9 +7,9 @@ package_handler = Resource(PackageHandler)
 mib_upload_handler = Resource(MibUploadHandler)
 
 urlpatterns = patterns('',
-    # (r'^data-object/$', data_object_handler),
-    (r'^data-object/(?P<id>\d+)/$', data_object_handler),
+    url(r'^data-object/$', data_object_handler, name='data_objects'),
+    url(r'^data-object/(?P<id>\d+)/$', data_object_handler, name='data_object'),
     
-    (r'^package/$', package_handler),
-    (r'^package/(?P<id>\d+)/$', package_handler),
+    url(r'^package/$', package_handler, name='packages'),
+    url(r'^package/(?P<id>\d+)/$', package_handler, name='package'),
 )

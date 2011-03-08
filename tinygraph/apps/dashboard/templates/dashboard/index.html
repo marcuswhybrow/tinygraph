@@ -95,8 +95,9 @@
                 'bottomLeft': new Quadrant({{ board.width_near }}, {{ board.depth_near }}, false, false)
             };
             
+            var device = null;
             {% for item in board.items.all %}
-                getTile({{ item.x }},{{ item.y }}).addDevice(new ServerDevice());
+                getTile({{ item.x }},{{ item.y }}).addDevice(new ServerDevice({{ item.pk }}));
             {% endfor %}
             
             var current = dashboardConfig.paper.text(30, $window.height() - 30, '');
@@ -190,14 +191,16 @@
                             // Indicate that some database interaction is going on.
                             updateSaving(true);
                             $.ajax({
-                                url: '{% url api:dashboard:item %}',
+                                url: '{% url api:dashboard:items %}',
                                 type: 'post',
+                                contentType: 'application/x-www-form-urlencoded',
+                                mimeType: 'application/x-www-form-urlencoded',
                                 data: {
                                     x: deviceGridPos.x,
                                     y: deviceGridPos.y,
                                     type: 'server',
                                     board: '{{ board.pk }}',
-                                    csrf_token: CSRF_TOKEN
+                                    csrfmiddlewaretoken: CSRF_TOKEN
                                 },
                                 success: function(data) {
                                     console.log('created');
@@ -207,6 +210,7 @@
                                 error: function(data) {
                                     console.log('failed');
                                     console.log(data);
+                                    console.log(data.response);
                                     updateSaving(false);
                                 },
                                 dataType: 'json'
@@ -281,6 +285,7 @@
 
             // Moves a device from is current tile to a new tile
             function moveDeviceToTile(device, newTile) {
+                console.log(device.pk);
                 var oldTile = device.tile;
 
                 if (newTile == null || newTile.device != null) return false;
@@ -311,6 +316,26 @@
                     dashboardConfig.layers['devices'].addAtPosition(device);
 
                     device.updateConnections();
+                    
+                    updateSaving(true);
+                    $.ajax({
+                        url: '{% url api:dashboard:items %}' + device.pk + '/',
+                        contentType: 'application/x-www-form-urlencoded',
+                        mimeType: 'application/x-www-form-urlencoded',
+                        type: 'PUT',
+                        data: {
+                            x: newTile.x,
+                            y: newTile.y,
+                            csrfmiddlewaretoken: CSRF_TOKEN
+                        },
+                        success: function(data) {
+                            updateSaving(false);
+                        },
+                        error: function(data) {
+                            updateSaving(false);
+                        },
+                        // dataType: 'json'
+                    });
                 });
 
                 return true;

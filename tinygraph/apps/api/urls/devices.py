@@ -5,6 +5,6 @@ from api.views.devices import DeviceHandler
 device_handler = Resource(DeviceHandler)
 
 urlpatterns = patterns('',
-    (r'^device/$', device_handler),
-    (r'^device/(?P<id>\d+)/$', device_handler),
+    url(r'^device/$', device_handler, name='devices'),
+    url(r'^device/(?P<id>\d+)/$', device_handler, name='device'),
 )

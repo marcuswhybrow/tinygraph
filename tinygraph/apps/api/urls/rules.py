@@ -6,9 +6,9 @@ rule_handler = Resource(RuleHandler)
 package_instance_handler = Resource(PackageInstanceHandler)
 
 urlpatterns = patterns('',
-    (r'^rule/$', rule_handler),
-    (r'^rule/(?P<id>\d+)/$', rule_handler),
+    url(r'^rule/$', rule_handler, name='rules'),
+    url(r'^rule/(?P<id>\d+)/$', rule_handler, name='rule'),
     
-    (r'^package-instance/$', package_instance_handler),
-    (r'^package-instance/(?P<id>\d+)/$', package_instance_handler),
+    url(r'^package-instance/$', package_instance_handler, name='package_instances'),
+    url(r'^package-instance/(?P<id>\d+)/$', package_instance_handler, name='package_instance'),
 )
