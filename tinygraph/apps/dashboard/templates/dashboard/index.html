@@ -471,7 +471,6 @@
                                     $.stateBindings.activeStates.contains('placingSwitch') ? 'SWITCH' :
                                     'SERVER'
                                 );
-                                console.log($.stateBindings.activeStates);
                                 break;
                         }
                     }
@@ -486,7 +485,8 @@
                     case 77:
                         $.stateBindings.toggleState('editing');
                         $.stateBindings.toggleState('viewing');
-                        $('header').css('background-color', $.stateBindings.activeStates.contains('viewing') ? 'white' : 'blue');
+                        $.stateBindings.toggleState('placingDevices');
+                        $('header').css('background-color', $.stateBindings.activeStates.contains('editing') ? 'blue' : 'white');
                         
                         // Clean up states
                         if (! $.stateBindings.activeStates.contains('editing')) {
