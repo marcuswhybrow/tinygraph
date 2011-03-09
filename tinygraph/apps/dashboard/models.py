@@ -48,4 +48,4 @@ class Connection(models.Model):
     to_item = models.ForeignKey('dashboard.Item')
     
     def __unicode__(self):
-        return '%s to %s on %s' % (from_item, to_item, from_item.board)
+        return '%s to %s' % (self.from_item, self.to_item)

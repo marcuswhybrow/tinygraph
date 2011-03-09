@@ -193,7 +193,7 @@ Device.prototype.updateConnections = function() {
     }
 };
 Device.prototype.connectTo = function(toDevice) {
-    new Connection(this, toDevice);
+    return new Connection(this, toDevice);
 };
 
 
@@ -284,9 +284,11 @@ Quadrant.prototype.translate = function(cx, cy) {
 // Connection
 // ---------------------------------------------------------------------------
 
-function Connection(fromDevice, toDevice) {
+function Connection(fromDevice, toDevice, pk) {
     this.fromDevice = (fromDevice === undefined) ? null : fromDevice;
     this.toDevice = (toDevice === undefined) ? null : toDevice;
+    
+    this.pk = pk;
     
     var fromPoint = fromDevice.getOriginPos(),
         toPoint = toDevice.getOriginPos();
