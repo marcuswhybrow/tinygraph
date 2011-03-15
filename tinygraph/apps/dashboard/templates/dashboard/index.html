@@ -96,7 +96,7 @@
             };
             
             var device = null;
-            {% for item in board.items.all %}
+            {% for item in items %}
                 {% if item.type == 'server' %}
                     device = new ServerDevice({{ item.pk }});
                 {% else %}
@@ -109,12 +109,10 @@
             
             var fromDevice = null;
             var toDevice = null;
-            {% for item in board.items.all %}
-                {% for connection in item.connections.all %}
-                    fromDevice = getTile({{ connection.from_item.x }}, {{ connection.from_item.y }}).device;
-                    toDevice = getTile({{ connection.to_item.x }}, {{ connection.to_item.y }}).device;
-                    fromDevice.connectTo(toDevice);
-                {% endfor %}
+            {% for connection in connections %}
+                fromDevice = getTile({{ connection.from_item.x }}, {{ connection.from_item.y }}).device;
+                toDevice = getTile({{ connection.to_item.x }}, {{ connection.to_item.y }}).device;
+                fromDevice.connectTo(toDevice);
             {% endfor %}
             
             var current = dashboardConfig.paper.text(30, $window.height() - 30, '');
