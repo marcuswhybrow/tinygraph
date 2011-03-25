@@ -1,6 +1,7 @@
 from django import forms
 from devices.models import Device
 from django.db.models import Q
+from django.template.defaultfilters import slugify
 
 class DeviceForm(forms.ModelForm):
     class Meta:

@@ -22,11 +22,70 @@ header {
 
 #dashboard-edit-panel {
     z-index: 1010;
-    background: red;
+    background: #999;
     
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 200px;
+}
+
+#dep-inner {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    
+    background-color: #eee;
+}
+
+#dep-devices {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    bottom: 10px;
+    
+    padding: 10px;
+}
+
+#dep-devices .dep-device {
+    position: relative;
+    float: left;
+    width: 130px;
+    height: 150px;
+    
+    margin-right: 20px;
+    
+    background: -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#eee));
+    
+    -webkit-border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+#dep-devices .dep-device .dep-device-image {
+    background: top center no-repeat url('/static/images/dashboard/server.png');
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    height: 100px;
+    
+    cursor: move;
+}
+
+#dep-devices .dep-device.placed .dep-device-image {
+    background-image: url('/static/images/dashboard/server-disabled.png');
+}
+
+#dep-devices .dep-device .dep-device-name {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    text-align: center;
+    
+    text-transform: uppercase;
+    font-size: 14px;
 }

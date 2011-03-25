@@ -5,7 +5,20 @@
     <h3>Loading Dashboard &#8230;</h3>
     <noscript>JavaScript must be enabled.</noscript>
     
-    <div id="dashboard-edit-panel" style="bottom: -200px"></div>
+    <div id="dashboard-edit-panel" style="bottom: -200px">
+        <div id="dep-inner">
+            <div id="dep-devices">
+                {% for device in devices %}
+                    <div class="dep-device {% if device.item_set|length %}placed{% else %}not-placed{% endif %}">
+                        <div class="dep-device-image-wrapper">
+                            <div class="dep-device-image"></div>
+                        </div>
+                        <div class="dep-device-name">{{ device.user_given_name }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block meta %}
@@ -34,6 +47,21 @@
         $(function() {
             var $window = $(window),
                 $editPanel = $('#dashboard-edit-panel');
+            
+            // ---------------------------------------------------------------
+            // Edit Panel Code
+            // ---------------------------------------------------------------
+            
+            $('.dep-device.not-placed .dep-device-image-wrapper').draggable({
+                revert: true,
+                zIndex: 10000,
+                revertDuration: 200,
+                scroll: false
+            });
+            
+            // ---------------------------------------------------------------
+            // Regular Dashboard Code
+            // ---------------------------------------------------------------
             
             dashboardConfig.imagePath = '{{ STATIC_URL }}images/dashboard/';
             
@@ -388,19 +416,47 @@
                 return newVal;
             }
             
+            function moveEverything(xChange, yChange) {
+                if (xChange !== null && yChange !== null) {
+                    for (var name in dashboardConfig.quadrants) {
+                        dashboardConfig.quadrants[name].translate(xChange, yChange);
+                    }
+                }
+            }
+            
             $window.stateBindings({
                 movingTiles: {
                     mousemove: function(e) {
-                        if (xChange !== null && yChange !== null) {
-                            // and translate the position of all tiles based upon
-                            // the movement of the mouse since the last frame
-                            for (var name in dashboardConfig.quadrants) {
-                                dashboardConfig.quadrants[name].translate(xChange, yChange);
-                            }
-                        }
+                        // and translate the position of all tiles based upon
+                        // the movement of the mouse since the last frame
+                        moveEverything(xChange, yChange);
                     }
                 },
                 isInteractive: {
+                    keydown: function(e) {
+                        var code = e.keyCode ? e.keyCode : e.which;
+
+                        switch (code) {
+                            // Space
+                            case 32:
+                                spaceIsDown = true;
+                                $('html').css('cursor', 'move');
+                                break;
+                        }
+                    },
+                    keyup: function(e) {
+                        var code = e.keyCode ? e.keyCode : e.which;
+
+                        switch (code) {
+                            // space
+                            case 32:
+                                spaceIsDown = false;
+                                $('html').css('cursor', 'default');
+                                break;
+                        }
+                    }
+                },
+                editing: {
                     mousemove: function(e) {
                         if (hoveredOverTile != null) {
                             var points = hoveredOverTile.getPoints(),
@@ -430,30 +486,6 @@
                                 setHighlightedTile(hoveredOverTile);
                         }
                     },
-                    keydown: function(e) {
-                        var code = e.keyCode ? e.keyCode : e.which;
-
-                        switch (code) {
-                            // Space
-                            case 32:
-                                spaceIsDown = true;
-                                $('html').css('cursor', 'move');
-                                break;
-                        }
-                    },
-                    keyup: function(e) {
-                        var code = e.keyCode ? e.keyCode : e.which;
-
-                        switch (code) {
-                            // space
-                            case 32:
-                                spaceIsDown = false;
-                                $('html').css('cursor', 'default');
-                                break;
-                        }
-                    }
-                },
-                editing: {
                     keyup: function(e) {
                         var code = e.keyCode ? e.keyCode : e.which;
 
@@ -503,9 +535,15 @@
                             $editPanel.animate({
                                 bottom: 0
                             }, 200);
+                            $('header').animate({
+                                top: '-150'
+                            }, 200);
                         } else {
                             $editPanel.animate({
                                 bottom: '-200px'
+                            }, 200);
+                            $('header').animate({
+                                top: 0
                             }, 200);
                         }
                         
