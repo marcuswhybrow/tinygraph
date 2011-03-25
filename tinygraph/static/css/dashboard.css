@@ -1,0 +1,32 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+* {
+/*            -moz-user-select: -moz-none;
+    -webkit-user-select: none;*/
+}
+
+html {
+    overflow: hidden;
+}
+
+header {
+    z-index: 1000;
+    position: relative;
+    background: white;
+    border: 1px solid #999;
+    border-top: none;
+}
+
+#dashboard-edit-panel {
+    z-index: 1010;
+    background: red;
+    
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+}

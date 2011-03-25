@@ -4,6 +4,8 @@
 
     <h3>Loading Dashboard &#8230;</h3>
     <noscript>JavaScript must be enabled.</noscript>
+    
+    <div id="dashboard-edit-panel" style="bottom: -200px"></div>
 {% endblock %}
 
 {% block meta %}
@@ -14,29 +16,7 @@
 {% endblock %}
 
 {% block links %}
-    <style type="text/css" media="screen">
-        * {
-            margin: 0;
-            padding: 0;
-        }
-        
-        * {
-/*            -moz-user-select: -moz-none;
-            -webkit-user-select: none;*/
-        }
-        
-        body {
-            overflow: hidden;
-        }
-        
-        header {
-            z-index: 1000;
-            position: relative;
-            background: white;
-            border: 1px solid #999;
-            border-top: none;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" media="screen" charset="utf-8">
 {% endblock %}
 
 {% block scripts %}
@@ -52,7 +32,8 @@
         var paper = dashboardConfig.paper = Raphael(0, 0, '100%', '100%');
 
         $(function() {
-            var $window = $(window);
+            var $window = $(window),
+                $editPanel = $('#dashboard-edit-panel');
             
             dashboardConfig.imagePath = '{{ STATIC_URL }}images/dashboard/';
             
@@ -503,7 +484,9 @@
             });
 
             $window.keyup(function(e) {
-                var code = e.keyCode ? e.keyCode : e.which;
+                var nowEditing = false,
+                    nowPlacingSwitch = false,
+                    code = e.keyCode ? e.keyCode : e.which;
 
                 switch (code) {
                     // m
@@ -511,15 +494,28 @@
                         $.stateBindings.toggleState('editing');
                         $.stateBindings.toggleState('viewing');
                         $.stateBindings.toggleState('placingDevices');
-                        $('header').css('background-color', $.stateBindings.activeStates.contains('editing') ? 'blue' : 'white');
+                        
+                        nowEditing = $.stateBindings.activeStates.contains('editing');
+                        nowPlacingSwitch = $.stateBindings.activeStates.contains('placingSwitch')
+                        
+                        // Animate dashboard edit panel
+                        if(nowEditing) {
+                            $editPanel.animate({
+                                bottom: 0
+                            }, 200);
+                        } else {
+                            $editPanel.animate({
+                                bottom: '-200px'
+                            }, 200);
+                        }
                         
                         // Clean up states
-                        if (! $.stateBindings.activeStates.contains('editing')) {
+                        if (! nowEditing) {
                             // $.stateBindings.removeState('placingSwitch');
                             // $.stateBindings.removeState('placingServer');
                             current.attr('text', '');
                         } else {
-                            current.attr('text', $.stateBindings.activeStates.contains('placingSwitch') ? 'SWITCH' : 'SERVER');
+                            current.attr('text', nowPlacingSwitch ? 'SWITCH' : 'SERVER');
                             $.stateBindings.addState('placingDevices');
                             $.stateBindings.addState('placingServer');
                         }
