@@ -183,87 +183,6 @@
             var $tiles = $('svg image[layer="tiles"]');
             
             // ---------------------------------------------------------------
-            // Tile Bindings
-            // ---------------------------------------------------------------
-            
-            $tiles.hover(function() {
-                hoveredOverTile = this.raphael.wrapper;
-            }, function() {
-                hoveredOverTile = null;
-            });
-            
-            $tiles.stateBindings({
-                viewing: {
-                    click: function(e) {
-                        // do nothing at the moment
-                    },
-                },
-                placingDevices: {
-                    click: function(e) {
-                        if (movingDevice !== null && highlightedTile.device === null) {
-                            if (moveDeviceToTile(movingDevice, highlightedTile))
-                                movingDevice = null;
-                        } else if (highlightedTile.device !== null) {
-                            var device = highlightedTile.device;
-                            device.moving = ! device.moving;
-                            
-                            if (device.moving) {
-                                // If the device is now moving, update the
-                                // global movingDevice reference
-                                if (movingDevice !== null)
-                                    movingDevice.setHighlighted(false);
-                                movingDevice = device;
-
-                                // Then visually highlight the device
-                                device.setHighlighted(true);
-                            } else {
-                                movingDevice = null;
-                                device.setHighlighted(false);
-                            }
-                        }
-                    }
-                },
-                drawingConnections: {
-                    click: function(e) {
-                        var device = highlightedTile.device;
-
-                        if (device !== null) {
-                            if (selectedDevice == null) {
-                                selectedDevice = device;
-                            } else {
-                                var con = selectedDevice.connectTo(device);
-                                
-                                updateSaving(true);
-                                $.ajax({
-                                    url: '{% url api:dashboard:connections %}',
-                                    type: 'post',
-                                    context: con,
-                                    data: {
-                                        from_item: con.fromDevice.pk,
-                                        to_item: con.toDevice.pk,
-                                        csrfmiddlewaretoken: CSRF_TOKEN
-                                    },
-                                    success: function(data) {
-                                        this.pk = data['id'];
-                                        updateSaving(false);
-                                    },
-                                    error: function(data) {
-                                        updateSaving(false);
-                                    },
-                                    dataType: 'json'
-                                });
-                            
-                                $window.resize();
-
-                                // and then start the process over again.
-                                selectedDevice = null;
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // ---------------------------------------------------------------
             // Functions
             // ---------------------------------------------------------------
 
@@ -473,33 +392,10 @@
                 },
                 editing: {
                     mousemove: function(e) {
-                        if (hoveredOverTile != null) {
-                            var points = hoveredOverTile.getPoints(),
-                                gridPos = hoveredOverTile.getGridPos();
-
-                            var northWest = false,
-                                northEast = false,
-                                southEast = false,
-                                southWest = false;
-
-                            northWest = ! isPointRightOfLine(points.left.x, points.left.y, points.top.x, points.top.y, e.pageX, e.pageY);
-                            northEast = ! isPointRightOfLine(points.top.x, points.top.y, points.right.x, points.right.y, e.pageX, e.pageY);
-                            southEast = ! isPointRightOfLine(points.right.x, points.right.y, points.bottom.x, points.bottom.y, e.pageX, e.pageY);
-                            southWest = ! isPointRightOfLine(points.bottom.x, points.bottom.y, points.left.x, points.left.y, e.pageX, e.pageY);
-
-                            if (northEast === true && northWest === true)
-                                setHighlightedTile(getTile(incSkipZero(gridPos.x), incSkipZero(gridPos.y)));
-                            else if (northWest === true)
-                                setHighlightedTile(getTile(gridPos.x, incSkipZero(gridPos.y)));
-                            else if (northEast === true)
-                                setHighlightedTile(getTile(incSkipZero(gridPos.x), gridPos.y));
-                            else if (southWest === true)
-                                setHighlightedTile(getTile(gridPos.x, decSkipZero(gridPos.y)));
-                            else if (southEast === true)
-                                setHighlightedTile(getTile(decSkipZero(gridPos.x), gridPos.y));
-                            else
-                                setHighlightedTile(hoveredOverTile);
-                        }
+                        hoveredOverTile = getTileByPoint(e.pageX, e.pageY);
+                        // Uncomment to enable highlighting of the tile under
+                        // the mouse:
+                        //setHighlightedTile(hoveredOverTile);
                     },
                     keyup: function(e) {
                         var code = e.keyCode ? e.keyCode : e.which;
@@ -525,6 +421,66 @@
                                     'SERVER'
                                 );
                                 break;
+                        }
+                    }
+                },
+                placingDevices: {
+                    mousemove: function(e) {
+                        if (movingDevice !== null && hoveredOverTile.device === null)
+                            setHighlightedTile(hoveredOverTile);
+                        else
+                            setHighlightedTile(null);
+                    },
+                    click: function(e) {
+                        if (movingDevice !== null && hoveredOverTile.device === null) {
+                            if (moveDeviceToTile(movingDevice, hoveredOverTile))
+                                movingDevice = null;
+                        } else if (hoveredOverTile.device !== null) {
+                            var device = hoveredOverTile.device;
+                            
+                            if (movingDevice !== null) {
+                                movingDevice.setHighlighted(false);
+                            }
+                            movingDevice = device;
+                            movingDevice.setHighlighted(true);
+                        }
+                    }
+                },
+                drawingConnections: {
+                    click: function(e) {
+                        var device = hoveredOverTile.device;
+
+                        if (device !== null) {
+                            if (selectedDevice == null) {
+                                selectedDevice = device;
+                            } else {
+                                var con = selectedDevice.connectTo(device);
+                                
+                                updateSaving(true);
+                                $.ajax({
+                                    url: '{% url api:dashboard:connections %}',
+                                    type: 'post',
+                                    context: con,
+                                    data: {
+                                        from_item: con.fromDevice.pk,
+                                        to_item: con.toDevice.pk,
+                                        csrfmiddlewaretoken: CSRF_TOKEN
+                                    },
+                                    success: function(data) {
+                                        this.pk = data['id'];
+                                        updateSaving(false);
+                                    },
+                                    error: function(data) {
+                                        updateSaving(false);
+                                    },
+                                    dataType: 'json'
+                                });
+                            
+                                $window.resize();
+
+                                // and then start the process over again.
+                                selectedDevice = null;
+                            }
                         }
                     }
                 }
