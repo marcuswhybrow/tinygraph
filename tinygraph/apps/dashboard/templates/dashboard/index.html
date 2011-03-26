@@ -17,6 +17,13 @@
                         <div class="dep-device-name">{{ device.user_given_name }}</div>
                     </div>
                 {% endfor %}
+            </div>
+            <div id="dep-tools">
+                <div id="dep-delete"></div>
+                <div id="dep-connection-mode" class="tool" title="C">Connections</div>
+                <div class="tool">Other Thing</div>
+            </div>
+            <div id="dep-other-devices">
                 <div id="dep-device-switch" class="dep-device">
                     <div class="dep-device-image-empty"></div>
                     <div class="dep-device-image-wrapper">
@@ -170,14 +177,6 @@
             }
             
             var $devices = $('svg image[layer="devices"]');
-            
-            $devices.live('mouseenter', function() {
-                $(this.raphael.wrapper.tile.raphaelObj.node).mouseenter();
-            }).live('mouseeout', function() {
-                $(this.raphael.wrapper.tile.raphaelObj.node).mouseout();
-            }).live('click', function(e) {
-                $(this.raphael.wrapper.tile.raphaelObj.node).trigger('click', [e.pageX, e.pageY]);
-            });
             
             
             var $tiles = $('svg image[layer="tiles"]');
@@ -403,19 +402,16 @@
                         // Uncomment to enable highlighting of the tile under
                         // the mouse:
                         //setHighlightedTile(hoveredOverTile);
+                        
+                        if (movingDevice !== null && hoveredOverTile !== null && hoveredOverTile.device === null)
+                            setHighlightedTile(hoveredOverTile);
+                        else
+                            setHighlightedTile(null);
                     },
                     keyup: function(e) {
                         var code = e.keyCode ? e.keyCode : e.which;
 
                         switch (code) {
-                            // s
-                            case 83:
-                                $.stateBindings.toggleState('placingSwitch');
-                                $.stateBindings.toggleState('placingServer');
-
-                                current.attr('text', $.stateBindings.activeStates.contains('placingSwitch') ? 'SWITCH' : 'SERVER');
-                                break;
-
                             // c
                             case 67:
                                 $.stateBindings.toggleState('drawingConnections');
@@ -428,33 +424,6 @@
                                     'SERVER'
                                 );
                                 break;
-                        }
-                    }
-                },
-                placingDevices: {
-                    mousemove: function(e) {
-                        if (movingDevice !== null && hoveredOverTile.device === null)
-                            setHighlightedTile(hoveredOverTile);
-                        else
-                            setHighlightedTile(null);
-                    },
-                    click: function(e) {
-                        if (movingDevice !== null && hoveredOverTile.device === null) {
-                            if (moveDeviceToTile(movingDevice, hoveredOverTile))
-                                movingDevice = null;
-                        } else if (hoveredOverTile.device !== null) {
-                            var device = hoveredOverTile.device;
-                            
-                            if (movingDevice !== null) {
-                                movingDevice.setHighlighted(false);
-                            }
-                            movingDevice = device;
-                            movingDevice.setHighlighted(true);
-                        }
-                    },
-                    keyup: function(e) {
-                        var code = e.keyCode ? e.keyCode : e.which;
-                        switch (code) {
                             // Esc
                             case 27:
                                 if (movingDevice !== null) {
@@ -462,6 +431,22 @@
                                     movingDevice = null;
                                 }
                                 break;
+                        }
+                    },
+                    click: function(e) {
+                        if (hoveredOverTile !== null) {
+                            if (movingDevice !== null && hoveredOverTile.device === null) {
+                                if (moveDeviceToTile(movingDevice, hoveredOverTile))
+                                    movingDevice = null;
+                            } else if (hoveredOverTile.device !== null) {
+                                var device = hoveredOverTile.device;
+                            
+                                if (movingDevice !== null) {
+                                    movingDevice.setHighlighted(false);
+                                }
+                                movingDevice = device;
+                                movingDevice.setHighlighted(true);
+                            }
                         }
                     }
                 },

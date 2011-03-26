@@ -41,17 +41,20 @@ header {
     background-color: #eee;
 }
 
+
+/* Devices */
+
 #dep-devices {
     position: absolute;
     top: 10px;
     left: 10px;
-    right: 10px;
+    right: 160px;
     bottom: 10px;
     
     padding: 10px;
 }
 
-#dep-devices .dep-device {
+.dep-device {
     position: relative;
     float: left;
     width: 130px;
@@ -65,7 +68,7 @@ header {
     border: 1px solid #ccc;
 }
 
-#dep-devices .dep-device .dep-device-image {
+.dep-device .dep-device-image {
     background: top center no-repeat url('/static/images/dashboard/server.png');
     position: absolute;
     top: 10px;
@@ -74,15 +77,15 @@ header {
     height: 100px;
 }
 
-#dep-devices .dep-device.placed .dep-device-image {
+.dep-device.placed .dep-device-image {
     background-image: url('');
 }
 
-#dep-devices .dep-device.not-placed .dep-device-image {
+.dep-device.not-placed .dep-device-image {
     cursor: move;
 }
 
-#dep-devices .dep-device .dep-device-image-empty {
+.dep-device .dep-device-image-empty {
     background: top center no-repeat url('/static/images/dashboard/server-empty.png');
     position: absolute;
     top: 10px;
@@ -91,7 +94,7 @@ header {
     height: 100px;
 }
 
-#dep-devices .dep-device .dep-device-name {
+.dep-device .dep-device-name {
     position: absolute;
     bottom: 10px;
     left: 10px;
@@ -103,19 +106,72 @@ header {
 }
 
 
-/* Switch */
+/* Other Devices */
 
-#dep-devices #dep-device-switch.dep-device {
+#dep-other-devices {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    
+    width: 130px;
+    
+    padding: 10px;
+}
+
+#dep-other-devices #dep-device-switch.dep-device {
     float: right;
     margin: 0;
 }
 
-#dep-devices #dep-device-switch.dep-device .dep-device-image {
+#dep-other-devices #dep-device-switch.dep-device .dep-device-image {
     background-image: url('/static/images/dashboard/switch.png');
     background-position: 10px center;
 }
 
-#dep-devices #dep-device-switch.dep-device .dep-device-image-empty {
+#dep-other-devices #dep-device-switch.dep-device .dep-device-image-empty {
     background-image: url('/static/images/dashboard/switch-empty.png');
     background-position: 10px center;
+}
+
+
+/* Tools */
+
+#dep-tools {
+    position: absolute;
+    width: 130px;
+    top: 10px;
+    right: 160px;
+    bottom: 10px;
+    
+    padding: 10px;
+}
+
+#dep-tools .tool {
+    text-align: center;
+    
+    -webkit-border-radius: 6px;
+    
+    padding: 7px 10px 5px;
+    
+    color: #888;
+    font-weight: bold;
+    text-shadow: 0 1px 0 #fff;
+    text-transform: uppercase;
+    
+    border: 1px solid #aaa;
+    
+    margin-bottom: 10px;
+}
+
+#dep-tools .tool:hover {
+    background-color: #aaa;
+    color: #fff;
+    text-shadow: 0 1px 0 #666;
+    border-color: #888;
+    cursor: pointer;
+}
+
+#dep-tools #dep-connection-mode {
+    
 }
