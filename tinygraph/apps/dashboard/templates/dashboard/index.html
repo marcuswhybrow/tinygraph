@@ -194,44 +194,9 @@
                 placingDevices: {
                     click: function(e) {
                         if (movingDevice !== null && highlightedTile.device === null) {
-                            if (moveDeviceToTile(movingDevice, highlightedTile)) {
+                            if (moveDeviceToTile(movingDevice, highlightedTile))
                                 movingDevice = null;
-                            }
-                        } else if (highlightedTile.device === null) {
-                            var device = null;
-                            if ($.stateBindings.activeStates.contains('placingSwitch')) {
-                                device = new SwitchDevice();
-                            } else if ($.stateBindings.activeStates.contains('placingServer')) {
-                                device = new ServerDevice();
-                            }
-                            highlightedTile.addDevice(device);
-                            var deviceGridPos = device.getGridPos();
-                            // Indicate that some database interaction is going on.
-                            updateSaving(true);
-                            $.ajax({
-                                url: '{% url api:dashboard:items %}',
-                                type: 'post',
-                                context: device,
-                                data: {
-                                    x: deviceGridPos.x,
-                                    y: deviceGridPos.y,
-                                    type: $.stateBindings.activeStates.contains('placingServer') ? 'server' :
-                                        $.stateBindings.activeStates.contains('placingSwitch') ? 'switch' :
-                                        'error',
-                                    board: '{{ board.pk }}',
-                                    csrfmiddlewaretoken: CSRF_TOKEN
-                                },
-                                success: function(data) {
-                                    this.pk = data['id'];
-                                    updateSaving(false);
-                                },
-                                error: function(data) {
-                                    
-                                    updateSaving(false);
-                                },
-                                dataType: 'json'
-                            });
-                        } else {
+                        } else if (highlightedTile.device !== null) {
                             var device = highlightedTile.device;
                             device.moving = ! device.moving;
                             
