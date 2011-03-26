@@ -5,7 +5,7 @@ from devices.models import Device
 def index(request):
     # For now assum the first Board in the database is the one to display
     try:
-        board = Board.objects.get(pk=1)
+        board = Board.objects.get(pk=2)
     except Board.DoesNotExist:
         board = None
     

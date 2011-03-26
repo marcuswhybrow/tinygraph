@@ -10,6 +10,7 @@
             <div id="dep-devices">
                 {% for device in devices %}
                     <div class="dep-device {% if device.item_set|length %}placed{% else %}not-placed{% endif %}">
+                        <div class="dep-device-image-empty"></div>
                         <div class="dep-device-image-wrapper">
                             <div class="dep-device-image"></div>
                         </div>
@@ -53,14 +54,23 @@
             // ---------------------------------------------------------------
             
             $('.dep-device.not-placed .dep-device-image-wrapper').draggable({
-                revert: true,
+                revert: function() {
+                    // TODO put logic her to inspect if dropped on tile.
+                    //      If so animate to tile center and swap for SVG
+                    //      counterpart. If not then return true in order to
+                    //      allow the revert animation to take place.
+                    return true;
+                },
+                drag: function(event, ui) {
+                    $window.trigger('mousemove', event);
+                },
                 zIndex: 10000,
                 revertDuration: 200,
-                scroll: false
+                scroll: false,
             });
             
             // ---------------------------------------------------------------
-            // Regular Dashboard Code
+            // Variable declarations
             // ---------------------------------------------------------------
             
             dashboardConfig.imagePath = '{{ STATIC_URL }}images/dashboard/';
@@ -185,6 +195,10 @@
             
             var $tiles = $('svg image[layer="tiles"]');
             
+            // ---------------------------------------------------------------
+            // Tile Bindings
+            // ---------------------------------------------------------------
+            
             $tiles.hover(function() {
                 hoveredOverTile = this.raphael.wrapper;
             }, function() {
@@ -296,6 +310,10 @@
                     }
                 }
             });
+            
+            // ---------------------------------------------------------------
+            // Functions
+            // ---------------------------------------------------------------
 
             // Triggers the click event on a Tile
             function clickTile(i, j) {
@@ -383,24 +401,6 @@
             function isPointRightOfLine(ax, ay, bx, by, px, py) {
                 return (bx - ax) * (by - ay) < (px - ax) * (py - ay) + (bx - px) * (by - py) + (bx - px) * (py - ay) * 2;
             }
-
-            // Updates the size of certain objects when the window
-            // resizes.
-            $window.resize(function() {
-                rect.attr({
-                    'width': $window.width(),
-                    'height': $window.height()
-                });
-                
-                current.attr({
-                    y: $(window).height() - 30
-                })
-                
-                status.attr({
-                    x: $window.width() - 30,
-                    y: $window.height() - 30
-                })
-            });
             
             function incSkipZero(val) {
                 var newVal = val + 1;
@@ -424,7 +424,27 @@
                 }
             }
             
-            $window.stateBindings({
+            // ---------------------------------------------------------------
+            // Window Bindings
+            // ---------------------------------------------------------------
+
+            // Updates the size of certain objects when the window
+            // resizes.
+            $window.resize(function() {
+                rect.attr({
+                    'width': $window.width(),
+                    'height': $window.height()
+                });
+                
+                current.attr({
+                    y: $(window).height() - 30
+                })
+                
+                status.attr({
+                    x: $window.width() - 30,
+                    y: $window.height() - 30
+                })
+            }).stateBindings({
                 movingTiles: {
                     mousemove: function(e) {
                         // and translate the position of all tiles based upon
@@ -513,9 +533,7 @@
                         }
                     }
                 }
-            });
-
-            $window.keyup(function(e) {
+            }).keyup(function(e) {
                 var nowEditing = false,
                     nowPlacingSwitch = false,
                     code = e.keyCode ? e.keyCode : e.which;
@@ -560,9 +578,7 @@
                         
                         break;
                 }
-            });
-            
-            $window.mousemove(function(e) {
+            }).mousemove(function(e) {
                 
                 if (lastX !== null && lastY !== null) {
                     // Get the diffence in position since the last frame
@@ -572,18 +588,18 @@
                 
                 lastX = e.pageX;
                 lastY = e.pageY;
-            });
-
-            $window.mousedown(function(e) {
+            }).mousedown(function(e) {
                 if (spaceIsDown === true) {
                     $.stateBindings.addState('movingTiles');
                 }
                 e.preventDefault();
-            });
-
-            $window.mouseup(function(e) {
+            }).mouseup(function(e) {
                 $.stateBindings.removeState('movingTiles');
             });
+            
+            // ---------------------------------------------------------------
+            // SUPER IMPORTANT - Setting the initial state
+            // ---------------------------------------------------------------
             
             $.stateBindings.setState('viewing isInteractive');
 
