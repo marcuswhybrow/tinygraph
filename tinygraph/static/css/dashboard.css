@@ -71,12 +71,14 @@ header {
     left: 10px;
     right: 10px;
     height: 100px;
-    
-    cursor: move;
 }
 
 #dep-devices .dep-device.placed .dep-device-image {
     background-image: url('');
+}
+
+#dep-devices .dep-device.not-placed .dep-device-image {
+    cursor: move;
 }
 
 #dep-devices .dep-device .dep-device-image-empty {

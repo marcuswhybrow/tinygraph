@@ -1,5 +1,6 @@
 from tinygraph.apps.api.utils import CsrfBaseHandler
 from tinygraph.apps.dashboard.models import Board, Item, Connection
+from tinygraph.apps.devices.models import Device
 from piston.utils import rc
 
 class BoardHandler(CsrfBaseHandler):
@@ -8,8 +9,10 @@ class BoardHandler(CsrfBaseHandler):
 class ItemHandler(CsrfBaseHandler):
     model = Item
     
-    def _resolve_board(self, request):
+    def _resolve_fks(self, request):
         dct = request.data.copy()
+        
+        # Replaces the board fk with an actual reference
         if 'board' in dct:
             try:
                 dct['board'] = Board.objects.get(pk=dct['board'])
@@ -17,17 +20,26 @@ class ItemHandler(CsrfBaseHandler):
                 resp = rc.BAD_REQUEST
                 resp.write('Board with primary key "%d" not found.' % dct['board'])
                 return resp
+        
+        # Replaces the devices fk with an actual reference
+        if  'device' in dct:
+            try:
+                dct['device'] = Device.objects.get(pk=dct['device'])
+            except Device.DoesNotExist:
+                resp = rc.BAD_REQUEST
+                resp.write('Device with primary key "%d" not found.' % dct['device'])
+                return resp
         request.data = dct
         return None
     
     def create(self, request):
-        resp = self._resolve_board(request)
+        resp = self._resolve_fks(request)
         if resp is not None:
             return resp
         return super(ItemHandler, self).create(request)
     
     def update(self, request, *args, **kwargs):
-        resp = self._resolve_board(request)
+        resp = self._resolve_fks(request)
         if resp is not None:
             return resp
         return super(ItemHandler, self).update(request, *args, **kwargs)

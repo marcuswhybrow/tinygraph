@@ -1,6 +1,7 @@
 from django.views.generic.simple import direct_to_template
 from dashboard.models import Board, Item, Connection
 from devices.models import Device
+from django.db.models import Count
 
 def index(request):
     # For now assum the first Board in the database is the one to display
@@ -22,9 +23,21 @@ def index(request):
     # All of the devices in the system
     devices = Device.objects.select_related()
     
+    device_counts = Item.objects.values('device').annotate(count=Count('device'))
+    print device_counts
+    
+    device_list = []
+    for device in devices:
+        placed = False
+        for item in device_counts:
+            if item['device'] == device.pk:
+                placed = item['count'] > 0
+                break
+        device_list.append((device, placed))
+    
     return direct_to_template(request, 'dashboard/index.html', {
         'board': board,
         'items': items,
         'connections': connections,
-        'devices': devices,
+        'devices': device_list,
     })

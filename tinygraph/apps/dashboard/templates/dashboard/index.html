@@ -8,8 +8,8 @@
     <div id="dashboard-edit-panel" style="bottom: -200px">
         <div id="dep-inner">
             <div id="dep-devices">
-                {% for device in devices %}
-                    <div class="dep-device {% if device.item_set|length %}placed{% else %}not-placed{% endif %}">
+                {% for device, placed in devices %}
+                    <div devicePk="{{ device.pk }}" class="dep-device {% if placed %}placed{% else %}not-placed{% endif %}">
                         <div class="dep-device-image-empty"></div>
                         <div class="dep-device-image-wrapper">
                             <div class="dep-device-image"></div>
@@ -48,26 +48,6 @@
         $(function() {
             var $window = $(window),
                 $editPanel = $('#dashboard-edit-panel');
-            
-            // ---------------------------------------------------------------
-            // Edit Panel Code
-            // ---------------------------------------------------------------
-            
-            $('.dep-device.not-placed .dep-device-image-wrapper').draggable({
-                revert: function() {
-                    // TODO put logic her to inspect if dropped on tile.
-                    //      If so animate to tile center and swap for SVG
-                    //      counterpart. If not then return true in order to
-                    //      allow the revert animation to take place.
-                    return true;
-                },
-                drag: function(event, ui) {
-                    $window.trigger('mousemove', event);
-                },
-                zIndex: 10000,
-                revertDuration: 200,
-                scroll: false,
-            });
             
             // ---------------------------------------------------------------
             // Variable declarations
@@ -340,6 +320,49 @@
                     return dashboardConfig.quadrants['bottomLeft'].tiles[posX][posY];
                 }
             }
+            
+            // For a x and y co-ordinate on the page, this function will get
+            // the tile which is at that point.
+            function getTileByPoint(x, y) {
+                var tiles = getTiles();
+                
+                for (var i = 0; i < tiles.length; i++) {
+                    var tile = tiles[i],
+                        points = tile.getPoints(),
+                        gridPos = tile.getGridPos(),
+                        northWest = false,
+                        northEast = false,
+                        southEast = false,
+                        southWest = false;
+                
+                    northWest = ! isPointRightOfLine(points.left.x, points.left.y, points.top.x, points.top.y, x, y);
+                    northEast = ! isPointRightOfLine(points.top.x, points.top.y, points.right.x, points.right.y, x, y);
+                    southEast = ! isPointRightOfLine(points.right.x, points.right.y, points.bottom.x, points.bottom.y, x, y);
+                    southWest = ! isPointRightOfLine(points.bottom.x, points.bottom.y, points.left.x, points.left.y, x, y);
+                    
+                    if (northWest == false && northEast == false && southEast == false && southWest == false) {
+                        return tile;
+                    }
+                }
+                return null;
+            }
+            
+            function getTiles() {
+                var allTiles = new Array(),
+                    k = 0,
+                    quadTiles = null;
+                
+                for (var name in dashboardConfig.quadrants) {
+                    quadTiles = dashboardConfig.quadrants[name].tiles;
+                    for (var i = 1; i < quadTiles.length; i++) {
+                        for (var j = 1; j < quadTiles[i].length; j++) {
+                            allTiles[k++] = quadTiles[i][j];
+                        }
+                    }
+                }
+                
+                return allTiles;
+            }
 
             // Moves a device from is current tile to a new tile
             function moveDeviceToTile(device, newTile) {
@@ -595,6 +618,81 @@
                 e.preventDefault();
             }).mouseup(function(e) {
                 $.stateBindings.removeState('movingTiles');
+            });
+            
+            // ---------------------------------------------------------------
+            // Edit Panel Code
+            // ---------------------------------------------------------------
+            
+            $('.dep-device.not-placed .dep-device-image-wrapper').draggable({
+                revert: function(revertDefault) {
+                    // TODO put logic her to inspect if dropped on tile.
+                    //      If so animate to tile center and swap for SVG
+                    //      counterpart. If not then return true in order to
+                    //      allow the revert animation to take place.
+                    
+                    var $this = $(this),
+                        imageWidth = 72,
+                        imageHeight = 96,
+                        imageXOffset = 36,
+                        imageYOffset = 74,
+                        xOffset = ($this.width() - imageWidth) / 2 + imageXOffset,
+                        yOffset = 10 + imageYOffset,
+                        x = $this.offset().left + xOffset,
+                        y = $this.offset().top + yOffset;
+                    
+                    var tile = getTileByPoint(x, y);
+                    if (tile == null) {
+                        return true;
+                    } else {
+                        var device = new ServerDevice();
+                        tile.addDevice(device),
+                        devicePk = $this.parent().attr('devicePk');
+                        
+                        $this.remove();
+                        var deviceGridPos = device.getGridPos();
+                        
+                        updateSaving(true);
+                        $.ajax({
+                            url: '{% url api:dashboard:items %}',
+                            type: 'post',
+                            context: device,
+                            data: {
+                                x: deviceGridPos.x,
+                                y: deviceGridPos.y,
+                                type: 'server',
+                                board: '{{ board.pk }}',
+                                device: devicePk,
+                                csrfmiddlewaretoken: CSRF_TOKEN
+                            },
+                            success: function(data) {
+                                this.pk = data['id'];
+                                updateSaving(false);
+                            },
+                            error: function(data) {
+                                
+                                updateSaving(false);
+                            },
+                            dataType: 'json'
+                        });
+                        return false;
+                    }
+                },
+                drag: function(event, ui) {
+                    var $this = $(this),
+                        imageWidth = 72,
+                        imageHeight = 96,
+                        imageXOffset = 36,
+                        imageYOffset = 74,
+                        xOffset = ($this.width() - imageWidth) / 2 + imageXOffset,
+                        yOffset = 10 + imageYOffset,
+                        x = $this.offset().left + xOffset,
+                        y = $this.offset().top + yOffset;
+                    setHighlightedTile(getTileByPoint(x, y));
+                },
+                zIndex: 10000,
+                revertDuration: 200,
+                scroll: false,
             });
             
             // ---------------------------------------------------------------
