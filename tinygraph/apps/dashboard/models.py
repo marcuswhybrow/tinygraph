@@ -41,7 +41,7 @@ class Item(models.Model):
     board = models.ForeignKey('dashboard.Board', related_name='items')
     
     def __unicode__(self):
-        return '%s on %s' % (self.device, self.board)
+        return '%s on %s' % (self.device if self.type == 'server' else self.type, self.board)
 
 class Connection(models.Model):
     from_item = models.ForeignKey('dashboard.Item', related_name='connections')

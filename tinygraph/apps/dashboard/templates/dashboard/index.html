@@ -182,6 +182,13 @@
             
             var $tiles = $('svg image[layer="tiles"]');
             
+            // For displaying a path which updates to draw from a selected
+            // device to the postion of the cursor whilst the cursor is
+            // moving.
+            // Disapears when the second device is selected and the connection
+            // is made.
+            var connectionPath = null;
+            
             // ---------------------------------------------------------------
             // Functions
             // ---------------------------------------------------------------
@@ -444,16 +451,54 @@
                             movingDevice = device;
                             movingDevice.setHighlighted(true);
                         }
+                    },
+                    keyup: function(e) {
+                        var code = e.keyCode ? e.keyCode : e.which;
+                        switch (code) {
+                            // Esc
+                            case 27:
+                                if (movingDevice !== null) {
+                                    movingDevice.setHighlighted(false);
+                                    movingDevice = null;
+                                }
+                                break;
+                        }
                     }
                 },
                 drawingConnections: {
+                    mousemove: function(e) {
+                        // Update the path which follows the mouse
+                        var fromPoint = selectedDevice.getOriginPos();
+                        connectionPath.attr(
+                            'path',
+                            'M' + fromPoint.x + ' ' + fromPoint.y + 'L' + e.pageX + ' ' + e.pageY
+                        );
+                    },
                     click: function(e) {
                         var device = hoveredOverTile.device;
 
                         if (device !== null) {
-                            if (selectedDevice == null) {
+                            if (selectedDevice === null) {
                                 selectedDevice = device;
+                                
+                                var fromPoint = selectedDevice.getOriginPos();
+                                
+                                // Create the path which follows the mouse
+                                connectionPath = paper.path(
+                                    'M' + fromPoint.x + ' ' + fromPoint.y +
+                                    'L' + e.pageX + ' ' + e.pageY
+                                );
+                                connectionPath.attr({
+                                    'stroke-width': 5,
+                                    'stroke-linecap': 'round',
+                                    'stroke': '#666'
+                                });
+                                connectionPath.insertBefore(dashboardConfig.layers['connections']);
                             } else {
+                                // Remove the path which follows the mouse
+                                connectionPath.remove();
+                                connectionPath = null;
+                                
                                 var con = selectedDevice.connectTo(device);
                                 
                                 updateSaving(true);
@@ -481,6 +526,19 @@
                                 // and then start the process over again.
                                 selectedDevice = null;
                             }
+                        }
+                    },
+                    keyup: function(e) {
+                        var code = e.keyCode ? e.keyCode : e.which;
+                        switch (code) {
+                            // Esc
+                            case 27:
+                                if (selectedDevice !== null) {
+                                    connectionPath.remove();
+                                    connectionPath = null;
+                                    selectedDevice = null;
+                                }
+                                break;
                         }
                     }
                 }
