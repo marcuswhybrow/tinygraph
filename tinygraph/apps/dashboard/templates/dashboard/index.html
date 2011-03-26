@@ -598,11 +598,6 @@
             
             $('.dep-device.not-placed .dep-device-image-wrapper').draggable({
                 revert: function(revertDefault) {
-                    // TODO put logic her to inspect if dropped on tile.
-                    //      If so animate to tile center and swap for SVG
-                    //      counterpart. If not then return true in order to
-                    //      allow the revert animation to take place.
-                    
                     var $this = $(this),
                         imageWidth = 72,
                         imageHeight = 96,
@@ -661,6 +656,75 @@
                         x = $this.offset().left + xOffset,
                         y = $this.offset().top + yOffset;
                     setHighlightedTile(getTileByPoint(x, y));
+                },
+                zIndex: 10000,
+                revertDuration: 200,
+                scroll: false,
+            });
+            
+            $('#dep-device-switch .dep-device-image-wrapper').draggable({
+                revert: function(revertDefault) {
+                    var $this = $(this),
+                        imageWidth = 90,
+                        imageHeight = 76,
+                        imageXOffset = 45,
+                        imageYOffset = 47,
+                        xOffset = ($this.width() - imageWidth) / 2 + imageXOffset,
+                        yOffset = 20 + imageYOffset,
+                        x = $this.offset().left + xOffset,
+                        y = $this.offset().top + yOffset;
+                    
+                    var tile = getTileByPoint(x, y);
+                    if (tile !== null) {
+                        var device = new SwitchDevice();
+                        tile.addDevice(device);
+                        
+                        var deviceGridPos = device.getGridPos();
+                        
+                        updateSaving(true);
+                        $.ajax({
+                            url: '{% url api:dashboard:items %}',
+                            type: 'post',
+                            context: device,
+                            data: {
+                                x: deviceGridPos.x,
+                                y: deviceGridPos.y,
+                                type: 'switch',
+                                board: '{{ board.pk }}',
+                                csrfmiddlewaretoken: CSRF_TOKEN
+                            },
+                            success: function(data) {
+                                updateSaving(false);
+                            },
+                            error: function(data) {
+                                updateSaving(false);
+                            },
+                            dataType: 'json'
+                        });
+                        $(this).draggable('option', 'revertDuration', 0);
+                        return true;
+                    }
+                    
+                    // Always revert
+                    $(this).draggable('option', 'revertDuration', 200);
+                    return true;
+                },
+                drag: function(event, ui) {
+                    var $this = $(this),
+                        imageWidth = 90,
+                        imageHeight = 76,
+                        imageXOffset = 45,
+                        imageYOffset = 47,
+                        xOffset = ($this.width() - imageWidth) / 2 + imageXOffset,
+                        yOffset = 20 + imageYOffset,
+                        x = $this.offset().left + xOffset,
+                        y = $this.offset().top + yOffset;
+                    setHighlightedTile(getTileByPoint(x, y));
+                },
+                stop: function(event, ui) {
+                    var $this = $(this);
+                    if ($this.draggable('option', 'revertDuration') == 0)
+                        $this.fadeTo(0, 0).fadeTo(200, 1);
                 },
                 zIndex: 10000,
                 revertDuration: 200,
