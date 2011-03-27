@@ -19,9 +19,8 @@
                 {% endfor %}
             </div>
             <div id="dep-tools">
-                <div id="dep-delete"></div>
                 <div id="dep-connection-mode" class="tool" title="C">Connections</div>
-                <div class="tool">Other Thing</div>
+                <div id="dep-remove" class="tool">Remove</div>
             </div>
             <div id="dep-other-devices">
                 <div id="dep-device-switch" class="dep-device">
@@ -714,6 +713,10 @@
                 $.stateBindings.toggleState('editing>drawingConnections');
             });
             
+            $('#dep-remove').click(function(e) {
+                $.stateBindings.toggleState('editing>removingDevices');
+            })
+            
             // ---------------------------------------------------------------
             // State Change Events
             // ---------------------------------------------------------------
@@ -731,6 +734,7 @@
                 
             }).bind('editing>drawingConnections.stateEnabled', function(e) {
                 $.stateBindings.removeState('editing>movingDevices');
+                $.stateBindings.removeState('editing>removingDevices');
                 $('html').css('cursor', 'crosshair');
                 $('#dep-connection-mode').addClass('active');
                 
@@ -745,6 +749,12 @@
                     connectionPath = null;
                 }
                 selectedDevice = null;
+            }).bind('editing>removingDevices.stateEnabled', function(e) {
+                $.stateBindings.removeState('editing>drawingConnections');
+                $.stateBindings.removeState('editing>movingDevices');
+                $('#dep-remove').addClass('active');
+            }).bind('editing>removingDevices.stateDisabled', function(e) {
+                $('#dep-remove').removeClass('active');
             });
             
             // ---------------------------------------------------------------

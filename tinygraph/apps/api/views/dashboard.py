@@ -2,6 +2,7 @@ from tinygraph.apps.api.utils import CsrfBaseHandler
 from tinygraph.apps.dashboard.models import Board, Item, Connection
 from tinygraph.apps.devices.models import Device
 from piston.utils import rc
+from django.core.exceptions import ValidationError
 
 class BoardHandler(CsrfBaseHandler):
     model = Board
@@ -70,10 +71,20 @@ class ConnectionHandler(CsrfBaseHandler):
         resp = self._resolve_devices(request)
         if resp is not None:
             return resp
-        return super(ConnectionHandler, self).create(request, *args, **kwargs)
+        try:
+            return super(ConnectionHandler, self).create(request, *args, **kwargs)
+        except ValidationError, e:
+            resp = rc.BAD_REQUEST
+            resp.write(str(e))
+            return resp
 
     def update(self, request, *args, **kwargs):
         resp = self._resolve_devices(request)
         if resp is not None:
             return resp
-        return super(ConnectionHandler, self).update(request, *args, **kwargs)
+        try:
+            return super(ConnectionHandler, self).update(request, *args, **kwargs)
+        except ValidationError, e:
+            resp = rc.BAD_REQUEST
+            resp.write(str(e))
+            return resp

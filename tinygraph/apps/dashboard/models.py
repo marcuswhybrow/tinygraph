@@ -49,3 +49,28 @@ class Connection(models.Model):
     
     def __unicode__(self):
         return '%s to %s' % (self.from_item, self.to_item)
+    
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.from_item == self.to_item:
+            raise ValidationError('A connection cannot be created between the same device')
+        if self.from_item.board != self.to_item.board:
+            raise ValidatioError('A connection cannot be between devices on different boards')
+        try:
+            Connection.objects.get(from_item=self.from_item, to_item=self.to_item)
+        except Connection.DoesNotExist:
+            pass
+        else:
+            raise ValidationError('A connection already exists between these two devices')
+        
+        # Checking for the reverse connection also
+        try:
+            Connection.objects.get(from_item=self.to_item, to_item=self.from_item)
+        except Connection.DoesNotExist:
+            pass
+        else:
+            raise ValidationError('A connection already exists between these two devices')
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Connection, self).save(*args, **kwargs)
