@@ -442,20 +442,34 @@
                     }
                 },
                 'editing>movingDevices': {
-                    click: function(e) {
-                        if (hoveredOverTile !== null) {
-                            if (movingDevice !== null && hoveredOverTile.device === null) {
-                                if (moveDeviceToTile(movingDevice, hoveredOverTile))
-                                    movingDevice = null;
-                            } else if (hoveredOverTile.device !== null) {
-                                var device = hoveredOverTile.device;
-                            
-                                if (movingDevice !== null) {
-                                    movingDevice.setHighlighted(false);
-                                }
-                                movingDevice = device;
-                                movingDevice.setHighlighted(true);
-                            }
+                    mousedown: function(e) {
+                        if (movingDevice === null && hoveredOverTile != null && hoveredOverTile.device != null) {
+                            movingDevice = hoveredOverTile.device;
+                            $.stateBindings.addState('editing>movingDevices>inProgress');
+                        }
+                    }
+                },
+                'editing>movingDevices>inProgress': {
+                    mousemove: function(e) {
+                        movingDevice.translate(xChange, yChange);
+                        movingDevice.updateConnections();
+                    },
+                    mouseup: function(e) {
+                        if (movingDevice != null && hoveredOverTile != null && hoveredOverTile.device === null) {
+                            moveDeviceToTile(movingDevice, hoveredOverTile);
+                            movingDevice = null;
+                            $.stateBindings.removeState('editing>movingDevices>inProgress');
+                        } else {
+                            movingDevice.raphaelObj.animate({
+                                x: movingDevice.tile.raphaelObj.attr('x') + dashboardConfig.xOffset - movingDevice.xOffset,
+                                y: movingDevice.tile.raphaelObj.attr('y') + dashboardConfig.yOffset - movingDevice.yOffset,
+                            }, 200, function() {
+                                // One final time to ensure the connections
+                                // didn't miss the last frame of animation
+                                movingDevice.updateConnections();
+                                movingDevice = null;
+                                $.stateBindings.removeState('editing>movingDevices>inProgress');
+                            });
                         }
                     }
                 },
@@ -658,6 +672,7 @@
                                 csrfmiddlewaretoken: CSRF_TOKEN
                             },
                             success: function(data) {
+                                this.pk = data['id'];
                                 updateSaving(false);
                             },
                             error: function(data) {
