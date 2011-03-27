@@ -172,6 +172,19 @@ header {
     cursor: pointer;
 }
 
+#dep-tools .tool:active {
+    background-color: #888;
+    border-color: #666;
+    text-shadow: 0 1px 0 #444;
+}
+
+#dep-tools .tool.active {
+    background-color: #8c8;
+    border: 1px solid #6a6;
+    color: #484;
+    text-shadow: 0 1px 0 #aea;
+}
+
 #dep-tools #dep-connection-mode {
     
 }

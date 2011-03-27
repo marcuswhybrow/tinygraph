@@ -49,7 +49,7 @@
 
 {% block scripts %}
     <!-- <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/jquery.statebindings.js"></script> -->
-    <script type="text/javascript" src="https://github.com/marcuswhybrow/jquery-state-bindings/raw/master/jquery.statebindings.js"></script>
+    <script type="text/javascript" src="https://github.com/marcuswhybrow/jquery-state-bindings/raw/0.9/jquery.statebindings.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/libs/raphael-min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.layer.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/mylibs/raphael.device.js"></script>
@@ -372,6 +372,17 @@
                         moveEverything(xChange, yChange);
                     }
                 },
+                viewing: {
+                    keyup: function(e) {
+                        var code = e.keyCode ? e.keyCode : e.which;
+                        switch (code) {
+                            // m
+                            case 77:
+                                $.stateBindings.addState('editing');
+                                break;
+                        }
+                    }
+                },
                 isInteractive: {
                     keydown: function(e) {
                         var code = e.keyCode ? e.keyCode : e.which;
@@ -414,15 +425,7 @@
                         switch (code) {
                             // c
                             case 67:
-                                $.stateBindings.toggleState('drawingConnections');
-                                $.stateBindings.toggleState('placingDevices');
-                                
-                                $('html').css('cursor', $.stateBindings.activeStates.contains('drawingConnections') ? 'crosshair' : 'default');
-                                current.attr('text',
-                                    $.stateBindings.activeStates.contains('drawingConnections') ? 'CONNECTIONS' :
-                                    $.stateBindings.activeStates.contains('placingSwitch') ? 'SWITCH' :
-                                    'SERVER'
-                                );
+                                $.stateBindings.toggleState('editing>drawingConnections');
                                 break;
                             // Esc
                             case 27:
@@ -431,8 +434,14 @@
                                     movingDevice = null;
                                 }
                                 break;
+                            // m
+                            case 77:
+                                $.stateBindings.removeState('editing');
+                                break;
                         }
-                    },
+                    }
+                },
+                'editing>movingDevices': {
                     click: function(e) {
                         if (hoveredOverTile !== null) {
                             if (movingDevice !== null && hoveredOverTile.device === null) {
@@ -450,66 +459,59 @@
                         }
                     }
                 },
-                drawingConnections: {
-                    mousemove: function(e) {
-                        // Update the path which follows the mouse
-                        var fromPoint = selectedDevice.getOriginPos();
-                        connectionPath.attr(
-                            'path',
-                            'M' + fromPoint.x + ' ' + fromPoint.y + 'L' + e.pageX + ' ' + e.pageY
-                        );
-                    },
+                'editing>drawingConnections': {
                     click: function(e) {
-                        var device = hoveredOverTile.device;
+                        if (hoveredOverTile !== null) {
+                            var device = hoveredOverTile.device;
 
-                        if (device !== null) {
-                            if (selectedDevice === null) {
-                                selectedDevice = device;
-                                
-                                var fromPoint = selectedDevice.getOriginPos();
-                                
-                                // Create the path which follows the mouse
-                                connectionPath = paper.path(
-                                    'M' + fromPoint.x + ' ' + fromPoint.y +
-                                    'L' + e.pageX + ' ' + e.pageY
-                                );
-                                connectionPath.attr({
-                                    'stroke-width': 5,
-                                    'stroke-linecap': 'round',
-                                    'stroke': '#666'
-                                });
-                                connectionPath.insertBefore(dashboardConfig.layers['connections']);
+                            if ($.stateBindings.isEnabled('editing>drawingConnections>inProgress') == false) {
+                                if (device !== null && selectedDevice === null) {
+                                    selectedDevice = device;
+
+                                    var fromPoint = selectedDevice.getOriginPos();
+
+                                    // Create the path which follows the mouse
+                                    connectionPath = paper.path(
+                                        'M' + fromPoint.x + ' ' + fromPoint.y +
+                                        'L' + e.pageX + ' ' + e.pageY
+                                    );
+                                    connectionPath.attr({
+                                        'stroke-width': 5,
+                                        'stroke-linecap': 'round',
+                                        'stroke': '#666'
+                                    });
+                                    connectionPath.insertBefore(dashboardConfig.layers['connections']);
+                                    $.stateBindings.addState('editing>drawingConnections>inProgress');
+                                }
                             } else {
-                                // Remove the path which follows the mouse
-                                connectionPath.remove();
-                                connectionPath = null;
-                                
-                                var con = selectedDevice.connectTo(device);
-                                
-                                updateSaving(true);
-                                $.ajax({
-                                    url: '{% url api:dashboard:connections %}',
-                                    type: 'post',
-                                    context: con,
-                                    data: {
-                                        from_item: con.fromDevice.pk,
-                                        to_item: con.toDevice.pk,
-                                        csrfmiddlewaretoken: CSRF_TOKEN
-                                    },
-                                    success: function(data) {
-                                        this.pk = data['id'];
-                                        updateSaving(false);
-                                    },
-                                    error: function(data) {
-                                        updateSaving(false);
-                                    },
-                                    dataType: 'json'
-                                });
-                            
-                                $window.resize();
+                                if (device !== null && selectedDevice !== null) {
+                                    // Remove the path which follows the mouse
 
-                                // and then start the process over again.
-                                selectedDevice = null;
+                                    var con = selectedDevice.connectTo(device);
+
+                                    updateSaving(true);
+                                    $.ajax({
+                                        url: '{% url api:dashboard:connections %}',
+                                        type: 'post',
+                                        context: con,
+                                        data: {
+                                            from_item: con.fromDevice.pk,
+                                            to_item: con.toDevice.pk,
+                                            csrfmiddlewaretoken: CSRF_TOKEN
+                                        },
+                                        success: function(data) {
+                                            this.pk = data['id'];
+                                            updateSaving(false);
+                                        },
+                                        error: function(data) {
+                                            updateSaving(false);
+                                        },
+                                        dataType: 'json'
+                                    });
+
+                                    $window.resize();
+                                    $.stateBindings.removeState('editing>drawingConnections>inProgress');
+                                }
                             }
                         }
                     },
@@ -518,59 +520,22 @@
                         switch (code) {
                             // Esc
                             case 27:
-                                if (selectedDevice !== null) {
-                                    connectionPath.remove();
-                                    connectionPath = null;
-                                    selectedDevice = null;
-                                }
+                                $.stateBindings.removeState('editing>drawingConnections>inProgress');
                                 break;
                         }
                     }
-                }
-            }).keyup(function(e) {
-                var nowEditing = false,
-                    nowPlacingSwitch = false,
-                    code = e.keyCode ? e.keyCode : e.which;
-
-                switch (code) {
-                    // m
-                    case 77:
-                        $.stateBindings.toggleState('editing');
-                        $.stateBindings.toggleState('viewing');
-                        $.stateBindings.toggleState('placingDevices');
-                        
-                        nowEditing = $.stateBindings.activeStates.contains('editing');
-                        nowPlacingSwitch = $.stateBindings.activeStates.contains('placingSwitch')
-                        
-                        // Animate dashboard edit panel
-                        if(nowEditing) {
-                            $editPanel.animate({
-                                bottom: 0
-                            }, 200);
-                            $('header').animate({
-                                top: '-150'
-                            }, 200);
-                        } else {
-                            $editPanel.animate({
-                                bottom: '-200px'
-                            }, 200);
-                            $('header').animate({
-                                top: 0
-                            }, 200);
+                },
+                'editing>drawingConnections>inProgress': {
+                    mousemove: function(e) {
+                        // Update the path which follows the mouse
+                        if (selectedDevice !== null) {
+                            var fromPoint = selectedDevice.getOriginPos();
+                            connectionPath.attr(
+                                'path',
+                                'M' + fromPoint.x + ' ' + fromPoint.y + 'L' + e.pageX + ' ' + e.pageY
+                            );
                         }
-                        
-                        // Clean up states
-                        if (! nowEditing) {
-                            // $.stateBindings.removeState('placingSwitch');
-                            // $.stateBindings.removeState('placingServer');
-                            current.attr('text', '');
-                        } else {
-                            current.attr('text', nowPlacingSwitch ? 'SWITCH' : 'SERVER');
-                            $.stateBindings.addState('placingDevices');
-                            $.stateBindings.addState('placingServer');
-                        }
-                        
-                        break;
+                    }
                 }
             }).mousemove(function(e) {
                 
@@ -728,6 +693,43 @@
                 zIndex: 10000,
                 revertDuration: 200,
                 scroll: false,
+            });
+            
+            $('#dep-connection-mode').click(function(e) {
+                $.stateBindings.toggleState('editing>drawingConnections');
+            });
+            
+            // ---------------------------------------------------------------
+            // State Change Events
+            // ---------------------------------------------------------------
+            
+            $window.bind('editing.stateEnabled', function(e) {
+                $.stateBindings.addState('editing>movingDevices');
+                $.stateBindings.removeState('viewing');
+                $editPanel.animate({bottom: 0}, 200);
+                $('header').animate({top: '-150'}, 200);
+                
+            }).bind('editing.stateDisabled', function(e) {
+                $.stateBindings.addState('viewing');
+                $editPanel.animate({bottom: '-200px'}, 200);
+                $('header').animate({top: 0}, 200);
+                
+            }).bind('editing>drawingConnections.stateEnabled', function(e) {
+                $.stateBindings.removeState('editing>movingDevices');
+                $('html').css('cursor', 'crosshair');
+                $('#dep-connection-mode').addClass('active');
+                
+            }).bind('editing>drawingConnections.stateDisabled', function(e) {
+                $.stateBindings.addState('editing>movingDevices');
+                $('html').css('cursor', 'default');
+                $('#dep-connection-mode').removeClass('active');
+                
+            }).bind('editing>drawingConnections>inProgress.stateDisabled', function(e) {
+                if (connectionPath != null) {
+                    connectionPath.remove();
+                    connectionPath = null;
+                }
+                selectedDevice = null;
             });
             
             // ---------------------------------------------------------------
