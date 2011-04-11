@@ -589,37 +589,41 @@
                     if (tile == null) {
                         return true;
                     } else {
-                        var device = new ServerDevice();
-                        tile.addDevice(device),
-                        devicePk = $this.parent().attr('devicePk');
+                        if (tile.device == null) {
+                            var device = new ServerDevice();
+                            tile.addDevice(device),
+                            devicePk = $this.parent().attr('devicePk');
                         
-                        $this.remove();
-                        var deviceGridPos = device.getGridPos();
+                            $this.remove();
+                            var deviceGridPos = device.getGridPos();
                         
-                        updateSaving(true);
-                        $.ajax({
-                            url: '{% url api:dashboard:items %}',
-                            type: 'post',
-                            context: device,
-                            data: {
-                                x: deviceGridPos.x,
-                                y: deviceGridPos.y,
-                                type: 'server',
-                                board: '{{ board.pk }}',
-                                device: devicePk,
-                                csrfmiddlewaretoken: CSRF_TOKEN
-                            },
-                            success: function(data) {
-                                this.pk = data['id'];
-                                updateSaving(false);
-                            },
-                            error: function(data) {
+                            updateSaving(true);
+                            $.ajax({
+                                url: '{% url api:dashboard:items %}',
+                                type: 'post',
+                                context: device,
+                                data: {
+                                    x: deviceGridPos.x,
+                                    y: deviceGridPos.y,
+                                    type: 'server',
+                                    board: '{{ board.pk }}',
+                                    device: devicePk,
+                                    csrfmiddlewaretoken: CSRF_TOKEN
+                                },
+                                success: function(data) {
+                                    this.pk = data['id'];
+                                    updateSaving(false);
+                                },
+                                error: function(data) {
                                 
-                                updateSaving(false);
-                            },
-                            dataType: 'json'
-                        });
-                        return false;
+                                    updateSaving(false);
+                                },
+                                dataType: 'json'
+                            });
+                            return false;
+                        } else {
+                            return true;
+                        }
                     }
                 },
                 drag: function(event, ui) {
@@ -652,7 +656,7 @@
                         y = $this.offset().top + yOffset;
                     
                     var tile = getTileByPoint(x, y);
-                    if (tile !== null) {
+                    if (tile !== null && tile.device === null) {
                         var device = new SwitchDevice();
                         tile.addDevice(device);
                         
