@@ -114,7 +114,7 @@ body#dashboard #main-nav ul li.dashboard {
   margin: 0 20px 20px 0;
   border: 1px solid #dddddd;
   width: 150px;
-  height: 200px;
+  height: 250px;
 }
 /* line 22, ../../compass/src/screen.sass */
 #device-list .device dt,
@@ -128,14 +128,18 @@ body#dashboard #main-nav ul li.dashboard {
   text-decoration: none;
   hover-text-decoration: underline;
 }
-
 /* line 100, ../../compass/src/screen.sass */
+#device-list .device img {
+  margin: 0 auto 10px;
+}
+
+/* line 104, ../../compass/src/screen.sass */
 ul.mini-nav {
   list-style: none;
   margin: 0 0 20px 0;
   padding: 0;
 }
-/* line 105, ../../compass/src/screen.sass */
+/* line 109, ../../compass/src/screen.sass */
 ul.mini-nav li {
   float: left;
   padding: 5px 10px;
@@ -143,110 +147,110 @@ ul.mini-nav li {
   last-child-border-right: none;
 }
 
-/* line 113, ../../compass/src/screen.sass */
+/* line 117, ../../compass/src/screen.sass */
 div.do-list ul.mini-nav li.do-list,
 div.do-mibs ul.mini-nav li.do-mibs,
 ul.mini-nav li:hover {
   background-color: #eeeeee;
 }
 
-/* line 120, ../../compass/src/screen.sass */
+/* line 124, ../../compass/src/screen.sass */
 form.little-form {
   padding: 20px;
   border: 1px solid #eeeeee;
   display: inline-block;
 }
 
-/* line 126, ../../compass/src/screen.sass */
+/* line 130, ../../compass/src/screen.sass */
 #main {
   padding: 20px 20px 20px;
 }
-/* line 129, ../../compass/src/screen.sass */
+/* line 133, ../../compass/src/screen.sass */
 #main h2 {
   font-size: 28px;
   margin-bottom: 20px;
 }
-/* line 133, ../../compass/src/screen.sass */
+/* line 137, ../../compass/src/screen.sass */
 #main h3 {
   font-size: 22px;
   margin-bottom: 10px;
 }
-/* line 137, ../../compass/src/screen.sass */
+/* line 141, ../../compass/src/screen.sass */
 #main h4 {
   font-size: 18px;
   margin-bottom: 10px;
 }
-/* line 141, ../../compass/src/screen.sass */
+/* line 145, ../../compass/src/screen.sass */
 #main p {
   margin-bottom: 10px;
 }
-/* line 144, ../../compass/src/screen.sass */
+/* line 148, ../../compass/src/screen.sass */
 #main form {
   margin-bottom: 20px;
 }
-/* line 147, ../../compass/src/screen.sass */
+/* line 151, ../../compass/src/screen.sass */
 #main ul {
   margin-bottom: 20px;
 }
-/* line 150, ../../compass/src/screen.sass */
+/* line 154, ../../compass/src/screen.sass */
 #main fieldset {
   border: 1px solid #eeeeee;
   min-height: 40px;
   margin-bottom: 20px;
   padding: 20px;
 }
-/* line 156, ../../compass/src/screen.sass */
+/* line 160, ../../compass/src/screen.sass */
 #main fieldset legend {
   background-color: white;
   padding: 2px 4px;
 }
-/* line 160, ../../compass/src/screen.sass */
+/* line 164, ../../compass/src/screen.sass */
 #main fieldset label {
   margin-right: 10px;
   height: 30px;
   display: block;
 }
-/* line 165, ../../compass/src/screen.sass */
+/* line 169, ../../compass/src/screen.sass */
 #main fieldset label input {
   margin-right: 10px;
 }
-/* line 168, ../../compass/src/screen.sass */
+/* line 172, ../../compass/src/screen.sass */
 #main fieldset label.has-children {
   font-weight: bold;
 }
-/* line 171, ../../compass/src/screen.sass */
+/* line 175, ../../compass/src/screen.sass */
 #main table {
   margin-bottom: 20px;
   width: 100%;
   border-top: 1px solid #cccccc;
 }
-/* line 177, ../../compass/src/screen.sass */
+/* line 181, ../../compass/src/screen.sass */
 #main table tr:nth-child(even) {
   background-color: #eeeeee;
 }
-/* line 180, ../../compass/src/screen.sass */
+/* line 184, ../../compass/src/screen.sass */
 #main table tr {
   border-bottom: 1px solid #cccccc;
 }
-/* line 182, ../../compass/src/screen.sass */
+/* line 186, ../../compass/src/screen.sass */
 #main table tr td, #main table tr th {
   padding: 10px 20px;
 }
-/* line 185, ../../compass/src/screen.sass */
+/* line 189, ../../compass/src/screen.sass */
 #main table tr.information td {
   text-align: center;
   background-color: #eeeeee;
 }
-/* line 189, ../../compass/src/screen.sass */
+/* line 193, ../../compass/src/screen.sass */
 #main table .align-center {
   text-align: center;
 }
-/* line 192, ../../compass/src/screen.sass */
+/* line 196, ../../compass/src/screen.sass */
 #main table .align-left {
   text-align: left;
 }
 
-/* line 196, ../../compass/src/screen.sass */
+/* line 200, ../../compass/src/screen.sass */
 .packages {
   overflow: hidden;
   display: inline-block;
@@ -255,7 +259,7 @@ form.little-form {
 .packages {
   display: block;
 }
-/* line 198, ../../compass/src/screen.sass */
+/* line 202, ../../compass/src/screen.sass */
 .packages .package {
   float: left;
   background-color: #eeeeee;
@@ -278,13 +282,13 @@ form.little-form {
   text-decoration: none;
   hover-text-decoration: underline;
 }
-/* line 202, ../../compass/src/screen.sass */
+/* line 206, ../../compass/src/screen.sass */
 .packages .package .toggle {
   position: absolute;
   top: 20px;
   right: 20px;
 }
-/* line 207, ../../compass/src/screen.sass */
+/* line 211, ../../compass/src/screen.sass */
 .packages .package.enabled {
   background-color: #bbeebb;
   border-color: #88aa88;

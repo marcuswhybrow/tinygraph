@@ -6,6 +6,7 @@
     <div id="device-list" class="clearfix">
         {% for device in devices %}
             <div id="{{ device.pk }}" class="device">
+                <img src="{{ STATIC_URL }}images/dashboard/server.png" alt="{{ device.user_given_name }}">
                 <dl>
                     <dt><a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a></dt>
                     <dd><strong>{{ device.user_given_address }}</strong></dd>
