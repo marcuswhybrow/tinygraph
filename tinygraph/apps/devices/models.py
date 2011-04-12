@@ -23,8 +23,8 @@ class Device(models.Model):
     data_objects = models.ManyToManyField('definitions.DataObject', through='rules.Rule', related_name='devices')
     packages = models.ManyToManyField('definitions.Package', through='rules.PackageInstance', related_name='devices')
     
-    snmp_version = models.CharField(max_length=1, choices=SNMP_VERSIONS)
-    snmp_port = models.PositiveIntegerField(blank=True, null=True)
+    snmp_version = models.CharField(max_length=1, choices=SNMP_VERSIONS, help_text='2c recommended.')
+    snmp_port = models.PositiveIntegerField(blank=True, null=True, help_text='Leave blank for default (162).')
 
     def __unicode__(self):
         return self.user_given_name

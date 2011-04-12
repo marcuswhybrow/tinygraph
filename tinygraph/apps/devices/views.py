@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic.simple import direct_to_template
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from devices.models import Device
 from devices.forms import DeviceForm
 from definitions.models import Package

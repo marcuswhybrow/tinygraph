@@ -6,7 +6,7 @@ from django.template.defaultfilters import slugify
 class DeviceForm(forms.ModelForm):
     class Meta:
         model = Device
-        exclude = ('data_objects', 'ip_address', 'fqdn')
+        exclude = ('data_objects', 'ip_address', 'fqdn', 'packages')
     
     def clean_user_given_name(self):
         user_given_name = self.cleaned_data['user_given_name']

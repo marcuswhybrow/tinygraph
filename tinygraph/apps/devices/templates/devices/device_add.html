@@ -7,11 +7,13 @@
 
     <form action="" method="POST">
         
-        <ol>
-            {% for error in form.subject.errors %}
-                <li><strong>{{ error|escape }}</strong></li>
+        {{ form.non_field_errors }}
+        
+        <ul>
+            {% for error in form.errors %}
+                <li><strong>{{ error }}</strong></li>
             {% endfor %}
-        </ol>
+        </ul>
         
         {% csrf_token %}
         <div class="field">
@@ -22,6 +24,11 @@
         <div class="field">
             {{ form.user_given_address.errors }}
             {{ form.user_given_address.label_tag }} {{ form.user_given_address }} <span style="height:24px; display:inline-block" id="ping-notification"></span>
+        </div>
+        
+        <div class="field">
+            {{ form.snmp_version.errors }}
+            {{ form.snmp_version.label_tag }} {{ form.snmp_version }}
         </div>
         
         <input type="submit" name="submit" value="Save">
