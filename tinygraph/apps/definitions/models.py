@@ -55,7 +55,7 @@ class Package(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('definitions.views.package_detail', (), {
+        return ('definitions:package_detail', (), {
             'package_slug': self.slug,
         })
 
