@@ -145,5 +145,5 @@ TINYGRAPH_POLL_INTERVAL = 5 # minutes
 
 try:
     from tinygraph.settings_database import *
-except ImportError
+except ImportError:
     pass
