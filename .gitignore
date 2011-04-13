@@ -2,7 +2,8 @@
 *.db
 .DS_Store
 pip-log.txt
+
 media/
 mibs/
-
 tinygraph/static/compass/.sass-cache/
+tinygraph/settings_database.py

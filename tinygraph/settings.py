@@ -32,14 +32,11 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# The default database settings, create settings_database.py to override.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(SITE_ROOT, 'dev.db'),
-        # 'USER': '',
-        # 'PASSWORD': '',
-        # 'HOST': '',
-        # 'PORT': '',
     }
 }
 
@@ -145,3 +142,8 @@ TINYGRAPH_SNMP_GETBULK_SIZE = 10
 TINYGRAPH_TINYGRAPH_LOG_FILENAME = '/tmp/tinygraph.log'
 TINYGRAPH_TINYGRAPHD_LOG_FILENAME = '/var/log/tinygraphd.log'
 TINYGRAPH_POLL_INTERVAL = 5 # minutes
+
+try:
+    from tinygraph.settings_database import *
+except ImportError
+    pass
