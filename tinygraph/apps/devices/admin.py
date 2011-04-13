@@ -1,4 +1,4 @@
 from django.contrib import admin
-from devices.models import Device
+from tinygraph.apps.devices.models import Device
 
 admin.site.register(Device)

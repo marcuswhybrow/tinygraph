@@ -1,7 +1,7 @@
 from django.views.generic.simple import direct_to_template
-from definitions.models import DataObject
-from definitions.models import Package, MibUpload
-from definitions.forms import MibUploadForm
+from tinygraph.apps.definitions.models import DataObject
+from tinygraph.apps.definitions.models import Package, MibUpload
+from tinygraph.apps.definitions.forms import MibUploadForm
 from django.shortcuts import get_object_or_404
 
 def data_object_list(request):

@@ -1,5 +1,5 @@
 import datetime
-from data.utils import datetime_to_timestamp
+from tinygraph.apps.data.utils import datetime_to_timestamp
 
 class Presenter(object):
     """

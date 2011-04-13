@@ -1,6 +1,6 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-from tinygraphd.signals import pre_poll, post_poll
+from tinygraph.tinygraphd.signals import pre_poll, post_poll
 from django.dispatch import receiver
 
 SNMP_VERSIONS = (

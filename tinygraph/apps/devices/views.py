@@ -2,11 +2,11 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from devices.models import Device
-from devices.forms import DeviceForm
-from definitions.models import Package
-from data.models import DataInstance
-from data.presenters import Presenter, CounterPresenter
+from tinygraph.apps.devices.models import Device
+from tinygraph.apps.devices.forms import DeviceForm
+from tinygraph.apps.definitions.models import Package
+from tinygraph.apps.data.models import DataInstance
+from tinygraph.apps.data.presenters import Presenter, CounterPresenter
 
 import datetime
 

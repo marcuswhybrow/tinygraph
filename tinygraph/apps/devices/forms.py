@@ -1,5 +1,5 @@
 from django import forms
-from devices.models import Device
+from tinygraph.apps.devices.models import Device
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 

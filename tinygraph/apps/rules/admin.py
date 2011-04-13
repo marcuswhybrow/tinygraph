@@ -1,5 +1,5 @@
 from django.contrib import admin
-from rules.models import Rule, PackageInstance
+from tinygraph.apps.rules.models import Rule, PackageInstance
 
 admin.site.register(Rule)
 admin.site.register(PackageInstance)

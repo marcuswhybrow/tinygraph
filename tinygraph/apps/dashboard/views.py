@@ -1,6 +1,6 @@
 from django.views.generic.simple import direct_to_template
-from dashboard.models import Board, Item, Connection
-from devices.models import Device
+from tinygraph.apps.dashboard.models import Board, Item, Connection
+from tinygraph.apps.devices.models import Device
 from django.db.models import Count
 
 def index(request):

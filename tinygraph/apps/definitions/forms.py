@@ -1,5 +1,5 @@
 from django import forms
-from definitions.models import MibUpload
+from tinygraph.apps.definitions.models import MibUpload
 
 class MibUploadForm(forms.ModelForm):
     class Meta:
