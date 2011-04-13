@@ -121,12 +121,10 @@ class MibUpload(models.Model):
             except NoSuchObjectError:
                 break
 
-            print oid, 
             if len(oid) <= len(ENTERPRISES_OID) or oid[:6] != ENTERPRISES_OID:
-                print 'out of scope'
                 continue
             else:
-                print 'in scope'
+                pass
 
             fields = {
                 'identifier': '.'.join([str(i) for i in oid]),

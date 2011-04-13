@@ -5,6 +5,8 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902, rfc1905
 from pyasn1.type import univ
 from django.conf import settings
+import socket
+import logging
 
 SNMP_DEFAULT_PORT = getattr(settings, 'TINYGRAPH_SNMP_DEFAULT_PORT', 161)
 SNMP_AGENT_NAME = getattr(settings, 'TINYGRAPH_SNMP_AGENT_NAME', 'TinyGraph')

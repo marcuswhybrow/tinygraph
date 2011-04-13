@@ -117,12 +117,9 @@ class CounterPresenter(Presenter):
             prev_period = None
             for start_time, end_time in self._get_intervals(self.start_time, self.granularity, self.end_time):
                 
-                print 'times: %s %s' % (start_time, end_time)
-                
                 def data_instance_filter(item):
                     if item.created < start_time or item.created >= end_time:
                         return False
-                    print '    %s' % (item.created)
                     return True
                 instances = filter(data_instance_filter, self.instances)
                 
@@ -132,7 +129,6 @@ class CounterPresenter(Presenter):
                         total += int(instance.value)
                     average = float(total) / len(instances)
                     if prev_period is not None:
-                        print 'Yielding'
                         delta = end_time - prev_period['end_time']
                         delta_secs = delta.days * 86400 + delta.seconds
                         value = (average - prev_period['average']) / delta_secs

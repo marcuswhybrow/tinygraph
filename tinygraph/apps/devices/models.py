@@ -1,11 +1,23 @@
 from django.db import models
 from django.template.defaultfilters import slugify
+from tinygraphd.signals import pre_poll, post_poll
+from django.dispatch import receiver
 
 SNMP_VERSIONS = (
     ('1', '1'),
     ('2', '2c'),
     ('3', '3'),
 )
+
+@receiver(pre_poll)
+def pre_poll_callback(sender, device=None, **kwargs):
+    """Called before each poll is conducted"""
+    pass
+
+@receiver(post_poll)
+def post_poll_callback(sender, device=None, **kwargs):
+    """Called after each poll is conducted"""
+    pass
 
 class Device(models.Model):
     """A device on the network"""

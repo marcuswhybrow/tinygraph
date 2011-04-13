@@ -24,7 +24,6 @@ def index(request):
     devices = Device.objects.select_related()
     
     device_counts = Item.objects.values('device').annotate(count=Count('device'))
-    print device_counts
     
     device_list = []
     for device in devices:

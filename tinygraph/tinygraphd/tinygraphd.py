@@ -7,6 +7,8 @@ from tinygraph.apps.definitions.utils import snmp_value_to_str, \
      get_mib_view_controller, get_transport, get_authentication, \
      snmp_name_to_str
 from django.conf import settings
+from tinygraph.tinygraphd.signals import pre_poll, post_poll
+import django.dispatch
 import socket
 
 SNMP_GETBULK_SIZE = getattr(settings, 'TINYGRAPH_SNMP_GETBULK_SIZE', 25)
@@ -100,6 +102,8 @@ class TinyGraphDaemon(PollDaemon):
                 #      details might be incorrect
                 continue
             
+            pre_poll.send(sender=self, device=device)
+            
             # Setup the asynchronous SNMP BULK requests (non blocking)
             for rule in device.rules.filter(enabled=True):
                 asyn_command_generator.asyncBulkCmd(
@@ -115,4 +119,6 @@ class TinyGraphDaemon(PollDaemon):
             
             # Blocks until all requests have returned
             asyn_command_generator.snmpEngine.transportDispatcher.runDispatcher()
+            
+            post_poll.send(sender=self, device=device)
                 

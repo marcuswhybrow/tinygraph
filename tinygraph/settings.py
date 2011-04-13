@@ -92,7 +92,7 @@ TEMPLATE_LOADERS = (
 
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 TEMPLATE_CONTEXT_PROCESSORS += (
-    'context_processors.static',
+    'tinygraph.context_processors.static',
 )
 
 MIDDLEWARE_CLASSES = (
