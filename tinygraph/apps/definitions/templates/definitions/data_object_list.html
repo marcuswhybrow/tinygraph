@@ -41,7 +41,7 @@
                             type: 'POST',
                             data: {
                                 data_object_pk: this.id,
-                                csrf_token: '{{ csrf_token }}'
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
                             },
                             success: function(html) {
                                 li.append(html);
