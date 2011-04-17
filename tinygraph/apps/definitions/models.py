@@ -4,6 +4,9 @@ from pysnmp.smi.error import NoSuchObjectError
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
+from tinygraph.apps.rules.models import Rule
 
 import subprocess
 import os
@@ -49,6 +52,9 @@ class Package(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(str(self.title))
         super(Package, self).save(*args, **kwargs)
+        
+        for package_instance in self.instances.all():
+            package_instance.update_rules()
 
     def __unicode__(self):
         return self.title
@@ -59,6 +65,38 @@ class Package(models.Model):
             'package_slug': self.slug,
         })
 
+@receiver(m2m_changed, sender=Package.data_objects.through)
+def package_data_objects(sender, **kwargs):
+    action = kwargs.get('action')
+    pk_set = kwargs.get('pk_set')
+    reverse = kwargs.get('reverse')
+    package = kwargs.get('instance')
+    
+    if not reverse and action:
+        instances = package.instances.all()
+        
+        if action == 'post_add':
+            data_objects = DataObject.objects.filter(pk__in=pk_set)
+            for instance in instances:
+                for data_object in data_objects:
+                    try:
+                        rule = Rule.objects.get(device=instance.device, data_object=data_object, package_instance=instance)
+                    except Rule.DoesNotExist:
+                        rule = Rule.objects.create(device=instance.device, data_object=data_object, package_instance=instance, enabled=instance.enabled)
+        elif action == 'post_remove':
+            data_objects = DataObject.objects.filter(pk__in=pk_set)
+            for instance in instances:
+                for data_object in data_objects:
+                    try:
+                        rule = Rule.objects.get(device=instance.device, data_object=data_object, package_instance=instance)
+                    except Rule.DoesNotExist:
+                        pass
+                    else:
+                        rule.delete()
+        elif action == 'post_clear':
+            for instance in instances:
+                instance.rules.all().delete()
+                    
 
 class MibUpload(models.Model):
     file = models.FileField(null=True, blank=True, upload_to='mibs', db_index=True)
