@@ -1,16 +1,49 @@
 {% extends "definitions/packages/packages_base.html" %}
 
 {% block content_area %}
-    <h2>The {{ package.title }} Package</h2>
+
+    <div id="path">
+        <a href="{{ package.get_absolute_url }}">{{ package.title }}</a>
+    </div>
+    
     <p>
         {{ package.description }}
     </p>
     
-    {% with package.data_objects.all as data_objects %}
-        {% include "definitions/includes/data_object_table.html" %}
-    {% endwith %}
+    <div id="data-objects">
+        {% with package.data_objects.all as data_objects %}
+            {% include "definitions/includes/data_object_table.html" %}
+        {% endwith %}
+    </div>
     
-    <p>
-        <a href="{% url definitions:package_list %}">&#x2190; Back</a> to Packages
-    </p>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            var PACKAGE_PK = '{{ package.pk }}';
+            var PACKAGE_URL = '{% url api:definitions:packages %}';
+            
+            $('.delete .button').click(function() {
+                var $tableRow = $(this).closest('tr');
+                var dataObjectPK = $tableRow.attr('pk');
+                
+                $.ajax({    
+                    url: PACKAGE_URL + PACKAGE_PK + '/',
+                    type: 'put',
+                    context: $tableRow,
+                    data: {
+                        data_objects__remove: dataObjectPK
+                    },
+                    success: function(data) {
+                        this.remove();
+                    },
+                    error: function(data, other) {
+                        alert('There was an error removing this data object.');
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

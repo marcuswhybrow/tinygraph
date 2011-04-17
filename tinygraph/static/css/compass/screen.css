@@ -308,3 +308,44 @@ form.little-form {
 #path a:hover {
   text-decoration: underline;
 }
+
+/* line 228, ../../compass/src/screen.sass */
+#data-objects thead td.delete {
+  text-indent: -9999px;
+  overflow: hidden;
+}
+/* line 232, ../../compass/src/screen.sass */
+#data-objects tbody td.delete {
+  width: 20px;
+}
+/* line 235, ../../compass/src/screen.sass */
+#data-objects tbody td.delete span.button {
+  display: block;
+  width: 16px;
+  height: 16px;
+  text-indent: -99999px;
+  margin-left: 3px;
+  background: url("/static/images/icons/sweetie-plus-v2/without-shadows/badge-circle-cross-16-ns.png") no-repeat top center;
+  cursor: pointer;
+  opacity: 0;
+  -moz-transition-property: all;
+  -webkit-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -moz-transition-duration: 0.1s;
+  -webkit-transition-duration: 0.1s;
+  -o-transition-duration: 0.1s;
+  transition-duration: 0.1s;
+  -moz-transition-timing-function: ease-in-out;
+  -webkit-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  -moz-transition-delay: 0;
+  -webkit-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+}
+/* line 248, ../../compass/src/screen.sass */
+#data-objects tbody tr:hover span.button {
+  opacity: 1;
+}

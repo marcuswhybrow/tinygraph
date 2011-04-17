@@ -3,14 +3,16 @@
         <tr class="align-left">
             <th>Name</th>
             <th>Identifier</th>
+            <td class="delete">Delete</td>
         </tr>
     </thead>
     <tbody>
         {% if data_objects %}
             {% for data_object in data_objects %}
-                 <tr>
+                 <tr pk="{{ data_object.pk }}">
                     <td>{{ data_object.derived_name }}</td>
                     <td>{{ data_object.identifier }}</td>
+                    <td class="delete"><span class="button">Yes</a></td>
                 </tr>
             {% endfor %}
         {% else %}

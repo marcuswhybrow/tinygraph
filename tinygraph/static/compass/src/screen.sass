@@ -223,3 +223,30 @@ form.little-form
         
     a:hover
         text-decoration: underline
+
+#data-objects
+    thead td.delete
+        text-indent: -9999px
+        overflow: hidden
+    tbody
+        td.delete
+            width: 20px
+        
+            span.button
+                display: block
+                width: 16px
+                height: 16px
+                text-indent: -99999px
+                margin-left: 3px
+                background: url('/static/images/icons/sweetie-plus-v2/without-shadows/badge-circle-cross-16-ns.png') no-repeat top center
+                cursor: pointer
+                opacity: 0
+                
+                @include transition(all, 0.1s, ease-in-out, 0)
+        
+        tr:hover
+            span.button
+                opacity: 1
+            
+            span.button:hover
+                
