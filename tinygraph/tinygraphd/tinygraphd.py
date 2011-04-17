@@ -88,9 +88,12 @@ class TinyGraphDaemon(PollDaemon):
             
             prev_data_instance = None
             if (value_type in NON_INCREMENTAL_DATA_VALUE_TYPES):
-                prev_data_instance = DataInstance.objects.filter(
-                    rule=rule, data_object=data_object, suffix=str_suffix
-                ).latest()
+                try:
+                    prev_data_instance = DataInstance.objects.filter(
+                        rule=rule, data_object=data_object, suffix=str_suffix
+                    ).latest()
+                except:
+                    pass
 
             # Create the DataInstance
             new_data_instance = DataInstance.objects.create(rule=rule,
