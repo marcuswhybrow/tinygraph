@@ -6,13 +6,13 @@ class EventBase(models.Model):
     
     class Meta:
         abstract = True
-
+        
 class Event(EventBase):
     message = models.CharField(blank=True, max_length=255)
     
     def __unicode__(self):
         return u'%s: %s' % (self.device, self.message)
-
+        
 class ChangeEvent(EventBase):
     data_instance = models.ForeignKey('data.DataInstance', db_index=True, related_name='events')
     

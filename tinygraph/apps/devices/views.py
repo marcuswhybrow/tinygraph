@@ -74,10 +74,12 @@ def device_add(request):
 
 def device_data_object_list(request, device_slug):
     device = get_object_or_404(Device, slug=device_slug)
+    packages = Package.objects.all().select_related('devices')
+    packages_map = [(package, device.get_package_instance(package)) for package in packages]
     return direct_to_template(request, 'devices/device_data_object_list.html', {
         'device': device,
         'new_device': 'new' in request.GET and request.GET['new'].lower() in ['', 'true'],
-        'packages': Package.objects.all().select_related('devices'),
+        'packages_map': packages_map,
     })
 
 def test(request):

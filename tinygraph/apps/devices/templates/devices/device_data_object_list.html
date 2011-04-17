@@ -20,18 +20,16 @@
     </p>
     
     <div class="packages">
-        {% with device.packages.all as device_packages %}
-            {% for package in packages %}
-                <div class="package {% if package in device_packages %}enabled{% endif %}">
-                    <input class="toggle" type="checkbox" name="{{ package.slug }}"{% if package in device_packages %} checked="true"{% endif %}>
-                    <h5>{{ package.title }}</h5>
-                    <p>{{ package.description }}</p>
-                    <p>
-                        <a href="{% url definitions:package_detail package_slug=package.slug %}">Read More</a>
-                    </p>
-                </div>
-            {% endfor %}
-        {% endwith %}
+        {% for package, package_instance in packages_map %}
+            <div packageInstancePK="{{ package_instance.pk }}" packagePK="{{ package.pk }}" class="package {% if package_instance.enabled %}enabled{% endif %}">
+                <input class="toggle" type="checkbox" name="{{ package.slug }}"{% if package_instance.enabled %} checked="true"{% endif %}>
+                <h5>{{ package.title }}</h5>
+                <p>{{ package.description }}</p>
+                <p>
+                    <a href="{% url definitions:package_detail package_slug=package.slug %}">Read More</a>
+                </p>
+            </div>
+        {% endfor %}
     </div>
     
     <h3>Individual Data Objects</h3>
@@ -52,8 +50,45 @@
 {% block scripts %}
     <script type="text/javascript" charset="utf-8">
         $(function() {
-            $('.toggle:checkbox').change(function() {
-                $(this).closest('.package').toggleClass('enabled');
+            var PACKAGE_INSTANCE_URL = '{% url api:rules:package_instances %}';
+            var CSRF_TOKEN = '{{ csrf_token }}';
+            var DEVICE_PK = '{{ device.pk }}';
+            
+            $('.package .toggle:checkbox').change(function() {
+                var $p = $(this).closest('.package');
+                $p.toggleClass('enabled');
+                
+                var packageInstancePK = $p.attr('packageInstancePK');
+                var packagePK = $p.attr('packagePK');
+                var isEnabled = $p.is('.enabled') ? 'True' : '';
+                
+                if (packageInstancePK === '') {
+                    $.ajax({
+                        url: PACKAGE_INSTANCE_URL,
+                        type: 'post',
+                        context: $p,
+                        data: {
+                            device: DEVICE_PK,
+                            package: packagePK,
+                            enabled: true,
+                            csrfmiddlewaretoken: CSRF_TOKEN
+                        },
+                        success: function(data) {
+                            this.attr('packageInstancePK', data['id']);
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        url: PACKAGE_INSTANCE_URL + packageInstancePK + '/',
+                        type: 'put',
+                        context: $p,
+                        data: {
+                            enabled: isEnabled,
+                            csrfmiddlewaretoken: CSRF_TOKEN
+                        },
+                        dataType: 'json'
+                    });
+                }
             });
         })
     </script>

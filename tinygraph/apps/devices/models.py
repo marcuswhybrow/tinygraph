@@ -4,6 +4,7 @@ from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
     value_change
 from django.dispatch import receiver
 from tinygraph.apps.events.models import Event, ChangeEvent
+from tinygraph.apps.rules.models import PackageInstance
 import socket
 
 SNMP_VERSIONS = (
@@ -82,3 +83,9 @@ class Device(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(str(self.user_given_name))
         super(Device, self).save(*args, **kwargs)
+    
+    def get_package_instance(self, package):
+        try:
+            return PackageInstance.objects.get(device=self, package=package)
+        except:
+            return None
