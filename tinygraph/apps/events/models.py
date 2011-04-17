@@ -6,6 +6,7 @@ class EventBase(models.Model):
     
     class Meta:
         abstract = True
+        ordering = ('-created',)
         
 class Event(EventBase):
     message = models.CharField(blank=True, max_length=255)

@@ -7,26 +7,52 @@
 {% block content_area %}
 
     <div id="path">
-        <a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a>
+        <h1><a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a></h1>
+        
+        <ul id="actions">
+            <li><a href="{% url devices:device_data_object_list device_slug=device.slug %}">Data Objects</a></li>
+            <li><a href="{% url devices:device_edit device_slug=device.slug %}">Edit</a></li>
+            <li><a href="{% url devices:device_delete device_slug=device.slug %}">Delete</a></li>
+        </ul>
     </div>
     
-    <p>
-        This is <code>{{ device.user_given_name }}</code>, with a host name of <code>{{ device.host_name }}</code> and an IP address of <code>{{ device.address }}</code>.
-        Currently the information in this paragraph is static and defined by the user (i.e. host name and IP address may not match).
-    </p>
+    <div id="device-details">
+        <div>
+            <dl>
+                <dt>Name</dt>
+                <dd>{{ device.user_given_name }}</dd>
+            </dl>
+            <dl>
+                <dt>IP Address</dt>
+                <dd>{{ device.ip_address }}</dd>
+            </dl>
+            <dl>
+                <dt>FQ Domain Name</dt>
+                <dd>{{ device.fqdn }}</dd>
+            </dl>
+            <dl>
+                <dt>Uptime</dt>
+                <dd>100 days</dd>
+            </dl>
+        </div>
+    </div>
     
-    <p>
-        <a href="{% url devices:device_edit device_slug=device.slug %}">edit</a>
-        <a href="{% url devices:device_delete device_slug=device.slug %}">delete</a>
-    </p>
-    
-    <p>
-        <a href="{% url devices:device_data_object_list device_slug=device.slug %}">Data Objects</a>
-    </p>
-    
-    <h3>Overview</h3>
-    
-    <p>
-        This page will be an overview of the device in question, containing key information graphed by the fixed packages, and contain a list of events regarding this device.
-    </p>
+    <div class="columns">
+        <div class="first">
+            <h3>Activity</h3>
+            <ul>
+                {% for data_object in device.data_objects.all %}
+                    <li>{{ data_object }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="last">
+            <h3>Events</h3>
+            <ul>
+                {% for event in device.event_set.all %}
+                    <li>{{ event.message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 {% endblock %}

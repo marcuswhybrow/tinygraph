@@ -44,10 +44,6 @@
     {% with device.data_objects.all as device_objects %}
         {% include "definitions/includes/data_object_table.html" %}
     {% endwith %}
-    
-    <p>
-        <a href="{% url devices:device_detail device_slug=device.slug %}">&#x2190; Back</a> to {{ device.user_given_name }}
-    </p>
 {% endblock %}
 
 {% block scripts %}
