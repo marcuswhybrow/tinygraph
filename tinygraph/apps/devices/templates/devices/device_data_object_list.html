@@ -1,7 +1,10 @@
 {% extends "devices/devices_base.html" %}
 
 {% block content_area %}
-    <h2>Data Objects For {{ device.user_given_name }}</h2>
+
+    <div id="path">
+        <a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a> <span>/ Data Objects</span>
+    </div>
     
     {% if new_device %}
         <p>

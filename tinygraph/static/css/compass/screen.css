@@ -293,3 +293,18 @@ form.little-form {
   background-color: #bbeebb;
   border-color: #88aa88;
 }
+
+/* line 216, ../../compass/src/screen.sass */
+#path {
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+/* line 220, ../../compass/src/screen.sass */
+#path a {
+  font-weight: bold;
+  text-decoration: none;
+}
+/* line 224, ../../compass/src/screen.sass */
+#path a:hover {
+  text-decoration: underline;
+}

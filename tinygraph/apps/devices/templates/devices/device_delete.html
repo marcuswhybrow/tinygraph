@@ -14,6 +14,11 @@
             <a href="{% url devices:device_list %}">&#x2190; Back to the list of devices</a>
         </p>
     {% else %}
+        
+        <div id="path">
+            <a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a> <span>/ Delete</span>
+        </div>
+        
         <p>
             Are you sure you want to delete {{ device }}, <strong>you will also be deleting all data</strong> collected for {{ device }}.
         </p>
@@ -27,7 +32,5 @@
             <input type="hidden" name="delete" value="true">
             <input type="submit" name="submit" value="Confirm Deletion">
         </form>
-
-        <p><a href="{% url devices:device_detail device_slug=device.slug %}">&#x2190; back</a></p>
     {% endif %}
 {% endblock %}

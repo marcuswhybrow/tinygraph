@@ -5,8 +5,10 @@
 {% block content_title %}{{ device }}{% endblock %}
 
 {% block content_area %}
-    
-    <a href="{{ device.get_absolute_url }}"><h2>{{ device.user_given_name }}</h2></a>
+
+    <div id="path">
+        <a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a>
+    </div>
     
     <p>
         This is <code>{{ device.user_given_name }}</code>, with a host name of <code>{{ device.host_name }}</code> and an IP address of <code>{{ device.address }}</code>.
@@ -27,7 +29,4 @@
     <p>
         This page will be an overview of the device in question, containing key information graphed by the fixed packages, and contain a list of events regarding this device.
     </p>
-    
-    
-    <p><a href="{% url devices:device_list %}">&#x2190; back</a> to Devices</p>
 {% endblock %}

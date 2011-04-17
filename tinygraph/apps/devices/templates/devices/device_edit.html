@@ -1,13 +1,14 @@
 {% extends "devices/devices_base.html" %}
 
 {% block content_area %}
-    <h2>
+
+    <div id="path">
         {% if form.instance.pk %}
-            Edit {{ form.instance }}
+            <a href="{{ form.instance.get_absolute_url }}">{{ form.instance.user_given_name }}</a> <span>/ Edit</span>
         {% else %}
             Add New Device
         {% endif %}
-    </h2>
+    </div>
 
     <form action="" method="POST">
         {% csrf_token %}
@@ -16,8 +17,6 @@
     </form>
     
     <div id="target"></div>
-    
-    <p><a href="{% url devices:device_list %}">&#x2190; back</a></p>
 {% endblock %}
 
 {% block scripts %}
