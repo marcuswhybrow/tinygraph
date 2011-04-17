@@ -14,6 +14,16 @@ import socket
 SNMP_GETBULK_SIZE = getattr(settings, 'TINYGRAPH_SNMP_GETBULK_SIZE', 25)
 DEVICE_TRANSPORT_ERROR_MESSAGE = getattr(settings, 'TINYGRAPH_DEVICE_TRANSPORT_ERROR_MESSAGE', 'Could not connect to device.')
 
+NON_INCREMENTAL_DATA_VALUE_TYPES = (
+    'integer',
+    'bit_string',
+    'octet_string',
+    'null',
+    'object_identifier',
+    'sequence',
+    'ip_address',
+)
+
 class TinyGraphDaemon(PollDaemon):
     
     def _callback(self, handle, error_indication, error_status, error_index, var_bind_table, context):
@@ -75,11 +85,21 @@ class TinyGraphDaemon(PollDaemon):
             elif value_type is None:
                 logging.error('Unrecognised value "%s"' % value.__class__)
                 continue
+            
+            prev_data_instance = None
+            if (value_type in NON_INCREMENTAL_DATA_VALUE_TYPES):
+                prev_data_instance = DataInstance.objects.filter(
+                    rule=rule, data_object=data_object, suffix=str_suffix
+                ).latest()
 
             # Create the DataInstance
-            DataInstance.objects.create(rule=rule,
+            new_data_instance = DataInstance.objects.create(rule=rule,
                 data_object=data_object, suffix=str_suffix,
                 value=str_value, value_type=value_type)
+            
+            if (value_type in NON_INCREMENTAL_DATA_VALUE_TYPES):
+                if prev_data_instance is not None and (new_data_instance.value != prev_data_instance.value):
+                    value_change.send(sender=self, data_instance=new_data_instance)
         
         # The children of the rule have no yet been exhausted, continue with
         # the bulk requests

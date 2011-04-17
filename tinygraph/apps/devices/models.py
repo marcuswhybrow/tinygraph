@@ -1,8 +1,9 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error
+from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
+    value_change
 from django.dispatch import receiver
-from tinygraph.apps.events.models import Event
+from tinygraph.apps.events.models import Event, ChangeEvent
 import socket
 
 SNMP_VERSIONS = (
@@ -42,6 +43,13 @@ def poll_error_callback(sender, **kwargs):
     message = kwargs.get('message')
     if device is not None and message is not None:
         Event.objects.create(device=device, message=message)
+
+@receiver(value_change)
+def value_change_callback(sender, **kwargs):
+    """Called if a new data instance is different to the previous value."""
+    data_instance = kwargs.get('data_instance')
+    if data_instance is not None:
+        ChangeEvent.objects.create(device=data_instance.rule.device, data_instance=data_instance)
 
 class Device(models.Model):
     """A device on the network"""
