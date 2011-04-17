@@ -126,6 +126,7 @@ INSTALLED_APPS = (
     'data',
     'dashboard',
     'api',
+    'events',
 )
 
 # Tells pysnmp where the user uploaded (converted) mib files are
