@@ -1,7 +1,9 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-from tinygraph.tinygraphd.signals import pre_poll, post_poll
+from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error
 from django.dispatch import receiver
+from tinygraph.apps.events.models import Event
+import socket
 
 SNMP_VERSIONS = (
     ('1', '1'),
@@ -10,14 +12,36 @@ SNMP_VERSIONS = (
 )
 
 @receiver(pre_poll)
-def pre_poll_callback(sender, device=None, **kwargs):
-    """Called before each poll is conducted"""
-    pass
+def pre_poll_callback(sender, **kwargs):
+    """
+    Performs potentially blocking calls WHICH IS BAD. This kind of work should
+    be put on a job queue, however it is easier just to delay the poll a little
+    bit.
+    """
+    device = kwargs.get('device')
+    
+    Event.objects.create(device=device, message='Started polling.')
+    
+    if device is not None:
+        device.fqdn = socket.getfqdn(device.user_given_address)
+        # This call only supports IPv4 addresses
+        device.ip_address = socket.gethostbyname(device.user_given_address)
+        device.save()
 
 @receiver(post_poll)
-def post_poll_callback(sender, device=None, **kwargs):
+def post_poll_callback(sender, **kwargs):
     """Called after each poll is conducted"""
-    pass
+    device = kwargs.get('device')
+    if device is not None:
+        Event.objects.create(device=device, message='Finished Polling.')
+
+@receiver(poll_error)
+def poll_error_callback(sender, **kwargs):
+    """Called if there was an error connecting to the device"""
+    device = kwargs.get('device')
+    message = kwargs.get('message')
+    if device is not None and message is not None:
+        Event.objects.create(device=device, message=message)
 
 class Device(models.Model):
     """A device on the network"""

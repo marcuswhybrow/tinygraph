@@ -7,11 +7,12 @@ from tinygraph.apps.definitions.utils import snmp_value_to_str, \
      get_mib_view_controller, get_transport, get_authentication, \
      snmp_name_to_str
 from django.conf import settings
-from tinygraph.tinygraphd.signals import pre_poll, post_poll
+from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error
 import django.dispatch
 import socket
 
 SNMP_GETBULK_SIZE = getattr(settings, 'TINYGRAPH_SNMP_GETBULK_SIZE', 25)
+DEVICE_TRANSPORT_ERROR_MESSAGE = getattr(settings, 'TINYGRAPH_DEVICE_TRANSPORT_ERROR_MESSAGE', 'Could not connect to device.')
 
 class TinyGraphDaemon(PollDaemon):
     
@@ -98,8 +99,7 @@ class TinyGraphDaemon(PollDaemon):
             # the authentication details for the device were provided
             # incorrectly, then skip this device in the polling process
             if transport is None or authentication is None:
-                # TODO Add an event which notifies the user that there auth
-                #      details might be incorrect
+                poll_error.send(sender=self, device=device, message=DEVICE_TRANSPORT_ERROR_MESSAGE)
                 continue
             
             pre_poll.send(sender=self, device=device)
