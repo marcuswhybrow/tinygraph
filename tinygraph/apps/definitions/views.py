@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 
 def data_object_list(request):
     return direct_to_template(request, 'definitions/data_object_list.html', {
+        'mib_uploads': MibUpload.objects.filter(system=False),
         'root_data_object_list': DataObject.objects.root_only().select_related(),
     })
 
@@ -21,7 +22,6 @@ def mib_upload_list(request):
         form = MibUploadForm()
 
     return direct_to_template(request, 'definitions/mib_upload_list.html', {
-        'mib_uploads': MibUpload.objects.filter(system=False),
         'form': form,
     })
 

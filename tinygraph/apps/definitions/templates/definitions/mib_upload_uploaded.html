@@ -1,9 +1,6 @@
-{% extends "definitions/data_object_base.html" %}
-
-{% block content_class %}{{ block.super }} do-mibs{% endblock %}
+{% extends "definitions/definitions_base.html" %}
 
 {% block content_area %}
-    {{ block.super }}
     
     {% if mib_upload.pk %}
         <h3>Your MIB Has Been Uploaded</h3>

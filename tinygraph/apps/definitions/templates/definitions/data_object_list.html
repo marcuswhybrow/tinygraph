@@ -3,17 +3,39 @@
 {% block content_class %}{{ block.super }} do-list{% endblock %}
 
 {% block content_area %}
-    {{ block.super }}
-    <h2>The List!</h2>
     
-    <div id="data-object-list">
-        {% if root_data_object_list %}
-            {% with root_data_object_list as data_object_children %}
-                {% include "definitions/includes/data_object_children_list.html" %}
-            {% endwith %}
-        {% else %}
-            <p>TinyGraph has no "<code>DataObject</code>" entries. Run "<code>python manage.py create_data_objects</code>" to populate the database.</p>
-        {% endif %}
+    <div id="path">
+        <h1>Data Objects</h1>
+        <ul id="actions">
+            <li><a href="{% url definitions:mib_upload_list %}">Upload New MIB</a></li>
+        </ul>
+    </div>
+
+    <div class="columns">
+        <div class="first">
+            <h4>The List</h4>
+            <div id="data-object-list">
+                {% if root_data_object_list %}
+                    {% with root_data_object_list as data_object_children %}
+                        {% include "definitions/includes/data_object_children_list.html" %}
+                    {% endwith %}
+                {% else %}
+                    <p>TinyGraph has no "<code>DataObject</code>" entries. Run "<code>python manage.py create_data_objects</code>" to populate the database.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="last">
+            <h4>Uploaded MIBs</h4>
+            {% if mib_uploads %}
+                <ul>
+                    {% for mib_upload in mib_uploads %}
+                        <li>{{ mib_upload.get_file_name }} {% if mib_upload.file %}
+                            (<a href="{{ mib_upload.file.url }}">download</a>)
+                        {% endif %}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
     </div>
     
 {% endblock %}
