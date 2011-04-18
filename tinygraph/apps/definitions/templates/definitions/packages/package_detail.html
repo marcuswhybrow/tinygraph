@@ -15,7 +15,15 @@
             {% include "definitions/includes/data_object_table.html" %}
         {% endwith %}
     </div>
-    
+{% endblock %}
+
+{% block dialogs %}
+    <div id="delete-dialog" class="dialog-box">
+        <p>If you delete this Data Object from this Package, all related data instances will be deleted also.</p>
+    </div>
+    <div id="error-dialog" class="dialog-box">
+        <p></p>
+    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -24,25 +32,66 @@
         $(function() {
             var PACKAGE_PK = '{{ package.pk }}';
             var PACKAGE_URL = '{% url api:definitions:packages %}';
+            var $tableRow = null;
+            var dataObjectPK = null;
             
-            $('.delete .button').click(function() {
-                var $tableRow = $(this).closest('tr');
-                var dataObjectPK = $tableRow.attr('pk');
-                
-                $.ajax({    
-                    url: PACKAGE_URL + PACKAGE_PK + '/',
-                    type: 'put',
-                    context: $tableRow,
-                    data: {
-                        data_objects__remove: dataObjectPK
-                    },
-                    success: function(data) {
-                        this.remove();
-                    },
-                    error: function(data, other) {
-                        alert('There was an error removing this data object.');
+            var defaults = {
+                resizable: false,
+                draggable: false,
+                closeText: '',
+                autoOpen: false,
+                modal: true
+            }
+            
+            $('#error-dialog').dialog($.extend({
+                title: 'Error Deleting',
+                dialogClass: 'error',
+                buttons: {
+                    'OK': function() {
+                        $(this).dialog('close');
                     }
-                });
+                }
+            }, defaults));
+
+            $('#delete-dialog').dialog($.extend({
+                title: 'Really Delete?',
+                buttons: {
+                    'Yes Delete': function() {
+                        $(this).dialog('close');
+                        $.ajax({    
+                            url: PACKAGE_URL + PACKAGE_PK + '/',
+                            type: 'put',
+                            context: $tableRow,
+                            data: {
+                                data_objects__remove: dataObjectPK
+                            },
+                            success: function() {
+                                this.animate({
+                                    opacity: 0
+                                }, 100, function() {
+                                    $(this).slideUp(200, function() {
+                                        $(this).remove();
+                                    });
+                                });
+                            },
+                            error: function() {
+                                $('#error-dialog p').text('There was an error whilst deleting the Data Object. Please try again.');
+                                $('#error-dialog').dialog('open');
+                            }
+                        });
+                    },
+                    '\u2190 Cancel': function() {
+                        $(this).dialog('close');
+                        $tableRow = null;
+                        dataObjectPK = null;
+                    }
+                }
+            }, defaults));
+            
+            $('tr td.delete .button').click(function() {
+                $tableRow = $(this).closest('tr');
+                dataObjectPK = $tableRow.attr('pk');
+                $('#delete-dialog').dialog('open');
             });
         });
     </script>

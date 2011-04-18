@@ -2,34 +2,34 @@
  * In this file you should write your main styles. (or centralize your imports)
  * Import this file using the following HTML or equivalent:
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
-/* line 38, ../../compass/src/screen.sass */
+/* line 55, ../../compass/src/screen.sass */
 html {
   overflow-y: auto;
 }
 
-/* line 41, ../../compass/src/screen.sass */
+/* line 58, ../../compass/src/screen.sass */
 #container {
   width: 800px;
   margin: 0 auto;
 }
 
-/* line 45, ../../compass/src/screen.sass */
+/* line 62, ../../compass/src/screen.sass */
 header {
   padding: 20px;
   border-bottom: 1px solid #eeeeee;
 }
-/* line 50, ../../compass/src/screen.sass */
+/* line 67, ../../compass/src/screen.sass */
 header #logo h1 {
   font-size: 48px;
   margin-bottom: 20px;
 }
-/* line 54, ../../compass/src/screen.sass */
+/* line 71, ../../compass/src/screen.sass */
 header #logo a {
   text-decoration: none;
   color: inherit;
 }
 
-/* line 58, ../../compass/src/screen.sass */
+/* line 75, ../../compass/src/screen.sass */
 #main-nav ul li {
   float: left;
   background-color: #eeeeee;
@@ -54,7 +54,7 @@ header #logo a {
   -o-transition-delay: 0;
   transition-delay: 0;
 }
-/* line 68, ../../compass/src/screen.sass */
+/* line 85, ../../compass/src/screen.sass */
 #main-nav ul li a {
   color: inherit;
   text-decoration: none;
@@ -64,7 +64,7 @@ header #logo a {
   display: block;
 }
 
-/* line 76, ../../compass/src/screen.sass */
+/* line 93, ../../compass/src/screen.sass */
 #main-nav ul li:hover,
 body#devices #main-nav ul li.devices,
 body#data-objects #main-nav ul li.data-objects,
@@ -92,21 +92,21 @@ body#dashboard #main-nav ul li.dashboard {
   border-color: #666666;
 }
 
-/* line 89, ../../compass/src/screen.sass */
+/* line 106, ../../compass/src/screen.sass */
 #data-object-list ul {
   list-style: none;
 }
-/* line 91, ../../compass/src/screen.sass */
+/* line 108, ../../compass/src/screen.sass */
 #data-object-list a {
   text-decoration: none;
   hover-text-decoration: underline;
 }
 
-/* line 97, ../../compass/src/screen.sass */
+/* line 114, ../../compass/src/screen.sass */
 #device-list {
   margin-bottom: 20px;
 }
-/* line 100, ../../compass/src/screen.sass */
+/* line 117, ../../compass/src/screen.sass */
 #device-list .device {
   float: left;
   background-color: #eeeeee;
@@ -128,18 +128,18 @@ body#dashboard #main-nav ul li.dashboard {
   text-decoration: none;
   hover-text-decoration: underline;
 }
-/* line 103, ../../compass/src/screen.sass */
+/* line 120, ../../compass/src/screen.sass */
 #device-list .device img {
   margin: 0 auto 10px;
 }
 
-/* line 107, ../../compass/src/screen.sass */
+/* line 124, ../../compass/src/screen.sass */
 ul.mini-nav {
   list-style: none;
   margin: 0 0 20px 0;
   padding: 0;
 }
-/* line 112, ../../compass/src/screen.sass */
+/* line 129, ../../compass/src/screen.sass */
 ul.mini-nav li {
   float: left;
   padding: 5px 10px;
@@ -147,110 +147,110 @@ ul.mini-nav li {
   last-child-border-right: none;
 }
 
-/* line 120, ../../compass/src/screen.sass */
+/* line 137, ../../compass/src/screen.sass */
 div.do-list ul.mini-nav li.do-list,
 div.do-mibs ul.mini-nav li.do-mibs,
 ul.mini-nav li:hover {
   background-color: #eeeeee;
 }
 
-/* line 127, ../../compass/src/screen.sass */
+/* line 144, ../../compass/src/screen.sass */
 form.little-form {
   padding: 20px;
   border: 1px solid #eeeeee;
   display: inline-block;
 }
 
-/* line 133, ../../compass/src/screen.sass */
+/* line 150, ../../compass/src/screen.sass */
 #main {
   padding: 20px 20px 20px;
 }
-/* line 136, ../../compass/src/screen.sass */
+/* line 153, ../../compass/src/screen.sass */
 #main h2 {
   font-size: 28px;
   margin-bottom: 20px;
 }
-/* line 140, ../../compass/src/screen.sass */
+/* line 157, ../../compass/src/screen.sass */
 #main h3 {
   font-size: 22px;
   margin-bottom: 10px;
 }
-/* line 144, ../../compass/src/screen.sass */
+/* line 161, ../../compass/src/screen.sass */
 #main h4 {
   font-size: 18px;
   margin-bottom: 10px;
 }
-/* line 148, ../../compass/src/screen.sass */
+/* line 165, ../../compass/src/screen.sass */
 #main p {
   margin-bottom: 10px;
 }
-/* line 151, ../../compass/src/screen.sass */
+/* line 168, ../../compass/src/screen.sass */
 #main form {
   margin-bottom: 20px;
 }
-/* line 154, ../../compass/src/screen.sass */
+/* line 171, ../../compass/src/screen.sass */
 #main ul {
   margin-bottom: 20px;
 }
-/* line 157, ../../compass/src/screen.sass */
+/* line 174, ../../compass/src/screen.sass */
 #main fieldset {
   border: 1px solid #eeeeee;
   min-height: 40px;
   margin-bottom: 20px;
   padding: 20px;
 }
-/* line 163, ../../compass/src/screen.sass */
+/* line 180, ../../compass/src/screen.sass */
 #main fieldset legend {
   background-color: white;
   padding: 2px 4px;
 }
-/* line 167, ../../compass/src/screen.sass */
+/* line 184, ../../compass/src/screen.sass */
 #main fieldset label {
   margin-right: 10px;
   height: 30px;
   display: block;
 }
-/* line 172, ../../compass/src/screen.sass */
+/* line 189, ../../compass/src/screen.sass */
 #main fieldset label input {
   margin-right: 10px;
 }
-/* line 175, ../../compass/src/screen.sass */
+/* line 192, ../../compass/src/screen.sass */
 #main fieldset label.has-children {
   font-weight: bold;
 }
-/* line 178, ../../compass/src/screen.sass */
+/* line 195, ../../compass/src/screen.sass */
 #main table {
   margin-bottom: 20px;
   width: 100%;
   border-top: 1px solid #cccccc;
 }
-/* line 184, ../../compass/src/screen.sass */
+/* line 201, ../../compass/src/screen.sass */
 #main table tr:nth-child(even) {
   background-color: #eeeeee;
 }
-/* line 187, ../../compass/src/screen.sass */
+/* line 204, ../../compass/src/screen.sass */
 #main table tr {
   border-bottom: 1px solid #cccccc;
 }
-/* line 189, ../../compass/src/screen.sass */
+/* line 206, ../../compass/src/screen.sass */
 #main table tr td, #main table tr th {
   padding: 10px 20px;
 }
-/* line 192, ../../compass/src/screen.sass */
+/* line 209, ../../compass/src/screen.sass */
 #main table tr.information td {
   text-align: center;
   background-color: #eeeeee;
 }
-/* line 196, ../../compass/src/screen.sass */
+/* line 213, ../../compass/src/screen.sass */
 #main table .align-center {
   text-align: center;
 }
-/* line 199, ../../compass/src/screen.sass */
+/* line 216, ../../compass/src/screen.sass */
 #main table .align-left {
   text-align: left;
 }
 
-/* line 203, ../../compass/src/screen.sass */
+/* line 220, ../../compass/src/screen.sass */
 .packages {
   overflow: hidden;
   display: inline-block;
@@ -259,7 +259,7 @@ form.little-form {
 .packages {
   display: block;
 }
-/* line 205, ../../compass/src/screen.sass */
+/* line 222, ../../compass/src/screen.sass */
 .packages .package {
   float: left;
   background-color: #eeeeee;
@@ -282,47 +282,47 @@ form.little-form {
   text-decoration: none;
   hover-text-decoration: underline;
 }
-/* line 209, ../../compass/src/screen.sass */
+/* line 226, ../../compass/src/screen.sass */
 .packages .package .toggle {
   position: absolute;
   top: 20px;
   right: 20px;
 }
-/* line 214, ../../compass/src/screen.sass */
+/* line 231, ../../compass/src/screen.sass */
 .packages .package.enabled {
   background-color: #bbeebb;
   border-color: #88aa88;
 }
 
-/* line 219, ../../compass/src/screen.sass */
+/* line 236, ../../compass/src/screen.sass */
 #path {
   margin-bottom: 20px;
   font-size: 22px;
 }
-/* line 223, ../../compass/src/screen.sass */
+/* line 240, ../../compass/src/screen.sass */
 #path h1 {
   display: inline-block;
 }
-/* line 226, ../../compass/src/screen.sass */
+/* line 243, ../../compass/src/screen.sass */
 #path a {
   font-weight: bold;
   text-decoration: none;
 }
-/* line 230, ../../compass/src/screen.sass */
+/* line 247, ../../compass/src/screen.sass */
 #path a:hover {
   text-decoration: underline;
 }
 
-/* line 234, ../../compass/src/screen.sass */
+/* line 251, ../../compass/src/screen.sass */
 #data-objects thead td.delete {
   text-indent: -9999px;
   overflow: hidden;
 }
-/* line 238, ../../compass/src/screen.sass */
+/* line 255, ../../compass/src/screen.sass */
 #data-objects tbody td.delete {
   width: 20px;
 }
-/* line 241, ../../compass/src/screen.sass */
+/* line 258, ../../compass/src/screen.sass */
 #data-objects tbody td.delete span.button {
   display: block;
   width: 16px;
@@ -349,12 +349,12 @@ form.little-form {
   -o-transition-delay: 0;
   transition-delay: 0;
 }
-/* line 254, ../../compass/src/screen.sass */
+/* line 271, ../../compass/src/screen.sass */
 #data-objects tbody tr:hover span.button {
   opacity: 1;
 }
 
-/* line 259, ../../compass/src/screen.sass */
+/* line 276, ../../compass/src/screen.sass */
 #device-details {
   margin-bottom: 20px;
   padding: 20px 0;
@@ -362,29 +362,29 @@ form.little-form {
   border-left: none;
   border-right: none;
 }
-/* line 267, ../../compass/src/screen.sass */
+/* line 284, ../../compass/src/screen.sass */
 #device-details dl {
   height: 16px;
   margin: 5px 0 0 0;
 }
-/* line 270, ../../compass/src/screen.sass */
+/* line 287, ../../compass/src/screen.sass */
 #device-details dl dt {
   float: left;
   width: 130px;
   color: #999999;
 }
-/* line 274, ../../compass/src/screen.sass */
+/* line 291, ../../compass/src/screen.sass */
 #device-details dl:first-child {
   margin-top: 0;
 }
 
-/* line 277, ../../compass/src/screen.sass */
+/* line 294, ../../compass/src/screen.sass */
 #main #actions {
   margin: 0;
   list-style: none;
   float: right;
 }
-/* line 282, ../../compass/src/screen.sass */
+/* line 299, ../../compass/src/screen.sass */
 #main #actions li {
   display: inline-block;
   float: left;
@@ -392,7 +392,7 @@ form.little-form {
   margin-left: 10px;
   top: -5px;
 }
-/* line 290, ../../compass/src/screen.sass */
+/* line 307, ../../compass/src/screen.sass */
 #main #actions li a {
   display: inline-block;
   padding: 5px 10px;
@@ -410,8 +410,17 @@ form.little-form {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #f4f4f4), color-stop(100%, #ececec));
   background-image: -moz-linear-gradient(top, #f4f4f4 0%, #ececec 100%);
 }
+/* line 310, ../../compass/src/screen.sass */
+#main #actions li a:hover {
+  color: white;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #599bdc), color-stop(100%, #3072b3));
+  background-image: -moz-linear-gradient(top, #599bdc 0%, #3072b3 100%);
+  border-color: #518cc6 #518cc6 #2a65a0;
+  text-decoration: none;
+  text-shadow: rgba(0, 0, 0, 0.3) -1px -1px 0;
+}
 
-/* line 302, ../../compass/src/screen.sass */
+/* line 313, ../../compass/src/screen.sass */
 .columns {
   overflow: hidden;
   display: inline-block;
@@ -420,13 +429,112 @@ form.little-form {
 .columns {
   display: block;
 }
-/* line 304, ../../compass/src/screen.sass */
+/* line 315, ../../compass/src/screen.sass */
 .columns .first {
   width: 380px;
   float: left;
 }
-/* line 307, ../../compass/src/screen.sass */
+/* line 318, ../../compass/src/screen.sass */
 .columns .last {
   width: 380px;
   float: right;
+}
+
+/* line 322, ../../compass/src/screen.sass */
+.dialog-box {
+  display: none;
+}
+
+/* line 325, ../../compass/src/screen.sass */
+.ui-widget-overlay {
+  background-color: rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* line 334, ../../compass/src/screen.sass */
+.ui-dialog {
+  margin: 0 auto;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+/* line 340, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-titlebar {
+  background-color: white;
+  padding: 20px 20px 10px;
+}
+/* line 343, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-titlebar .ui-dialog-title {
+  font-size: 22px;
+  display: block;
+}
+/* line 346, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close {
+  display: none;
+}
+/* line 349, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-content {
+  background-color: white;
+  padding: 0 20px;
+}
+/* line 352, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-buttonpane {
+  background-color: white;
+  padding: 10px 20px 20px;
+  overflow: hidden;
+  display: inline-block;
+}
+/* line 8, ../../../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.2/frameworks/compass/stylesheets/compass/utilities/general/_hacks.scss */
+.ui-dialog .ui-dialog-buttonpane {
+  display: block;
+}
+/* line 357, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+  padding-top: 10px;
+  border-top: 1px solid #eeeeee;
+}
+/* line 361, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .ui-button {
+  float: right;
+  margin-left: 10px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #333333;
+  text-shadow: white 1px 1px 0;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #d4d4d4;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #f4f4f4), color-stop(100%, #ececec));
+  background-image: -moz-linear-gradient(top, #f4f4f4 0%, #ececec 100%);
+}
+/* line 365, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .ui-button:hover {
+  color: white;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #599bdc), color-stop(100%, #3072b3));
+  background-image: -moz-linear-gradient(top, #599bdc 0%, #3072b3 100%);
+  border-color: #518cc6 #518cc6 #2a65a0;
+  text-decoration: none;
+  text-shadow: rgba(0, 0, 0, 0.3) -1px -1px 0;
+}
+/* line 368, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .ui-button:last-child {
+  float: left;
+  margin: 0;
+}
+/* line 371, ../../compass/src/screen.sass */
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .ui-button:first-child {
+  float: right;
+}
+
+/* line 374, ../../compass/src/screen.sass */
+.ui-dialog.error .ui-dialog-title {
+  color: #aa0000;
 }

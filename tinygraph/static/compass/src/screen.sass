@@ -33,6 +33,23 @@
             :hover
                 text-decoration: underline
 
+@mixin minibutton()
+    padding: 5px 10px
+    font-size: 11px
+    font-weight: bold
+    color: #333
+    @include text-shadow(#fff, 1px, 1px, 0)
+    @include border-radius(3px)
+    border: 1px solid #d4d4d4
+    @include linear-gradient(color-stops(#f4f4f4, #ececec))
+
+@mixin minibutton-hover()
+    color: #fff
+    @include linear-gradient(color-stops(#599bdc, #3072b3))
+    border-color: #518cc6 #518cc6 #2a65a0
+    text-decoration: none
+    @include text-shadow(rgba(0,0,0,0.3), -1px, -1px, 0)
+
 // The SASS
 
 html
@@ -289,15 +306,9 @@ form.little-form
         
         a
             display: inline-block
-            padding: 5px 10px
-            font-size: 11px
-            font-weight: bold
-            color: #333
-            @include text-shadow(#fff, 1px, 1px, 0)
-            @include border-radius(3px)
-            
-            border: 1px solid #d4d4d4
-            @include linear-gradient(color-stops(#f4f4f4, #ececec))
+            @include minibutton()
+        a:hover
+            @include minibutton-hover()
 
 .columns
     @include clearfix
@@ -307,3 +318,58 @@ form.little-form
     .last
         width: 380px
         float: right
+
+.dialog-box
+    display: none
+
+.ui-widget-overlay
+    background-color: rgba(0,0,0,0.1)
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    
+
+.ui-dialog
+    margin: 0 auto
+    background-color: rgba(0,0,0,0.1)
+    
+    padding: 10px
+    
+    .ui-dialog-titlebar
+        background-color: #fff
+        padding: 20px 20px 10px
+        .ui-dialog-title
+            font-size: 22px
+            display: block
+        .ui-dialog-titlebar-close
+            display: none
+    
+    .ui-dialog-content
+        background-color: #fff
+        padding: 0 20px
+    .ui-dialog-buttonpane
+        background-color: #fff
+        padding: 10px 20px 20px
+        @include clearfix
+        
+        .ui-dialog-buttonset
+            padding-top: 10px
+            border-top: 1px solid #eee
+        
+            .ui-button
+                float: right
+                margin-left: 10px
+                @include minibutton
+            .ui-button:hover
+                @include minibutton-hover()
+            
+            .ui-button:last-child
+                float: left
+                margin: 0
+            .ui-button:first-child
+                float: right
+.ui-dialog.error
+    .ui-dialog-title
+        color: #a00

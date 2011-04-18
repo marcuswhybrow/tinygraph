@@ -41,6 +41,11 @@
 </head>
 
 <body id="{% block body_id %}{% endblock %}">
+    
+    <!-- Dialog boxes -->
+    {% block dialogs %}{% endblock %}
+    <!-- end Dialog boxes -->
+    
     <div id="container">
         <header>
             <div id="logo">
@@ -63,7 +68,7 @@
         <footer>
             
         </footer>
-    </div> <!--! end of #container -->
+    </div> <!-- end of #container -->
     
     
     <!-- Javascript at the bottom for fast page loading -->
@@ -76,7 +81,6 @@
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.js"></script>
     <script>!window.jQuery.ui && document.write(unescape('%3Cscript src="{{ STATIC_URL }}js/libs/jquery-ui-1.8.11.min.js"%3E%3C/script%3E'))</script>
     
-    
     <!-- Graphing libraries -->
     <script src="{{ STATIC_URL }}js/libs/jquery.flot.js"></script>
     
@@ -84,10 +88,13 @@
     <!-- scripts concatenated and minified via ant build script-->
     <script src="{{ STATIC_URL }}js/plugins.js"></script>
     <script src="{{ STATIC_URL }}js/script.js"></script>
+    <!-- end concatenated and minified scripts-->
+    
+    <!-- page specific scripts -->
     {% block scripts %}
         
     {% endblock %}
-    <!-- end concatenated and minified scripts-->
+    <!-- end page specific scripts -->
     
     
     <!--[if lt IE 7 ]>
