@@ -1,0 +1,14 @@
+{% extends "definitions/packages/packages_base.html" %}
+
+{% block content_area %}
+
+    <div id="path">
+        <h1>Add New Package</h1>
+    </div>
+    
+    <form action="" method="post" accept-charset="utf-8">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="Save"></p>
+    </form>
+{% endblock %}

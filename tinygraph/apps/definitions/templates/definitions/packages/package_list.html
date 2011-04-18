@@ -1,16 +1,22 @@
 {% extends "definitions/packages/packages_base.html" %}
 
 {% block content_area %}
-    <h2>Packages</h2>
+
+    <div id="path">
+        <h1>Packages</h1>
+        <ul id="actions">
+            <li><a href="{% url definitions:package_add %}">Add New Package</a></li>
+        </ul>
+    </div>
     
-    <h3>Fixed Packages</h3>
+    <h4>Fixed Packages</h4>
     <ul>
         {% for package in system_packages %}
             <li><a href="{{ package.get_absolute_url }}">{{ package.title }}</a></li>
         {% endfor %}
     </ul>
     
-    <h3>Custom Packages</h3>
+    <h4>Custom Packages</h4>
     <ul>
         {% for package in custom_packages %}
             <li><a href="{{ package.get_absolute_url }}">{{ package.title }}</a></li>
