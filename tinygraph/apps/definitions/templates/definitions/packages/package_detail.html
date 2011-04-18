@@ -80,6 +80,8 @@
                 $dataObjectAddBox.val($(this).text());
                 updateDataObjectAddBox();
                 $dataObjectAddBox.focus();
+                
+                return false;
             });
             
             $dataObjectAddBox.keydown(function(e) {
