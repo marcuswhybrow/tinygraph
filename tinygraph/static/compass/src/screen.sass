@@ -257,13 +257,14 @@ form.little-form
         
             span.button
                 display: block
-                width: 16px
-                height: 16px
+                width: 14px
+                height: 14px
                 text-indent: -99999px
                 margin-left: 3px
-                background: url('/static/images/icons/sweetie-plus-v2/without-shadows/badge-circle-cross-16-ns.png') no-repeat top center
+                background: url('/static/images/icons/data-object-delete.png') no-repeat top center
                 cursor: pointer
                 opacity: 0
+                margin-top: 1px
                 
                 @include transition(all, 0.1s, ease-in-out, 0)
         
@@ -373,3 +374,58 @@ form.little-form
 .ui-dialog.error
     .ui-dialog-title
         color: #a00
+
+#data-object-add
+    .data-object-add-box
+        position: relative
+        
+        input[name="data-object-name"]
+            padding: 10px 20px
+            font-family: Monaco,monospace
+            font-size: 14px
+            background-color: #999
+            color: #fff
+            border: 1px solid #666
+            @include text-shadow(rgba(0,0,0,0.3), -1px, -1px, 0)
+            width: 720px
+            height: 20px
+        
+        input[name="data-object-name"]:focus
+            outline-width: 0
+    
+        input[name="data-object-name"]::-webkit-input-placeholder
+            color: #bbb
+        
+        input[name="data-object-name"]:-moz-placeholder
+            color: #bbb
+        
+        .is-ok-notifier
+            display: block
+            width: 32px
+            height: 32px
+            position: absolute
+            top: 10px
+            right: 17px
+            
+        .is-ok-notifier.is-ok
+            background: url('/static/images/icons/data-object-add-box-ok.png') top center no-repeat
+    
+    ul#lookup-list
+        background-color: #eee
+        margin: 0 10px
+        list-style: none
+        
+        @include border-bottom-left-radius(3px)
+        @include border-bottom-right-radius(3px)
+        
+        font-family: Monaco,monospace
+        font-size: 14px
+        
+        li
+            cursor: pointer
+            padding: 3px 10px 3px
+            border-bottom: 1px solid #fff
+        li:first-child
+            padding-top: 6px
+        li:last-child
+            padding-bottom: 6px

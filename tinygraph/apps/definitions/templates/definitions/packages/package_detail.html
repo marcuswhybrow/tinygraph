@@ -15,6 +15,19 @@
             {% include "definitions/includes/data_object_table.html" %}
         {% endwith %}
     </div>
+    
+    <h4>Add New Data Objects</h4>
+    
+    <div id="data-object-add">
+        <form action="" method="post" accept-charset="utf-8">
+            <div class="data-object-add-box">
+                <input type="text" name="data-object-name" spellcheck='false' value="" placeholder="Type to begin" autocomplete="off">
+                <span class="is-ok-notifier"></span>
+            </div>
+            <ul id="lookup-list">
+            </ul>
+        </form>
+    </div>
 {% endblock %}
 
 {% block dialogs %}
@@ -30,8 +43,135 @@
     {{ block.super }}
     <script type="text/javascript" charset="utf-8">
         $(function() {
+            var CSRF_TOKEN = '{{ csrf_token }}';
             var PACKAGE_PK = '{{ package.pk }}';
             var PACKAGE_URL = '{% url api:definitions:packages %}';
+            
+            // ---------------------------------------------------------------
+            // Adding Data Objects
+            // ---------------------------------------------------------------
+            
+            var LOOKUP_URL = '{% url api:core:lookup_data_object_name %}';
+            var request_id = 0;
+            var userInputDataObject = null;
+            
+            $('#data-object-add form').submit(function() {
+                return false;
+            });
+            
+            var $dataObjectAddBox = $('.data-object-add-box input[name="data-object-name"]');
+            
+            $('ul#lookup-list li').live('click', function() {
+                $dataObjectAddBox.val($(this).text());
+                updateDataObjectAddBox();
+                $dataObjectAddBox.focus();
+            });
+            
+            $dataObjectAddBox.keydown(function(e) {
+                var code = e.keyCode ? e.keyCode : e.which;
+                switch (code) {
+                    case 9: // TAB key
+                        var matches = $('ul#lookup-list li');
+                        if (matches.length > 0) {
+                            var firstMatchText = $(matches[0]).text();
+                            var longestMatch = '';
+                            for (var i = firstMatchText.length; i > 0; i--) {
+                                var matchesAll = true;
+                                for (var j = matches.length - 1; j >= 0; j--) {
+                                    if (firstMatchText.substring(0,i) != $(matches[j]).text().substring(0,i)) {
+                                        matchesAll = false;
+                                        break;
+                                    }
+                                }
+                                if (matchesAll) {
+                                    longestMatch = firstMatchText.substring(0,i);
+                                    break;
+                                }
+                            }
+                            
+                            if (longestMatch.length > $dataObjectAddBox.val().length)
+                                $dataObjectAddBox.val(longestMatch);
+                        }
+                        
+                        e.preventDefault();
+                        return false;
+                }
+            }).keyup(function(e) {
+                var code = e.keyCode ? e.keyCode : e.which;
+                switch (code) {
+                    case 13: // ENTER
+                        if (userInputDataObject != null) {
+                            var dataObject = userInputDataObject;
+                            $dataObjectAddBox.val('');
+                            exitDataObjectAddBox();
+                            $('.data-object-add-box .is-ok-identifier').removeClass('is-ok');
+                            
+                            $.ajax({    
+                                url: PACKAGE_URL + PACKAGE_PK + '/',
+                                type: 'put',
+                                data: {
+                                    data_objects__add: dataObject['pk']
+                                },
+                                context: dataObject,
+                                success: function() {
+                                    $('#data-objects table tbody').append('<tr pk="'+this['pk']+'">'
+                                    +'<td>'+this['derived_name']+'</td>'
+                                    +'<td>'+this['identifier']+'</td>'
+                                    +'<td class="delete"><span class="button">Yes</span></td>'
+                                    +'</tr>');
+                                    $('#data-objects tablet tbody tr:last').slideDown(200);
+                                },
+                                error: function() {
+                                    $('#error-dialog p').text('There was an error whilst adding the Data Object. Please try again.');
+                                    $('#error-dialog').dialog('open');
+                                }
+                            });
+                        }
+                        break;
+                    default:
+                        updateDataObjectAddBox();
+                }
+            }).focus(function() {
+                updateDataObjectAddBox();
+            }).click(function(e) {
+                return false;
+            });
+            
+            $(window).click(function(e) {
+                exitDataObjectAddBox();
+            });
+            
+            function updateDataObjectAddBox() {
+                $.ajax({
+                    url: LOOKUP_URL,
+                    type: 'post',
+                    data: {
+                        user_input: $dataObjectAddBox.val(),
+                        request_id: ++  request_id,
+                        csrfmiddlewaretoken: CSRF_TOKEN
+                    },
+                    success: function(data) {
+                        if (data['data_objects']) {
+                            $('ul#lookup-list').empty();
+                            for (var i = 0; i < data['data_objects'].length; i++) {
+                                $('ul#lookup-list').append('<li>'+data['data_objects'][i]['derived_name']+'</li>');
+                            }
+                            userInputDataObject = data['user_input_data_object'];
+                            $('.data-object-add-box .is-ok-notifier').toggleClass('is-ok', userInputDataObject != null);
+                        }
+                    },
+                    dataType: 'json'
+                });
+            }
+            
+            function exitDataObjectAddBox() {
+                $('ul#lookup-list').empty();
+            }
+            
+            // ---------------------------------------------------------------
+            // Deleting Data Objects
+            // ---------------------------------------------------------------
+            
             var $tableRow = null;
             var dataObjectPK = null;
             
@@ -88,7 +228,7 @@
                 }
             }, defaults));
             
-            $('tr td.delete .button').click(function() {
+            $('tr td.delete .button').live('click', function() {
                 $tableRow = $(this).closest('tr');
                 dataObjectPK = $tableRow.attr('pk');
                 $('#delete-dialog').dialog('open');

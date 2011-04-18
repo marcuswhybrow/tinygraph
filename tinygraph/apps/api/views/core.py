@@ -58,3 +58,34 @@ def dashboard_create_item(request):
         data = {'incorrect-arguments': True}
         
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+
+def lookup_data_object_name(request):
+    data = {}
+    if request.is_ajax() and request.method == 'POST':
+        user_input = request.POST.get('user_input')
+        request_id = request.POST.get('request_id')
+        
+        parent = None
+        derived_name = user_input
+        
+        while derived_name != '':
+            try:
+                parent = DataObject.objects.get(derived_name=derived_name)
+            except DataObject.DoesNotExist:
+                derived_name = '.'.join(derived_name.split('.')[:-1])
+                continue
+            else:
+                break
+        
+        matches = DataObject.objects.filter(derived_name__startswith=user_input, parent=parent).values('pk', 'identifier', 'derived_name')
+        
+        data['user_input'] = user_input
+        data['user_input_data_object'] = {
+            'pk': parent.pk,
+            'derived_name': parent.derived_name,
+            'identifier': parent.identifier,
+        } if parent and derived_name == user_input else None
+        data['request_id'] = request_id
+        data['data_objects'] = list(matches)
+    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+        

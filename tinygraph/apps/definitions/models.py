@@ -20,7 +20,7 @@ class DataObject(models.Model):
     """A piece of data retrievable via a protocol from a host"""
     
     identifier = models.CharField(max_length=255, db_index=True, unique=True)
-    derived_name = models.CharField(blank=True, max_length=255)
+    derived_name = models.CharField(blank=True, max_length=255, db_index=True)
     user_given_name = models.CharField(blank=True, max_length=255)
     parent = models.ForeignKey('DataObject', null=True, blank=True, db_index=True, related_name='children')
     mib_uploads = models.ManyToManyField('MibUpload', db_index=True, related_name='data_objects')
