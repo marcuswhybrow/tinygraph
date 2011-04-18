@@ -436,3 +436,10 @@ form.little-form
             padding-top: 6px
         li:last-child
             padding-bottom: 6px
+            @include border-bottom-left-radius(3px)
+            @include border-bottom-right-radius(3px)
+        
+        li:hover,
+        li.selected
+            @include minibutton-hover()
+            

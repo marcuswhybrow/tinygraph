@@ -86,6 +86,13 @@
             
             $dataObjectAddBox.keydown(function(e) {
                 var code = e.keyCode ? e.keyCode : e.which;
+                if (code == 38) // UP
+                    e.preventDefault();
+                if (code >= 37 && code <= 40) {
+                    if ($('ul#lookup-list li.selected').length > 0)
+                        e.preventDefault();
+                    return true;
+                }
                 switch (code) {
                     case 9: // TAB key
                         var matches = $('ul#lookup-list li');
@@ -115,9 +122,14 @@
                 }
             }).keyup(function(e) {
                 var code = e.keyCode ? e.keyCode : e.which;
+                if (code >= 37 && code <= 40)
+                    return true;
                 switch (code) {
                     case 13: // ENTER
-                        if (userInputDataObject != null) {
+                        var $selected = $('ul#lookup-list li.selected');
+                        if ($selected.length > 0) {
+                            $selected.click();
+                        } else if (userInputDataObject != null) {
                             var dataObject = userInputDataObject;
                             $dataObjectAddBox.val('');
                             exitDataObjectAddBox();
@@ -156,6 +168,34 @@
             
             $(window).click(function(e) {
                 exitDataObjectAddBox();
+            }).keydown(function(e) {
+                var code = e.keyCode ? e.keyCode : e.which;
+                switch (code) {
+                    case 37: // left
+                        break;
+                    case 38: // up
+                        if ($('ul#lookup-list li:first').is('.selected')) {
+                            $('ul#lookup-list li').removeClass('selected');
+                        } else {
+                            var $selected = $('ul#lookup-list li.selected');
+                            if ($selected.length > 0) {
+                                $selected.prev().siblings().removeClass('selected');
+                                $selected.prev().addClass('selected');
+                            }
+                        }
+                        break;
+                    case 39: // right
+                        break;
+                    case 40: // down
+                        var $selected = $('ul#lookup-list li.selected');
+                        if ($selected.length == 0)
+                            $('ul#lookup-list li:first').addClass('selected');
+                        else {
+                            $selected.next().siblings().removeClass('selected');
+                            $selected.next().addClass('selected');
+                        }
+                        break;
+                }
             });
             
             function updateDataObjectAddBox() {
