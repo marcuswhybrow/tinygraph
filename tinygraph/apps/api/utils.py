@@ -55,7 +55,7 @@ class ImprovedHandler(BaseHandler):
                 if isinstance(field, ForeignKey):
                     self._resolve_fk(field.related.parent_model, field.name)
         
-            if self.instance is not None:
+            if hasattr(self, 'instance') and self.instance is not None:
                 for field, model in self.model._meta.get_m2m_with_model():
                     self._handle_m2m(field.related.parent_model, field.name)
 
