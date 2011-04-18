@@ -1,0 +1,20 @@
+{% extends "definitions/packages/packages_base.html" %}
+
+{% block content_area %}
+    <div id="path">
+        <a href="{{ package.get_absolute_url }}">{{ package.title }}</a> <span>/ Delete</span>
+    </div>
+    
+    <p>
+        Are you sure you want to delete {{ package.title }}, you will also be <strong>deleting all data collected by this package</strong>.
+    </p>
+    
+    <p>
+        <strong>WARNING:</strong> Deletion of a device is permanent and irreversible.
+    </p>
+    
+    <form action="" method="post" accept-charset="utf-8">
+        {% csrf_token %}
+        <p><input type="submit" value="Confirm Deletion"></p>
+    </form>
+{% endblock %}

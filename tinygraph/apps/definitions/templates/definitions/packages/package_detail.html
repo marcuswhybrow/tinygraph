@@ -4,6 +4,9 @@
 
     <div id="path">
         <a href="{{ package.get_absolute_url }}">{{ package.title }}</a>
+        <ul id="actions">
+            <li><a href="{% url definitions:package_delete slug=package.slug %}">Delete</a></li>
+        </ul>
     </div>
     
     {% if devices %}
