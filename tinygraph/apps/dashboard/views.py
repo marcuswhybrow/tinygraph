@@ -23,7 +23,7 @@ def index(request):
     # All of the devices in the system
     devices = Device.objects.select_related()
     
-    device_counts = Item.objects.values('device').annotate(count=Count('device'))
+    device_counts = Item.objects.filter(board=board).values('device').annotate(count=Count('device'))
     
     device_list = []
     for device in devices:
