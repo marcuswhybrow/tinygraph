@@ -7,7 +7,8 @@ from tinygraph.apps.definitions.utils import snmp_value_to_str, \
      get_mib_view_controller, get_transport, get_authentication, \
      snmp_name_to_str
 from django.conf import settings
-from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error
+from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
+    value_change
 import django.dispatch
 import socket
 
