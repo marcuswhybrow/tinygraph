@@ -6,9 +6,24 @@
         <a href="{{ package.get_absolute_url }}">{{ package.title }}</a>
     </div>
     
-    <p>
+    {% if devices %}
+        <div class="details">
+            <dl>
+                <dt>Using Devices</dt>
+                <dd>
+                    {% for device in devices %}
+                        <a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a>
+                    {% endfor %}
+                </dd>
+            </dl>
+        </div>
+    {% endif %}
+    
+    <p style="margin-bottom: 20px">
         {{ package.description }}
     </p>
+    
+    <h4>Data Objects</h4>
     
     <div id="data-objects">
         {% with package.data_objects.all as data_objects %}
