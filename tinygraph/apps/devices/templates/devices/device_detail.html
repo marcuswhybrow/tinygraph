@@ -41,8 +41,8 @@
         <div class="first">
             <h3>Activity</h3>
             <ul>
-                {% for data_object in device.data_objects.all %}
-                    <li>{{ data_object }}</li>
+                {% for package in device.packages.all %}
+                    <li><a href="{% url devices:package_instance_detail device_slug=device.slug package_slug=package.slug %}">{{ package }}</a></li>
                 {% endfor %}
             </ul>
         </div>

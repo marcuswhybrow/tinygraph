@@ -1,0 +1,45 @@
+{% extends "rules/rules_base.html" %}
+{% load cache %}
+{% load data_object_filters %}
+
+{% block content_area %}
+    <div id="path">
+        <h1><a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a></h1> <span>/ {{ package.title }}</span>
+    </div>
+    
+    {% if rules %}
+        {% for rule, data_objects in rules %}
+            <h4>{{ rule.data_object.derived_name }}</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data Object</th>
+                        <th>Suffix</th>
+                        <th>Value Type</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, data in data_objects %}
+                        <tr>
+                            <td>{{ key.data_object.derived_name|subtract:rule.data_object.derived_name }}</td>
+                            <td>{{ key.suffix }}</td>
+                            <td>{{ key.value_type }}</td>
+                            <td>
+                                {% if key.value_type in singular_value_types %}
+                                    {% if data %}{{ data }}{% else %}<em>no value</em>{% endif %}
+                                {% else %}
+                                    <ul>
+                                        {% for data_instance in data %}
+                                            <li>{{ data_instance.created}} - {{ data_instance.value }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
