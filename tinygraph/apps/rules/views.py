@@ -7,9 +7,10 @@ from tinygraph.apps.data.models import DataInstance
 from django.db.models import Count
 import datetime
 import itertools
+from django.core.cache import cache
 
 def keyfunc(data_instance):
-    return '%s.%s' % (data_instance.data_object, data_instance.suffix)
+    return '%s.%s' % (data_instance['data_object'], data_instance['suffix'])
 
 SINGULAR_VALUE_TYPES = ['octet_string', 'object_identifier', 'gauge', 'integer', 'time_ticks']
 
@@ -21,32 +22,34 @@ def package_instance_detail(request, device_slug, package_slug):
     
     limit = datetime.datetime.now() - datetime.timedelta(days=1)
     
+    cache_key = 'package_instance_detail_pairs-%s' % package_instance.pk
+    
     rule_pairs = []
     for rule in rules:
-        data_instances = rule.instances.filter(created__gte=limit).select_related()
-        
+        data_instances = rule.instances.filter(created__gte=limit).select_related().values('data_object', 'suffix', 'value_type', 'value', 'created')
+    
         data_objects = []
         data = sorted(data_instances, key=keyfunc)
         for key, group in itertools.groupby(data, key=keyfunc):
             group = list(group)
-            
+        
             data = None
             data_instance = group[-1]
-            data_object = data_instance.data_object
-            suffix = data_instance.suffix
-            value_type = data_instance.value_type
-            
+            data_object = data_instance['data_object']
+            suffix = data_instance['suffix']
+            value_type = data_instance['value_type']
+        
             if value_type in SINGULAR_VALUE_TYPES:
-                data = data_instance.value
+                data = data_instance['value']
             else:
                 data = group
-            
+        
             data_objects.append(({
                 'data_object': data_object,
                 'suffix': suffix,
                 'value_type': value_type,
             }, data))
-        
+    
         rule_pairs.append((rule, data_objects))
         
     
