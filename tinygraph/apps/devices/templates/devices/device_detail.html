@@ -39,7 +39,7 @@
     
     <div class="columns">
         <div class="first">
-            <h3>Activity</h3>
+            <h3>Packages</h3>
             <ul>
                 {% for package in device.packages.all %}
                     <li><a href="{% url devices:package_instance_detail device_slug=device.slug package_slug=package.slug %}">{{ package }}</a></li>
