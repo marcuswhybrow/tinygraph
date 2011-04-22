@@ -5,7 +5,7 @@ from django.core.signals import request_finished
 from tinygraph.apps.devices.models import Device
 from tinygraph.apps.definitions.models import Package, PackageMembership
 from tinygraph.apps.rules.models import PackageInstance, \
-    PackageInstanceMembership
+    PackageInstanceMembership, PackageRule
 
 """
 This module is imported in tinygraph.apps.core.models. If it was not then none
