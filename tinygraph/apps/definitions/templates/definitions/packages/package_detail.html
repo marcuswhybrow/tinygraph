@@ -29,8 +29,31 @@
     <h4>Data Objects</h4>
     
     <div id="data-objects">
-        {% with package.data_objects.all as data_objects %}
-            {% include "definitions/includes/data_object_table.html" %}
+        {% with package.memberships.all as package_memberships %}
+            <table border="0">
+                <thead>
+                    <tr class="align-left">
+                        <th>Name</th>
+                        <th>Identifier</th>
+                        <td class="delete">Delete</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if package_memberships %}
+                        {% for package_membership in package_memberships %}
+                             <tr pk="{{ package_membership.pk }}">
+                                <td>{{ package_membership.data_object.derived_name }}</td>
+                                <td>{{ package_membership.data_object.identifier }}</td>
+                                <td class="delete"><span class="button">Yes</a></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr class="information">
+                            <td colspan="2">No data objects</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         {% endwith %}
     </div>
     
@@ -246,7 +269,7 @@
             }
             
             $('#error-dialog').dialog($.extend({
-                title: 'Error Deleting',
+                title: 'Error',
                 dialogClass: 'error',
                 buttons: {
                     'OK': function() {

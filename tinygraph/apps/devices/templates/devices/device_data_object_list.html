@@ -25,12 +25,28 @@
     <div class="packages">
         {% for package, package_instance in packages_map %}
             <div packageInstancePK="{{ package_instance.pk }}" packagePK="{{ package.pk }}" class="package {% if package_instance.enabled %}enabled{% endif %}">
-                <input class="toggle" type="checkbox" name="{{ package.slug }}"{% if package_instance.enabled %} checked="true"{% endif %}>
-                <h5>{{ package.title }}</h5>
-                <p>{{ package.description }}</p>
-                <p>
-                    <a href="{% url definitions:package_detail package_slug=package.slug %}">Read More</a>
-                </p>
+                <div class="inner">
+                    <input class="toggle" type="checkbox" name="{{ package.slug }}"{% if package_instance.enabled %} checked="true"{% endif %}>
+                    <h5>{{ package.title }}</h5>
+                    <ul>
+                        {% for package_instance_membership in package_instance.memberships.all %}
+                            <li pk="{{ package_instance_membership.pk }}">
+                                <div class="name" title="{{ package_instance_membership.package_membership.data_object }}">
+                                    {{ package_instance_membership.package_membership.data_object }}
+                                </div>
+                                <div class="config">
+                                    
+                                    <div class="config-toggle collect-data{% if package_instance_membership.enabled %} enabled{% endif %}" title="Collect this data for this device">
+                                        <span class="inner">Collect Data</span>
+                                    </div>
+                                    <div class="config-toggle graph-data{% if package_instance_membership.graphed %} enabled{% endif %}" title="Graph this data for this device">
+                                        <span class="inner">Graph Data</span>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         {% endfor %}
     </div>
@@ -61,6 +77,8 @@
                 var packagePK = $p.attr('packagePK');
                 var isEnabled = $p.is('.enabled') ? 'True' : '';
                 
+                $p.find('.config input[type="checkbox"]').attr('disabled', !isEnabled)
+                
                 if (packageInstancePK === '') {
                     $.ajax({
                         url: PACKAGE_INSTANCE_URL,
@@ -88,6 +106,44 @@
                         dataType: 'json'
                     });
                 }
+            });
+            
+            // ---------------------------------------------------------------
+            // PackageInstanceMembership configuration
+            // ---------------------------------------------------------------
+            
+            var PACKAGE_INSTANCE_MEMBERSHIP_URL = '{% url api:rules:package_instance_memberships %}';
+            
+            $('.config-toggle.collect-data').click(function(e) {
+                var packageInstanceMemberPK = $(this).closest('li').attr('pk');
+                
+                $(this).toggleClass('enabled');
+                var isEnabled = $(this).is('.enabled') ? 'True' : '';
+                
+                $.ajax({
+                    url: PACKAGE_INSTANCE_MEMBERSHIP_URL + packageInstanceMemberPK + '/',
+                    type: 'put',
+                    data: {
+                        enabled: isEnabled,
+                    },
+                    dataType: 'json'
+                });
+            });
+            
+            $('.config-toggle.graph-data').click(function(e) {
+                var packageInstanceMemberPK = $(this).closest('li').attr('pk');
+                
+                $(this).toggleClass('enabled');
+                var isEnabled = $(this).is('.enabled') ? 'True' : '';
+                
+                $.ajax({
+                    url: PACKAGE_INSTANCE_MEMBERSHIP_URL + packageInstanceMemberPK + '/',
+                    type: 'put',
+                    data: {
+                        graphed: isEnabled,
+                    },
+                    dataType: 'json'
+                });
             });
         })
     </script>

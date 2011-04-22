@@ -15,12 +15,14 @@
 @mixin card($width, $height)
     float: left
     background-color: #eee
-    padding: 15px 20px
     margin: 0 20px 20px 0
     border: 1px solid #ddd
 
     width: $width
     height: $height
+    
+    >.inner
+        padding: 15px 20px
 
     dt,
     h5
@@ -50,6 +52,14 @@
     text-decoration: none
     @include text-shadow(rgba(0,0,0,0.3), -1px, -1px, 0)
 
+@mixin icon($width, $height, $image)
+    display: block
+    text-indent: -99999px
+    overflow: hidden
+    width: $width
+    height: $height
+    background: url($image) no-repeat top center
+    
 // The SASS
 
 html
@@ -115,7 +125,7 @@ body#dashboard #main-nav ul li.dashboard
     margin-bottom: 20px
 
     .device
-        @include card(150px, 250px)
+        @include card(150px, 300px)
         
         img
             margin: 0 auto 10px
@@ -150,87 +160,149 @@ form.little-form
 #main
     padding: 20px 20px 20px
 
-    h2
-        font-size: 28px
-        margin-bottom: 20px
+h2
+    font-size: 28px
+    margin-bottom: 20px
 
-    h3
-        font-size: 22px
-        margin-bottom: 10px
+h3
+    font-size: 22px
+    margin-bottom: 10px
 
-    h4
-        font-size: 18px
-        margin-bottom: 10px
+h4
+    font-size: 18px
+    margin-bottom: 10px
 
-    p
-        margin-bottom: 10px
+p
+    margin-bottom: 10px
 
-    form
-        margin-bottom: 20px
+form
+    margin-bottom: 20px
 
-    ul
-        margin-bottom: 20px
+ul
+    margin-bottom: 20px
 
-    fieldset
-        border: 1px solid #eee
-        min-height: 40px
-        margin-bottom: 20px
-        padding: 20px
+fieldset
+    border: 1px solid #eee
+    min-height: 40px
+    margin-bottom: 20px
+    padding: 20px
 
-        legend
-            background-color: white
-            padding: 2px 4px
+    legend
+        background-color: white
+        padding: 2px 4px
 
-        label
+    label
+        margin-right: 10px
+        height: 30px
+        display: block
+        
+        input
             margin-right: 10px
-            height: 30px
-            display: block
-            
-            input
-                margin-right: 10px
 
-        label.has-children
-            font-weight: bold
+    label.has-children
+        font-weight: bold
+
+table
+    margin-bottom: 20px
+    width: 100%
     
-    table
-        margin-bottom: 20px
-        width: 100%
+    border-top: 1px solid #ccc
+    
+    tr:nth-child(even)
+        background-color: #eee
         
-        border-top: 1px solid #ccc
-        
-        tr:nth-child(even)
-            background-color: #eee
-            
-        tr
-            border-bottom: 1px solid #ccc
-            td, th
-                padding: 10px 20px
-        
-        tr.information td
-            text-align: center
-            background-color: #eee
-        
-        .align-center
-            text-align: center
-        
-        .align-left
-            text-align: left
+    tr
+        border-bottom: 1px solid #ccc
+        td, th
+            padding: 10px 20px
+    
+    tr.information td
+        text-align: center
+        background-color: #eee
+    
+    .align-center
+        text-align: center
+    
+    .align-left
+        text-align: left
 
 
 .packages
     @include clearfix
+    overflow: visible
     .package
-        @include card(150px, 200px)
+        @include card(100%, auto)
         position: relative
+        
+        h5
+            margin-bottom: 0
         
         .toggle
             position: absolute
             top: 20px
             right: 20px
         
+        ul
+            display: none
+            list-style: none
+            margin: 0
+            
+            li
+                @include clearfix
+                height: 24px
+                
+                margin-bottom: 10px
+                
+                position: relative
+                overflow: visible
+                
+                .name
+                    padding: 3px 0 4px
+                
+                .config
+                    width: 64px
+                    height: 24px
+                    position: absolute
+                    right: -3px
+                    top: 0
+                    overflow: hidden
+                
+                .config-toggle
+                    cursor: pointer
+                    padding: 5px
+                    border: 1px solid black
+                    border-color: rgba(0,0,0,0.5)
+                    position: absolute
+                    opacity: 0.5
+                
+                .config-toggle:hover
+                    opacity: 1
+                
+                .config-toggle.enabled
+                    opacity: 1
+                    outline: 2px solid black
+                    outline-offset: 1px
+                    outline-color: rgba(0,0,0,0.8)
+                    
+                .config-toggle.collect-data
+                    right: 37px
+                    >.inner
+                        @include icon(12px, 12px, '/static/images/icons/config-collect.png')
+                
+                .config-toggle.graph-data
+                    right: 3px
+                    >.inner
+                        @include icon(12px, 12px, '/static/images/icons/config-graph.png')
+        
     .package.enabled
         background-color: #beb
         border-color: #8a8
+        
+        ul
+            display: block
+        
+        h5
+            margin-bottom: 10px
 
 
 #path
@@ -271,8 +343,6 @@ form.little-form
         tr:hover
             span.button
                 opacity: 1
-            
-            span.button:hover
 
 #package-devices
     list-style: none
@@ -442,4 +512,18 @@ form.little-form
         li:hover,
         li.selected
             @include minibutton-hover()
-            
+
+.data-object-wrapper
+    display: block
+    width: 100%
+    overflow: hidden
+    position: relative
+    height: 13px
+
+    .inner
+        display: block
+        width: 99999px
+        position: absolute
+        top: 0
+        right: 0
+        text-align: right

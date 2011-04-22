@@ -1,4 +1,5 @@
 from django.db import models
+from django.db import IntegrityError
 from django.template.defaultfilters import slugify
 from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
     value_change
