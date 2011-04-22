@@ -5,7 +5,9 @@
     <div id="path">
         <a href="{{ package.get_absolute_url }}">{{ package.title }}</a>
         <ul id="actions">
-            <li><a href="{% url definitions:package_delete slug=package.slug %}">Delete</a></li>
+            {% if package.editable %}
+                <li><a href="{% url definitions:package_delete slug=package.slug %}">Delete</a></li>
+            {% endif %}
         </ul>
     </div>
     
@@ -41,7 +43,7 @@
                 <tbody>
                     {% if package_memberships %}
                         {% for package_membership in package_memberships %}
-                             <tr pk="{{ package_membership.pk }}">
+                             <tr pk="{{ package_membership.pk }}" data-object-pk="{{ package_membership.data_object.pk }}">
                                 <td>{{ package_membership.data_object.derived_name }}</td>
                                 <td>{{ package_membership.data_object.identifier }}</td>
                                 <td class="delete"><span class="button">Yes</a></td>
@@ -57,18 +59,20 @@
         {% endwith %}
     </div>
     
-    <h4>Add New Data Objects</h4>
-    
-    <div id="data-object-add">
-        <form action="" method="post" accept-charset="utf-8">
-            <div class="data-object-add-box">
-                <input type="text" name="data-object-name" spellcheck='false' value="" placeholder="Type to begin" autocomplete="off">
-                <span class="is-ok-notifier"></span>
-            </div>
-            <ul id="lookup-list">
-            </ul>
-        </form>
-    </div>
+    {% if pacakge.editable %}
+        <h4>Add New Data Objects</h4>
+
+        <div id="data-object-add">
+            <form action="" method="post" accept-charset="utf-8">
+                <div class="data-object-add-box">
+                    <input type="text" name="data-object-name" spellcheck='false' value="" placeholder="Type to begin" autocomplete="off">
+                    <span class="is-ok-notifier"></span>
+                </div>
+                <ul id="lookup-list">
+                </ul>
+            </form>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block dialogs %}

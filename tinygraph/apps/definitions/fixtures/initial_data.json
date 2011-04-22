@@ -21,7 +21,70 @@
         "model": "definitions.PackageMembership",
         "fields": {
             "package": 1,
-            "data_object": 25
+            "data_object": 26
+        }
+    }, {
+        "pk": 2,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 30
+        }
+    }, {
+        "pk": 3,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 31
+        }
+    }, {
+        "pk": 4,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 32
+        }
+    }, {
+        "pk": 5,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 33
+        }
+    }, {
+        "pk": 6,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 34
+        }
+    }, {
+        "pk": 7,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 38
+        }
+    }, {
+        "pk": 8,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 39
+        }
+    }, {
+        "pk": 9,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 44
+        }
+    }, {
+        "pk": 10,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 45
         }
     }
 ]
