@@ -46,6 +46,8 @@ class PackageMembership(models.Model):
     
     class Meta:
         unique_together = ('package', 'data_object')
+    
+    __unicode__ = lambda self: u'%s <-> %s' % (self.package, self.data_object)
 
 
 class Package(models.Model):

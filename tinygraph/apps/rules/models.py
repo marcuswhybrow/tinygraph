@@ -42,6 +42,9 @@ class PackageInstanceMembership(models.Model):
     
     class Meta:
         unique_together = ('package_instance', 'package_membership')
+    
+    def __unicode__(self):
+        return u'%s <-> (%s), %s, %s' % (self.package_instance, self.package_membership, 'enabled' if self.enabled else 'disabled', 'graphed' if self.graphed else 'not graphed')
 
 class PackageInstance(models.Model):
     device = models.ForeignKey('devices.Device', db_index=True)

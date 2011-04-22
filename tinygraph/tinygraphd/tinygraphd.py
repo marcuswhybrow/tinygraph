@@ -9,6 +9,7 @@ from tinygraph.apps.definitions.utils import snmp_value_to_str, \
 from django.conf import settings
 from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
     value_change
+from tinygraph.apps.rules.models import PackageInstanceMembership
 import django.dispatch
 import socket
 
@@ -129,7 +130,9 @@ class TinyGraphDaemon(PollDaemon):
             pre_poll.send(sender=self, device=device)
             
             # Setup the asynchronous SNMP BULK requests (non blocking)
-            for rule in device.rules.filter(enabled=True):
+            package_instance_memberships = PackageInstanceMembership.objects.filter(package_instance__device=device, package_instance__enabled=True, enabled=True)
+            for package_instance_membership in package_instance_memberships:
+                rule = package_instance_membership.rule
                 asyn_command_generator.asyncBulkCmd(
                     authentication,
                     transport,
@@ -141,8 +144,8 @@ class TinyGraphDaemon(PollDaemon):
                     })
                 )
             
-            # Blocks until all requests have returned
-            asyn_command_generator.snmpEngine.transportDispatcher.runDispatcher()
-            
-            post_poll.send(sender=self, device=device)
+        # Blocks until all requests have returned
+        asyn_command_generator.snmpEngine.transportDispatcher.runDispatcher()
+        
+        post_poll.send(sender=self, device=device)
                 
