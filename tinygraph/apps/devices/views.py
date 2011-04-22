@@ -20,6 +20,7 @@ def device_detail(request, device_slug):
             
     return direct_to_template(request, 'devices/device_detail.html', {
         'device': device,
+        'events': device.event_set.all()[:20]
     })
 
 def device_edit(request, device_slug=None):

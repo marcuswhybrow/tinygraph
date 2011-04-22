@@ -32,7 +32,7 @@
             </dl>
             <dl>
                 <dt>Uptime</dt>
-                <dd>100 days</dd>
+                <dd><del>100 days</del></dd>
             </dl>
         </div>
     </div>
@@ -49,10 +49,11 @@
         <div class="last">
             <h3>Events</h3>
             <ul>
-                {% for event in device.event_set.all %}
+                {% for event in events %}
                     <li>{{ event.message }}</li>
                 {% endfor %}
             </ul>
+            <del><a href="">View All Events</a></del>
         </div>
     </div>
 {% endblock %}
