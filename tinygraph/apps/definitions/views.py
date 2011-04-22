@@ -1,7 +1,7 @@
 from django.views.generic.simple import direct_to_template
-from tinygraph.apps.definitions.models import DataObject
-from tinygraph.apps.definitions.models import Package, MibUpload
+from tinygraph.apps.definitions.models import DataObject, Package, MibUpload
 from tinygraph.apps.definitions.forms import MibUploadForm
+from tinygraph.apps.rules.models import PackageInstance
 from django.shortcuts import get_object_or_404
 
 def data_object_list(request):
@@ -33,7 +33,8 @@ def package_list(request):
 
 def package_detail(request, package_slug):
     package = get_object_or_404(Package, slug=package_slug)
-    devices = package.devices.all()
+    package_instances = PackageInstance.objects.filter(enabled=True)
+    devices = [package_instance.device for package_instance in package_instances]
     return direct_to_template(request, 'definitions/packages/package_detail.html', {
         'package': package,
         'devices': devices,

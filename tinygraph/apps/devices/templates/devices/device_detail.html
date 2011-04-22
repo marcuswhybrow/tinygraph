@@ -39,10 +39,19 @@
     
     <div class="columns">
         <div class="first">
-            <h3>Packages</h3>
+            <h2>Packages</h2>
             <ul>
-                {% for package in device.packages.all %}
-                    <li><a href="{% url devices:package_instance_detail device_slug=device.slug package_slug=package.slug %}">{{ package }}</a></li>
+                {% for package_instance, package_instance_membership in package_instances %}
+                    <li>
+                        <h3>{{ package_instance.package.title }}</h3>
+                        <div class="body">
+                            <ul>
+                                {% for package_instance_membership in package_instance_membership %}
+                                    <li>{{ package_instance_membership.package_membership.data_object.derived_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
                 {% endfor %}
             </ul>
         </div>

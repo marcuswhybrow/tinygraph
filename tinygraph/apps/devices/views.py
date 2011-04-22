@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from tinygraph.apps.devices.models import Device
 from tinygraph.apps.devices.forms import DeviceForm
 from tinygraph.apps.definitions.models import Package
+from tinygraph.apps.rules.models import PackageInstance
 from tinygraph.apps.data.models import DataInstance
 from tinygraph.apps.data.presenters import Presenter, CounterPresenter
 
@@ -17,10 +18,13 @@ def device_list(request):
 
 def device_detail(request, device_slug):
     device = get_object_or_404(Device, slug=device_slug)
+    enabled_package_instances = PackageInstance.objects.filter(device=device, enabled=True)
+    package_instances = [(package_instance, package_instance.memberships.filter(graphed=True).select_related()) for package_instance in enabled_package_instances]
             
     return direct_to_template(request, 'devices/device_detail.html', {
         'device': device,
-        'events': device.event_set.all()[:20]
+        'events': device.event_set.all()[:20],
+        'package_instances': package_instances,
     })
 
 def device_edit(request, device_slug=None):
