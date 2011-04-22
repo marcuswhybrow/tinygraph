@@ -1,6 +1,6 @@
+from tinygraph.utils import scheduler
+from tinygraph.utils import daemon
 import datetime
-import scheduler
-import daemon
 import sys
 import logging
 import logging.handlers

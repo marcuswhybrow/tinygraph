@@ -4,3 +4,8 @@ pysnmp==4.1.15a
 pysnmp-mibs==0.0.8a
 
 https://bitbucket.org/jespern/django-piston/get/c4b2d21db51a.tar.gz
+
+# For BeanStalk the beanstalkc client library is being used and this is
+# dependant on pyyaml for some reason.
+pyyaml
+beanstalkc
