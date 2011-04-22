@@ -33,6 +33,13 @@ class DataObject(models.Model):
     def get_identifier_tuple(self):
         return tuple([int(s) for s in self.identifier.split('.')])
 
+class PackageMembership(models.Model):
+    package = models.ForeignKey('definitions.Package', db_index=True, related_name='meberships')
+    data_object = models.ForeignKey('definitions.DataObject', db_index=True, related_name='memberships')
+    
+    class Meta:
+        unique_together = ('package', 'data_object')
+
 
 class Package(models.Model):
     """
@@ -44,7 +51,7 @@ class Package(models.Model):
     """
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, editable=False, db_index=True)
-    data_objects = models.ManyToManyField('DataObject', related_name='packages')
+    data_objects = models.ManyToManyField('DataObject', through='definitions.PackageMembership', related_name='packages')
     description = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     editable = models.BooleanField(default=True)

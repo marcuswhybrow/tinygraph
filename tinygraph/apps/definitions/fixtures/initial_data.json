@@ -13,9 +13,15 @@
             "description": "The Network Interface Card (or NIC) of a machine connects it to the network. Enabling this package will log the number of interface cards a machine has, and the amount of data which passes through each.", 
             "created": "2011-02-10 00:26:01", 
             "title": "Interfaces", 
-            "editable": false, 
-            "data_objects": [25], 
+            "editable": false,
             "slug": "interfaces"
+        }
+    }, {
+        "pk": 1,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 25
         }
     }
 ]

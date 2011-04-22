@@ -63,7 +63,7 @@
         $(function() {
             var CSRF_TOKEN = '{{ csrf_token }}';
             var PACKAGE_PK = '{{ package.pk }}';
-            var PACKAGE_URL = '{% url api:definitions:packages %}';
+            var PACKAGE_MEMBERSHIP_URL = '{% url api:definitions:package_memberships %}';
             
             // ---------------------------------------------------------------
             // Adding Data Objects
@@ -139,14 +139,15 @@
                             $('.data-object-add-box .is-ok-identifier').removeClass('is-ok');
                             
                             $.ajax({    
-                                url: PACKAGE_URL + PACKAGE_PK + '/',
-                                type: 'put',
+                                url: PACKAGE_MEMBERSHIP_URL,
+                                type: 'post',
                                 data: {
-                                    data_objects__add: dataObject['pk']
+                                    'data_object': dataObject['pk'],
+                                    'package': PACKAGE_PK
                                 },
                                 context: dataObject,
-                                success: function() {
-                                    $('#data-objects table tbody').append('<tr pk="'+this['pk']+'">'
+                                success: function(data) {
+                                    $('#data-objects table tbody').append('<tr pk="'+data['id']+'">'
                                     +'<td>'+this['derived_name']+'</td>'
                                     +'<td>'+this['identifier']+'</td>'
                                     +'<td class="delete"><span class="button">Yes</span></td>'
@@ -156,7 +157,8 @@
                                 error: function() {
                                     $('#error-dialog p').text('There was an error whilst adding the Data Object. Please try again.');
                                     $('#error-dialog').dialog('open');
-                                }
+                                },
+                                dataType: 'json'
                             });
                         }
                         break;
@@ -259,12 +261,9 @@
                     'Yes Delete': function() {
                         $(this).dialog('close');
                         $.ajax({    
-                            url: PACKAGE_URL + PACKAGE_PK + '/',
-                            type: 'put',
+                            url: PACKAGE_MEMBERSHIP_URL + packageMembershipPK + '/',
+                            type: 'delete',
                             context: $tableRow,
-                            data: {
-                                data_objects__remove: dataObjectPK
-                            },
                             success: function() {
                                 this.animate({
                                     opacity: 0
@@ -275,7 +274,7 @@
                                 });
                             },
                             error: function() {
-                                $('#error-dialog p').text('There was an error whilst deleting the Data Object. Please try again.');
+                                $('#error-dialog p').text('There was an error whilst removing the Data Object from this package. Please try again.');
                                 $('#error-dialog').dialog('open');
                             }
                         });
@@ -283,14 +282,14 @@
                     '\u2190 Cancel': function() {
                         $(this).dialog('close');
                         $tableRow = null;
-                        dataObjectPK = null;
+                        packageMembershipPK = null;
                     }
                 }
             }, defaults));
             
             $('tr td.delete .button').live('click', function() {
                 $tableRow = $(this).closest('tr');
-                dataObjectPK = $tableRow.attr('pk');
+                packageMembershipPK = $tableRow.attr('pk');
                 $('#delete-dialog').dialog('open');
             });
         });
