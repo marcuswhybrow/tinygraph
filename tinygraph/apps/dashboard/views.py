@@ -1,5 +1,5 @@
 from django.views.generic.simple import direct_to_template
-from tinygraph.apps.dashboard.models import Board, Item, Connection
+from tinygraph.apps.dashboard.models import Board, Item, DeviceItem, Connection
 from tinygraph.apps.devices.models import Device
 from django.db.models import Count
 
@@ -23,7 +23,7 @@ def index(request):
     # All of the devices in the system
     devices = Device.objects.select_related()
     
-    device_counts = Item.objects.filter(board=board).values('device').annotate(count=Count('device'))
+    device_counts = DeviceItem.objects.filter(board=board).values('device').annotate(count=Count('device'))
     
     device_list = []
     for device in devices:

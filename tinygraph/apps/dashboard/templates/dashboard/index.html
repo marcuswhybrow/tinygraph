@@ -599,7 +599,7 @@
                         
                             updateSaving(true);
                             $.ajax({
-                                url: '{% url api:dashboard:items %}',
+                                url: '{% url api:dashboard:device_items %}',
                                 type: 'post',
                                 context: device,
                                 data: {

@@ -1,6 +1,8 @@
 from django.conf.urls.defaults import *
 from piston.resource import Resource
-from api.views.dashboard import BoardHandler, ItemHandler, ConnectionHandler
+from api.views.dashboard import BoardHandler, ItemHandler, \
+    ConnectionHandler, DeviceItemHandler
+    
 
 # class ShitResource(Resource):
 #     def __call__(self, request, *args, **kwargs):
@@ -9,6 +11,7 @@ from api.views.dashboard import BoardHandler, ItemHandler, ConnectionHandler
 
 board_handler = Resource(BoardHandler)
 item_handler = Resource(ItemHandler)
+device_item_handler = Resource(DeviceItemHandler)
 connection_handler = Resource(ConnectionHandler)
 
 urlpatterns = patterns('',
@@ -17,6 +20,9 @@ urlpatterns = patterns('',
     
     url(r'^item/$', item_handler, name='items'),
     url(r'^item/(?P<id>\d+)/$', item_handler, name='item'),
+    
+    url(r'^device-item/$', device_item_handler, name='device_items'),
+    url(r'^device-item/(?P<id>\d+)/$', device_item_handler, name='device_item'),
     
     url(r'^connection/$', connection_handler, name='connections'),
     url(r'^connection/(?P<id>\d+)/$', connection_handler, name='connection'),

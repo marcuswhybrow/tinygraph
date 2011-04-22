@@ -4,7 +4,7 @@ ITEM_TYPES = (
     ('server', 'Server'),
     ('switch', 'Switch'),
     ('router', 'Router'),
-    ('wireless', 'Wireless Access Point')
+    ('wireless', 'Wireless Access Point'),
 )
 
 class Board(models.Model):
@@ -24,24 +24,24 @@ class Board(models.Model):
         return self.name
 
 class Item(models.Model):
-    class Meta:
-        unique_together = (
-            ('x', 'y', 'board'),
-            ('device', 'board'),
-        )
-    
     x = models.IntegerField()
     y = models.IntegerField()
-    
     type = models.CharField(max_length=10, choices=ITEM_TYPES)
-    
-    # The device which data is being recorded about
-    device = models.ForeignKey('devices.Device', null=True, blank=True)
-    
     board = models.ForeignKey('dashboard.Board', related_name='items')
     
+    class Meta:
+        unique_together = ('x', 'y', 'board')
+    
     def __unicode__(self):
-        return '%s on %s' % (self.device if self.type == 'server' else self.type, self.board)
+        return '%s,%s on %s' % (self.x, self.y, self.board)
+
+
+class DeviceItem(Item):
+    device = models.ForeignKey('devices.Device')
+    
+    def save(self, *args, **kwargs):
+        self.type = 'server'
+        super(DeviceItem, self).save(*args, **kwargs)
 
 class Connection(models.Model):
     from_item = models.ForeignKey('dashboard.Item', related_name='connections')
