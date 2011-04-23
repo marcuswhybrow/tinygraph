@@ -4,9 +4,9 @@ import beanstalkc
 import logging
 import logging.handlers
 
-HOST = getattr(settings, 'BEANSTALK_HOST', 'localhost')
+ADDRESS = getattr(settings, 'BEANSTALK_ADDRESS', 'localhost')
 PORT = getattr(settings, 'BEANSTALK_PORT', 11300)
-LOG_FILENAME = getattr(settings, 'CONSUMER_LOG_FILENAME', '/var/log/consumerd.log')
+LOG_FILENAME = getattr(settings, 'JOBQUEUE_CONSUMER_LOG_FILENAME', '/tmp/tinygraph-jobqueue-consumer.log')
 
 # Logging stuff
 logging.basicConfig(filename=LOG_FILENAME, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -16,9 +16,9 @@ class ConsumerDaemon(daemon.Daemon):
     
     def run(self):
         try:
-            self.beanstalk = beanstalkc.Connection(host=HOST, port=PORT)
+            self.beanstalk = beanstalkc.Connection(host=ADDRESS, port=PORT)
         except:
-            logging.error('Could not connect to beanstalkd at %s:%s' % (HOST, PORT))
+            logging.error('Could not connect to beanstalkd at %s:%s' % (ADDRESS, PORT))
         else:
             if self.beanstalk:
                 # Ignore the default tube
