@@ -147,6 +147,7 @@ class TinyGraphDaemon(PollDaemon):
                 PackageInstanceMembership.objects.filter(
                     package_instance__device=device, 
                     package_instance__enabled=True, enabled=True)
+            
             for package_instance_membership in package_instance_memberships:
                 rule = package_instance_membership.rule
                 asyn_command_generator.asyncBulkCmd(

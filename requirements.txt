@@ -13,3 +13,5 @@ https://github.com/marcuswhybrow/django-piston/tarball/master
 # dependant on pyyaml for some reason.
 pyyaml
 beanstalkc
+
+python-memcached

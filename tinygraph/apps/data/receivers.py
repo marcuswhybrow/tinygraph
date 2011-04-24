@@ -3,6 +3,9 @@ from django.db.models.signals import post_save
 from tinygraph.apps.data.cacher import cacher
 from tinygraph.apps.data.settings import NON_INCREMENTAL_DATA_VALUE_TYPES
 from tinygraph.apps.data.models import DataInstance
+import logging
+
+logger = logging.getLogger('tinygraph.data.receivers')
 
 @receiver(post_save, sender=DataInstance)
 def update_caches(sender, instance=None, created=None, **kwargs):
@@ -20,4 +23,5 @@ def update_caches(sender, instance=None, created=None, **kwargs):
                 instance.data_object.derived_name,
                 instance.suffix
             )
-            cacher[cache_key] = instance.value
+            
+            cacher[cache_key] = (instance.value, instance.created)

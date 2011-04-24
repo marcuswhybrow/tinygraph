@@ -31,7 +31,7 @@ class PollDaemon(daemon.Daemon):
         
         # Call the all important (overriden) poll method
         self.poll()
-        logging.info('Finished poll')
+        logger.info('Finished poll')
     
     def run(self):
         # Sheduler stuff

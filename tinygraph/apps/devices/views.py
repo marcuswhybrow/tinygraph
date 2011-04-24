@@ -19,22 +19,31 @@ INTERFACE_TYPE = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifT
 INTERFACE_DESCR = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifDescr'
 INTERFACE_PHYS_ADDRESS = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifPhysAddress'
 
+HOST_SYSTEM_PROCESSES = 'iso.org.dod.internet.mgmt.mib-2.host.hrSystem.hrSystemProcesses'
+HOST_SYSTEM_UPTIME = 'iso.org.dod.internet.mgmt.mib-2.host.hrSystem.hrSystemUptime'
+
+SYSTEM_DESCR = 'iso.org.dod.internet.mgmt.mib-2.system.sysDescr'
+SYSTEM_UPTIME = 'iso.org.dod.internet.mgmt.mib-2.system.sysUpTime'
+SYSTEM_CONTACT = 'iso.org.dod.internet.mgmt.mib-2.system.sysContact'
+SYSTEM_NAME = 'iso.org.dod.internet.mgmt.mib-2.system.sysName'
+SYSTEM_CONTACT = 'iso.org.dod.internet.mgmt.mib-2.system.sysLocation'
+
 def device_list(request):
     return direct_to_template(request, 'devices/device_list.html', {
         'devices': Device.objects.all(),
     })
 
 def _get_interface_details(device_slug, index):
-    if_index = str(cacher[(device_slug, INTERFACE_INDEX, str(index))])
-    phys_address = cacher[(device_slug, INTERFACE_PHYS_ADDRESS, if_index)]
+    if_index = str(cacher[(device_slug, INTERFACE_INDEX, str(index))][0])
+    phys_address = cacher[(device_slug, INTERFACE_PHYS_ADDRESS, if_index)][0]
     if phys_address:
         phys_address = ':'.join('%0.2x' % int(n) for n in phys_address.split(' '))
     
     return {
         'index': if_index,
-        'mtu': cacher[(device_slug, INTERFACE_MTU, if_index)],
-        'type': cacher[(device_slug, INTERFACE_TYPE, if_index)],
-        'description': cacher[(device_slug, INTERFACE_DESCR, if_index)],
+        'mtu': cacher[(device_slug, INTERFACE_MTU, if_index)][0],
+        'type': cacher[(device_slug, INTERFACE_TYPE, if_index)][0],
+        'description': cacher[(device_slug, INTERFACE_DESCR, if_index)][0],
         'physical_address': phys_address,
     }
 
@@ -43,16 +52,35 @@ def device_detail(request, device_slug):
     enabled_package_instances = PackageInstance.objects.filter(device=device, enabled=True)
     package_instances = [(package_instance, package_instance.memberships.filter(graphed=True).select_related()) for package_instance in enabled_package_instances]
     
-    num_interfaces = int(cacher[(device.slug, NUM_INTERFACES, '0')])
-    interfaces = [_get_interface_details(device.slug, index) for index in range(1, num_interfaces + 1)]
+    slug = device.slug
+    
+    num_interfaces = int(cacher[(slug, NUM_INTERFACES, '0')][0])
+    interfaces = [_get_interface_details(slug, index) for index in range(1, num_interfaces + 1)]
     
     for interface in interfaces:
         if interface['physical_address'] == '':
             num_interfaces -= 1
     
+    system_uptime, created = cacher[(slug, HOST_SYSTEM_UPTIME, '0')]
+    system_uptime = int(system_uptime) / 100
+    diff = datetime.datetime.now() - created
+    diff = datetime.timedelta(seconds=diff.seconds)
+    system_uptime = datetime.timedelta(seconds=system_uptime) + diff
+    
     details = {
         'number_of_interfaces': num_interfaces,
         'interfaces': interfaces,
+        'system': {
+            'description': cacher[(slug, SYSTEM_DESCR, '0')][0],
+            'uptime': cacher[(slug, SYSTEM_UPTIME, '0')][0],
+            'contact': cacher[(slug, SYSTEM_CONTACT, '0')][0],
+            'name': cacher[(slug, SYSTEM_NAME, '0')][0],
+            'location': cacher[(slug, SYSTEM_CONTACT, '0')][0],
+        },
+        'host': {
+            'system_processes': cacher[(slug, HOST_SYSTEM_PROCESSES, '0')][0],
+            'system_uptime': system_uptime,
+        }
     }
             
     return direct_to_template(request, 'devices/device_detail.html', {
