@@ -51,7 +51,7 @@ def _get_interface_details(device_slug, index):
 
 def device_detail(request, device_slug):
     device = get_object_or_404(Device, slug=device_slug)
-    enabled_package_instances = PackageInstance.objects.filter(device=device, enabled=True)
+    enabled_package_instances = PackageInstance.objects.filter(device=device, enabled=True).select_related()
     package_instances = [(package_instance, package_instance.memberships.filter(graphed=True).select_related()) for package_instance in enabled_package_instances]
     
     slug = device.slug
@@ -74,7 +74,6 @@ def device_detail(request, device_slug):
         'interfaces': interfaces,
         'system': {
             'description': cacher[(slug, SYSTEM_DESCR, '0')][0],
-            'uptime': cacher[(slug, SYSTEM_UPTIME, '0')][0],
             'contact': cacher[(slug, SYSTEM_CONTACT, '0')][0],
             'name': cacher[(slug, SYSTEM_NAME, '0')][0],
             'location': cacher[(slug, SYSTEM_CONTACT, '0')][0],

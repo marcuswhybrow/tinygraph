@@ -10,7 +10,6 @@ from django.conf import settings
 from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
     value_change
 from tinygraph.apps.rules.models import PackageInstanceMembership
-from tinygraph.apps.data.settings import NON_INCREMENTAL_DATA_VALUE_TYPES
 from functools import wraps
 import django.dispatch
 import socket
@@ -22,6 +21,12 @@ DEVICE_TRANSPORT_ERROR_MESSAGE = getattr(settings,
     'Could not connect to device.')
 
 logger = logging.getLogger('tinygraph.tinygraphd.PollDaemon')
+
+VARIABLE_DATA_VALUE_TYPES = (
+    'time_ticks',
+    'counter',
+    'gauge',
+)
 
 def watch_for_exceptions(f):
     def wrapper(*args, **kwargs):
@@ -98,7 +103,7 @@ class TinyGraphDaemon(PollDaemon):
                 continue
             
             prev_data_instance = None
-            if (value_type in NON_INCREMENTAL_DATA_VALUE_TYPES):
+            if (value_type not in VARIABLE_DATA_VALUE_TYPES):
                 try:
                     prev_data_instance = DataInstance.objects.filter(
                         rule=rule, data_object=data_object, suffix=str_suffix
@@ -111,7 +116,7 @@ class TinyGraphDaemon(PollDaemon):
                 data_object=data_object, suffix=str_suffix,
                 value=str_value, value_type=value_type)
             
-            if (value_type in NON_INCREMENTAL_DATA_VALUE_TYPES):
+            if (value_type not in VARIABLE_DATA_VALUE_TYPES):
                 if prev_data_instance is not None and (new_data_instance.value
                     != prev_data_instance.value):
                     value_change.send(sender=self, 

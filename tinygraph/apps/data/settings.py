@@ -1,17 +1,5 @@
 from django.conf import settings
 
-NON_INCREMENTAL_DATA_VALUE_TYPES = getattr(settings, 
-    'NON_INCREMENTAL_DATA_VALUE_TYPES', (
-    
-    'integer',
-    'bit_string',
-    'octet_string',
-    'null',
-    'object_identifier',
-    'sequence',
-    'ip_address',
-))
-
 DATA_VALUE_TYPES = getattr(settings, 'DATA_VALUE_TYPES', (
     # Primitive ASN.1 Types
     ('integer', 'Integer'),
