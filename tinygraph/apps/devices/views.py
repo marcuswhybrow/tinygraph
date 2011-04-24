@@ -21,6 +21,8 @@ INTERFACE_PHYS_ADDRESS = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifE
 
 HOST_SYSTEM_PROCESSES = 'iso.org.dod.internet.mgmt.mib-2.host.hrSystem.hrSystemProcesses'
 HOST_SYSTEM_UPTIME = 'iso.org.dod.internet.mgmt.mib-2.host.hrSystem.hrSystemUptime'
+HOST_SYSTEM_NUM_USERS = 'iso.org.dod.internet.mgmt.mib-2.host.hrSystem.hrSystemNumUsers'
+HOST_SYSTEM_MAX_PROCESSES = 'iso.org.dod.internet.mgmt.mib-2.host.hrSystem.hrSystemMaxProcesses'
 
 SYSTEM_DESCR = 'iso.org.dod.internet.mgmt.mib-2.system.sysDescr'
 SYSTEM_UPTIME = 'iso.org.dod.internet.mgmt.mib-2.system.sysUpTime'
@@ -78,8 +80,10 @@ def device_detail(request, device_slug):
             'location': cacher[(slug, SYSTEM_CONTACT, '0')][0],
         },
         'host': {
-            'system_processes': cacher[(slug, HOST_SYSTEM_PROCESSES, '0')][0],
-            'system_uptime': system_uptime,
+            'processes': cacher[(slug, HOST_SYSTEM_PROCESSES, '0')][0],
+            'uptime': system_uptime,
+            'num_users': cacher[(slug, HOST_SYSTEM_NUM_USERS, '0')][0],
+            'max_processes': cacher[(slug, HOST_SYSTEM_MAX_PROCESSES, '0')][0],
         }
     }
             
