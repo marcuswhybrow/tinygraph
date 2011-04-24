@@ -86,5 +86,12 @@
             "package": 1,
             "data_object": 45
         }
+    }, {
+        "pk": 11,
+        "model": "definitions.PackageMembership",
+        "fields": {
+            "package": 1,
+            "data_object": 29
+        }
     }
 ]
