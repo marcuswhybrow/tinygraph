@@ -2,10 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
-from django.db.models.signals import m2m_changed
-from django.dispatch import receiver
 from tinygraph.apps.rules.models import Rule, PackageInstance, \
     PackageInstanceMembership
+from tinygraph.apps.data.settings import DATA_VALUE_TYPES
 import os
 
 class DataObjectManager(models.Manager):
@@ -20,6 +19,9 @@ class DataObject(models.Model):
     user_given_name = models.CharField(blank=True, max_length=255)
     parent = models.ForeignKey('DataObject', null=True, blank=True, db_index=True, related_name='children')
     mib_uploads = models.ManyToManyField('MibUpload', db_index=True, related_name='data_objects')
+    # This field is not knowable on create due to the limitations of pysnmp
+    # library, instead it is updated when a DataInstance is created.
+    value_type = models.CharField(max_length=100, choices=DATA_VALUE_TYPES, null=True, blank=True)
     
     objects = DataObjectManager()
     

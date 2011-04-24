@@ -10,14 +10,27 @@ from django.conf import settings
 from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
     value_change
 from tinygraph.apps.rules.models import PackageInstanceMembership
-import django.dispatch
 from tinygraph.apps.data.settings import NON_INCREMENTAL_DATA_VALUE_TYPES
+from functools import wraps
+import django.dispatch
 import socket
+import logging
 
 SNMP_GETBULK_SIZE = getattr(settings, 'TINYGRAPH_SNMP_GETBULK_SIZE', 25)
 DEVICE_TRANSPORT_ERROR_MESSAGE = getattr(settings, 
     'TINYGRAPH_DEVICE_TRANSPORT_ERROR_MESSAGE', 
     'Could not connect to device.')
+
+logger = logging.getLogger('tinygraph.tinygraphd.PollDaemon')
+
+def watch_for_exceptions(f):
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception, e:
+            logger.critical('%s() threw an exception: %s' % (f.__name__, e))
+        
+    return wraps(f)(wrapper)
 
 class TinyGraphDaemon(PollDaemon):
     
@@ -32,7 +45,7 @@ class TinyGraphDaemon(PollDaemon):
         mvc = context['mvc']
         
         if error_indication is not None:
-            logging.warning('SNMP GETBULK error "%s" for OID "%s" on '
+            logger.warning('SNMP GETBULK error "%s" for OID "%s" on '
                 'device "%s". Error status: %s, error index: %s' %
                 (error_indication, rule.data_object.get_identifier_tuple(),
                 rule.device.user_given_name, error_status, error_index))
@@ -58,7 +71,7 @@ class TinyGraphDaemon(PollDaemon):
 
             identifier = snmp_name_to_str(name)
             if identifier is None:
-                logging.warning('pysnmp returned "%s" as a name. Its value '
+                logger.warning('pysnmp returned "%s" as a name. Its value '
                     'was therefore not logged.' % name)
                 continue
 
@@ -68,7 +81,7 @@ class TinyGraphDaemon(PollDaemon):
             try:
                 data_object = DataObject.objects.get(identifier=str_oid)
             except DataObject.DoesNotExist:
-                logging.error('The database representation of DataObjects '
+                logger.error('The database representation of DataObjects '
                 'does not match the MIB strucute. a DataObject with the '
                 'OID "%s" could not be found.' % str_oid)
                 continue
@@ -81,7 +94,7 @@ class TinyGraphDaemon(PollDaemon):
             if value_type == 'end_of_mib_view':
                 return False
             elif value_type is None:
-                logging.error('Unrecognised value "%s"' % value.__class__)
+                logger.error('Unrecognised value "%s"' % value.__class__)
                 continue
             
             prev_data_instance = None
@@ -90,7 +103,7 @@ class TinyGraphDaemon(PollDaemon):
                     prev_data_instance = DataInstance.objects.filter(
                         rule=rule, data_object=data_object, suffix=str_suffix
                     ).latest()
-                except:
+                except DataInstance.DoesNotExist:
                     pass
 
             # Create the DataInstance
@@ -108,6 +121,7 @@ class TinyGraphDaemon(PollDaemon):
         # the bulk requests
         return True
     
+    @watch_for_exceptions
     def poll(self):
         """Called once for each poll (say every 5 minutes)"""
         

@@ -181,6 +181,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'tinygraph.data.cacher': {
+            'handlers': ['default'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 
