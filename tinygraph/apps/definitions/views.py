@@ -33,7 +33,7 @@ def package_list(request):
 
 def package_detail(request, package_slug):
     package = get_object_or_404(Package, slug=package_slug)
-    package_instances = PackageInstance.objects.filter(enabled=True)
+    package_instances = PackageInstance.objects.filter(enabled=True, package=package)
     devices = [package_instance.device for package_instance in package_instances]
     return direct_to_template(request, 'definitions/packages/package_detail.html', {
         'package': package,
