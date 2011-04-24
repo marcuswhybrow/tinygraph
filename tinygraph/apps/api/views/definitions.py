@@ -1,19 +1,19 @@
-from tinygraph.apps.api.utils import ImprovedHandler
+from piston.handler import BaseHandler
 from tinygraph.apps.definitions.models import DataObject, Package, \
     MibUpload, PackageMembership
 
 
-class DataObjectHandler(ImprovedHandler):
+class DataObjectHandler(BaseHandler):
     model = DataObject
     fields = ('identifier', 'user_given_name', 'derived_name')
     exclude = ('parent',)
 
-class PackageHandler(ImprovedHandler):
+class PackageHandler(BaseHandler):
     model = Package
     fields = ('description', 'created', 'editable', 'slug', 'title')
 
-class MibUploadHandler(ImprovedHandler):
+class MibUploadHandler(BaseHandler):
     model = MibUpload
 
-class PackageMembershipHandler(ImprovedHandler):
+class PackageMembershipHandler(BaseHandler):
     model = PackageMembership

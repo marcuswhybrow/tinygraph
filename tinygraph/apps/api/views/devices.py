@@ -1,6 +1,6 @@
-from tinygraph.apps.api.utils import ImprovedHandler
+from piston.handler import BaseHandler
 from tinygraph.apps.devices.models import Device
 
-class DeviceHandler(ImprovedHandler):
+class DeviceHandler(BaseHandler):
     allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
     model = Device

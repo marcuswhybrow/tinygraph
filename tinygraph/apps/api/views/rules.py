@@ -1,14 +1,14 @@
-from tinygraph.apps.api.utils import ImprovedHandler
+from piston.handler import BaseHandler
 from tinygraph.apps.rules.models import Rule, PackageInstance, \
     PackageInstanceMembership
 from tinygraph.apps.devices.models import Device
 from tinygraph.apps.definitions.models import Package
 
-class RuleHandler(ImprovedHandler):
+class RuleHandler(BaseHandler):
     model = Rule
 
-class PackageInstanceHandler(ImprovedHandler):
+class PackageInstanceHandler(BaseHandler):
     model = PackageInstance
 
-class PackageInstanceMembershipHandler(ImprovedHandler):
+class PackageInstanceMembershipHandler(BaseHandler):
     model = PackageInstanceMembership

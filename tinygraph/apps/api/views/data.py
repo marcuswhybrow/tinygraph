@@ -1,6 +1,6 @@
-from tinygraph.apps.api.utils import ImprovedHandler
+from piston.handler import BaseHandler
 from tinygraph.apps.data.models import DataInstance
 
-class DataInstanceHandler(ImprovedHandler):
+class DataInstanceHandler(BaseHandler):
     allowed_methods = ('GET',)
     model = DataInstance
