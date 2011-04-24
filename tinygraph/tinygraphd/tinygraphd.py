@@ -11,22 +11,13 @@ from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
     value_change
 from tinygraph.apps.rules.models import PackageInstanceMembership
 import django.dispatch
+from tinygraph.apps.data.settings import NON_INCREMENTAL_DATA_VALUE_TYPES
 import socket
 
 SNMP_GETBULK_SIZE = getattr(settings, 'TINYGRAPH_SNMP_GETBULK_SIZE', 25)
 DEVICE_TRANSPORT_ERROR_MESSAGE = getattr(settings, 
     'TINYGRAPH_DEVICE_TRANSPORT_ERROR_MESSAGE', 
     'Could not connect to device.')
-
-NON_INCREMENTAL_DATA_VALUE_TYPES = (
-    'integer',
-    'bit_string',
-    'octet_string',
-    'null',
-    'object_identifier',
-    'sequence',
-    'ip_address',
-)
 
 class TinyGraphDaemon(PollDaemon):
     
@@ -138,7 +129,7 @@ class TinyGraphDaemon(PollDaemon):
             pre_poll.send(sender=self, device=device)
             
             # Setup the asynchronous SNMP BULK requests (non blocking)
-            package_instance_memberships = 
+            package_instance_memberships = \
                 PackageInstanceMembership.objects.filter(
                     package_instance__device=device, 
                     package_instance__enabled=True, enabled=True)
