@@ -8,8 +8,11 @@ from tinygraph.apps.definitions.models import Package
 from tinygraph.apps.rules.models import PackageInstance
 from tinygraph.apps.data.models import DataInstance
 from tinygraph.apps.data.presenters import Presenter, CounterPresenter
+from tinygraph.apps.data.cacher import cacher
 
 import datetime
+
+NUM_INTERFACES = '1.3.6.1.2.1.2.1'
 
 def device_list(request):
     return direct_to_template(request, 'devices/device_list.html', {
@@ -20,11 +23,16 @@ def device_detail(request, device_slug):
     device = get_object_or_404(Device, slug=device_slug)
     enabled_package_instances = PackageInstance.objects.filter(device=device, enabled=True)
     package_instances = [(package_instance, package_instance.memberships.filter(graphed=True).select_related()) for package_instance in enabled_package_instances]
+    
+    details = {
+        'number_of_interfaces': cacher[(device.slug, NUM_INTERFACES, '0')],
+    }
             
     return direct_to_template(request, 'devices/device_detail.html', {
         'device': device,
         'events': device.event_set.all()[:20],
         'package_instances': package_instances,
+        'details': details
     })
 
 def device_edit(request, device_slug=None):
