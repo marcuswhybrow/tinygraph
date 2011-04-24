@@ -23,7 +23,8 @@ class PollDaemon(daemon.Daemon):
     def _function(self):
         self.this_time = datetime.datetime.now()
         if self.last_time is not None:
-            logger.info('Started poll, time elapsed since last poll: %s' % (self.this_time - self.last_time))
+            logger.info('Started poll, time elapsed since last poll: %s' % 
+                (self.this_time - self.last_time))
         else:
             logger.info('Started poll')
         self.last_time = self.this_time
@@ -38,7 +39,8 @@ class PollDaemon(daemon.Daemon):
         
         # Get the next round second
         now = datetime.datetime.now()
-        start_time = datetime.datetime(now.year, now.month, now.day, now.hour, now.minute, now.second)
+        start_time = datetime.datetime(now.year, now.month, now.day, now.hour, 
+            now.minute, now.second)
         start_time = start_time + datetime.timedelta(seconds=1)
         
         logger.info('Started Daemon')

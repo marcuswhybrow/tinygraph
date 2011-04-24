@@ -14,7 +14,9 @@ import django.dispatch
 import socket
 
 SNMP_GETBULK_SIZE = getattr(settings, 'TINYGRAPH_SNMP_GETBULK_SIZE', 25)
-DEVICE_TRANSPORT_ERROR_MESSAGE = getattr(settings, 'TINYGRAPH_DEVICE_TRANSPORT_ERROR_MESSAGE', 'Could not connect to device.')
+DEVICE_TRANSPORT_ERROR_MESSAGE = getattr(settings, 
+    'TINYGRAPH_DEVICE_TRANSPORT_ERROR_MESSAGE', 
+    'Could not connect to device.')
 
 NON_INCREMENTAL_DATA_VALUE_TYPES = (
     'integer',
@@ -28,7 +30,8 @@ NON_INCREMENTAL_DATA_VALUE_TYPES = (
 
 class TinyGraphDaemon(PollDaemon):
     
-    def _callback(self, handle, error_indication, error_status, error_index, var_bind_table, context):
+    def _callback(self, handle, error_indication, error_status, error_index, 
+                  var_bind_table, context):
         """
         A callback which returns False to stop further bulk requests and True
         to continue
@@ -53,7 +56,8 @@ class TinyGraphDaemon(PollDaemon):
             rule_oid = rule.data_object.get_identifier_tuple()
             try:
                 if rule_oid != name[:len(rule_oid)]:
-                    # This is not a child of the rule, do no more bulk requests
+                    # This is not a child of the rule, do no more bulk 
+                    # requests
                     return False
             except IndexError:
                 # This is not a child of the rule, do no more bulk requests
@@ -63,7 +67,8 @@ class TinyGraphDaemon(PollDaemon):
 
             identifier = snmp_name_to_str(name)
             if identifier is None:
-                logging.warning('pysnmp returned "%s" as a name. Its value was therefore not logged.' % name)
+                logging.warning('pysnmp returned "%s" as a name. Its value '
+                    'was therefore not logged.' % name)
                 continue
 
             str_oid = '.'.join([str(i) for i in oid])
@@ -103,8 +108,10 @@ class TinyGraphDaemon(PollDaemon):
                 value=str_value, value_type=value_type)
             
             if (value_type in NON_INCREMENTAL_DATA_VALUE_TYPES):
-                if prev_data_instance is not None and (new_data_instance.value != prev_data_instance.value):
-                    value_change.send(sender=self, data_instance=new_data_instance)
+                if prev_data_instance is not None and (new_data_instance.value
+                    != prev_data_instance.value):
+                    value_change.send(sender=self, 
+                        data_instance=new_data_instance)
         
         # The children of the rule have no yet been exhausted, continue with
         # the bulk requests
@@ -124,13 +131,17 @@ class TinyGraphDaemon(PollDaemon):
             # the authentication details for the device were provided
             # incorrectly, then skip this device in the polling process
             if transport is None or authentication is None:
-                poll_error.send(sender=self, device=device, message=DEVICE_TRANSPORT_ERROR_MESSAGE)
+                poll_error.send(sender=self, device=device, 
+                    message=DEVICE_TRANSPORT_ERROR_MESSAGE)
                 continue
             
             pre_poll.send(sender=self, device=device)
             
             # Setup the asynchronous SNMP BULK requests (non blocking)
-            package_instance_memberships = PackageInstanceMembership.objects.filter(package_instance__device=device, package_instance__enabled=True, enabled=True)
+            package_instance_memberships = 
+                PackageInstanceMembership.objects.filter(
+                    package_instance__device=device, 
+                    package_instance__enabled=True, enabled=True)
             for package_instance_membership in package_instance_memberships:
                 rule = package_instance_membership.rule
                 asyn_command_generator.asyncBulkCmd(
