@@ -144,6 +144,41 @@ TINYGRAPH_TINYGRAPH_LOG_FILENAME = '/tmp/tinygraph.log'
 TINYGRAPH_TINYGRAPHD_LOG_FILENAME = '/var/log/tinygraphd.log'
 TINYGRAPH_POLL_INTERVAL = 5 # minutes
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s %(name)s [%(levelname)s]: %(message)s',
+        },
+    },
+    'handlers': {
+        'default': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/default.log',
+            'formatter': 'standard',
+        },  
+    },
+    'loggers': {
+        'tinygraph.jobqueue.dispatcher': {
+            'handlers': ['default'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'tinygraph.jobqueue.consumerd': {
+            'handlers': ['default'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'tinygraph.jobqueue.consumers': {
+            'handlers': ['default'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 try:
     from tinygraph.settings_database import *
 except ImportError:
