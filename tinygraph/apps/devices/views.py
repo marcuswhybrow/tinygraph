@@ -9,6 +9,7 @@ from tinygraph.apps.rules.models import PackageInstance
 from tinygraph.apps.data.models import DataInstance
 from tinygraph.apps.data.presenters import Presenter, CounterPresenter
 from tinygraph.apps.data.cacher import cacher
+from django.db.models import Q
 
 import datetime
 
@@ -51,8 +52,21 @@ def _get_interface_details(device_slug, index):
 
 def device_detail(request, device_slug):
     device = get_object_or_404(Device, slug=device_slug)
-    enabled_package_instances = PackageInstance.objects.filter(device=device, enabled=True).select_related()
-    package_instances = [(package_instance, package_instance.memberships.filter(graphed=True).select_related()) for package_instance in enabled_package_instances]
+    enabled_package_instances = PackageInstance.objects.filter(device=device, 
+        enabled=True).select_related()
+    package_instances = [
+        (
+            package_instance,
+            package_instance.memberships.filter(
+                Q(graphed=True) & ~ \
+                Q(package_membership__data_object__value_type__in=['counter'])
+            ).select_related(),
+            package_instance.memberships.filter(
+                graphed=True,
+                package_membership__data_object__value_type__in=['counter'],
+            ).select_related(),
+            
+        ) for package_instance in enabled_package_instances]
     
     slug = device.slug
     

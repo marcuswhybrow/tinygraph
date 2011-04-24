@@ -69,13 +69,21 @@
         <div class="first">
             <h2>Packages</h2>
             <ul>
-                {% for package_instance, package_instance_membership in package_instances %}
+                {% for package_instance, package_instance_membership, package_instance_membership_counters in package_instances %}
                     <li>
                         <h3>{{ package_instance.package.title }}</h3>
                         <div class="body">
+                            <h4>Values</h4>
                             <ul>
                                 {% for package_instance_membership in package_instance_membership %}
                                     <li>{{ package_instance_membership.package_membership.data_object.derived_name }}</li>
+                                {% endfor %}
+                            </ul>
+                            
+                            <h4>Counters</h4>
+                            <ul>
+                                {% for package_instance_membership_counter in package_instance_membership_counters %}
+                                    <li>{{ package_instance_membership_counter.package_membership.data_object.derived_name }}</li>
                                 {% endfor %}
                             </ul>
                         </div>

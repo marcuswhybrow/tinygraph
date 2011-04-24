@@ -110,7 +110,7 @@ class TinyGraphDaemon(PollDaemon):
                     ).latest()
                 except DataInstance.DoesNotExist:
                     pass
-
+            
             # Create the DataInstance
             new_data_instance = DataInstance.objects.create(rule=rule,
                 data_object=data_object, suffix=str_suffix,
