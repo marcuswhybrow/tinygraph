@@ -13,7 +13,7 @@ def _get_cache_key(device_slug, derived_name, suffix):
 
 class Cacher(object):
     def _set(self, key, value):
-        cache.set(key, value)
+        cache.set(key, value, timeout=86400)
         logger.info('"%s" set as "%s"' % (key, value))
     
     def __setitem__(self, key, value):
@@ -22,6 +22,8 @@ class Cacher(object):
     
     def __getitem__(self, key):
         cache_key = _get_cache_key(*key)
+        
+        logger.info('"%s" got' % cache_key)
         
         # Attempt to get the value from cache
         value = cache.get(cache_key)
