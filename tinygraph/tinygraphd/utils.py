@@ -3,15 +3,11 @@ from tinygraph.utils import daemon
 import datetime
 import sys
 import logging
-import logging.handlers
 import time
 
 from django.conf import settings
 
-LOG_FILENAME = getattr(settings, 'TINYGRAPH_TINYGRAPHD_LOG_FILENAME', '/var/log/tinygraphd.log')
-
-# Logging stuff
-logging.basicConfig(filename=LOG_FILENAME, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('tinygraph.tinygraphd.PollDaemon')
 
 class PollDaemon(daemon.Daemon):
     
@@ -27,9 +23,9 @@ class PollDaemon(daemon.Daemon):
     def _function(self):
         self.this_time = datetime.datetime.now()
         if self.last_time is not None:
-            logging.info('Started poll, time elapsed since last poll: %s' % (self.this_time - self.last_time))
+            logger.info('Started poll, time elapsed since last poll: %s' % (self.this_time - self.last_time))
         else:
-            logging.info('Started poll')
+            logger.info('Started poll')
         self.last_time = self.this_time
         
         # Call the all important (overriden) poll method
@@ -45,7 +41,7 @@ class PollDaemon(daemon.Daemon):
         start_time = datetime.datetime(now.year, now.month, now.day, now.hour, now.minute, now.second)
         start_time = start_time + datetime.timedelta(seconds=1)
         
-        logging.info('Started Daemon')
+        logger.info('Started Daemon')
         
         function_task = scheduler.Task(
             'poller',
@@ -61,9 +57,9 @@ class PollDaemon(daemon.Daemon):
     
     def stop(self, *args, **kwargs):
         print 'Stopping...'
-        logging.info('Stopping Daemon')
+        logger.info('Stopping Daemon')
         super(PollDaemon, self).stop(*args, **kwargs)
-        logging.info('Stopped Daemon')
+        logger.info('Stopped Daemon')
         print 'Stopped'
     
     def start(self, *args, **kwargs):

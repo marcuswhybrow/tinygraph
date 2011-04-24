@@ -176,6 +176,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'tinygraph.tinygraphd.PollDaemon': {
+            'handlers': ['default'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 
