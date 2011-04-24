@@ -12,7 +12,7 @@ from tinygraph.apps.data.cacher import cacher
 
 import datetime
 
-NUM_INTERFACES = '1.3.6.1.2.1.2.1'
+NUM_INTERFACES = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifNumber'
 
 def device_list(request):
     return direct_to_template(request, 'devices/device_list.html', {

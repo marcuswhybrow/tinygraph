@@ -7,9 +7,9 @@ DATA_INSTANCE_KEY = 'data_instances'
 
 logger = logging.getLogger('tinygraph.data.cacher')
 
-def _get_cache_key(device_slug, identifier, suffix):
+def _get_cache_key(device_slug, derived_name, suffix):
     return '%s:%s:%s:%s[%s]' % (PROJECT_KEY, DATA_INSTANCE_KEY, device_slug, 
-        identifier, suffix)
+        derived_name, suffix)
 
 class Cacher(object):
     def _set(self, key, value):
@@ -28,11 +28,11 @@ class Cacher(object):
         
         # If the value was not found in the cache then try the database
         if value is None:
-            device_slug, identifier, suffix = key
+            device_slug, derived_name, suffix = key
             try:
                 value = DataInstance.objects.filter(
                     rule__device__slug=device_slug, 
-                    data_object__identifier=identifier, 
+                    data_object__derived_name=derived_name, 
                     suffix=suffix
                 ).values_list('value').latest()[0]
             except DataInstance.DoesNotExist:

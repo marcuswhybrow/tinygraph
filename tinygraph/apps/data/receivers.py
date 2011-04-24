@@ -17,7 +17,7 @@ def update_caches(sender, instance=None, created=None, **kwargs):
         if instance.value_type in NON_INCREMENTAL_DATA_VALUE_TYPES:
             cache_key = (
                 instance.rule.device.slug,
-                instance.data_object.identifier,
+                instance.data_object.derived_name,
                 instance.suffix
             )
             cacher[cache_key] = instance.value
