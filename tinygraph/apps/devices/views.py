@@ -13,19 +13,46 @@ from tinygraph.apps.data.cacher import cacher
 import datetime
 
 NUM_INTERFACES = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifNumber'
+INTERFACE_INDEX = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifIndex'
+INTERFACE_MTU = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifMtu'
+INTERFACE_TYPE = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifType'
+INTERFACE_DESCR = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifDescr'
+INTERFACE_PHYS_ADDRESS = 'iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifPhysAddress'
 
 def device_list(request):
     return direct_to_template(request, 'devices/device_list.html', {
         'devices': Device.objects.all(),
     })
 
+def _get_interface_details(device_slug, index):
+    if_index = str(cacher[(device_slug, INTERFACE_INDEX, str(index))])
+    phys_address = cacher[(device_slug, INTERFACE_PHYS_ADDRESS, if_index)]
+    if phys_address:
+        phys_address = ':'.join('%0.2x' % int(n) for n in phys_address.split(' '))
+    
+    return {
+        'index': if_index,
+        'mtu': cacher[(device_slug, INTERFACE_MTU, if_index)],
+        'type': cacher[(device_slug, INTERFACE_TYPE, if_index)],
+        'description': cacher[(device_slug, INTERFACE_DESCR, if_index)],
+        'physical_address': phys_address,
+    }
+
 def device_detail(request, device_slug):
     device = get_object_or_404(Device, slug=device_slug)
     enabled_package_instances = PackageInstance.objects.filter(device=device, enabled=True)
     package_instances = [(package_instance, package_instance.memberships.filter(graphed=True).select_related()) for package_instance in enabled_package_instances]
     
+    num_interfaces = int(cacher[(device.slug, NUM_INTERFACES, '0')])
+    interfaces = [_get_interface_details(device.slug, index) for index in range(1, num_interfaces + 1)]
+    
+    for interface in interfaces:
+        if interface['physical_address'] == '':
+            num_interfaces -= 1
+    
     details = {
-        'number_of_interfaces': cacher[(device.slug, NUM_INTERFACES, '0')],
+        'number_of_interfaces': num_interfaces,
+        'interfaces': interfaces,
     }
             
     return direct_to_template(request, 'devices/device_detail.html', {

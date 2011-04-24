@@ -60,7 +60,27 @@
             </ul>
         </div>
         <div class="last">
-            <h3>Events</h3>
+            <h2>Interfaces</h2>
+            <table>
+                <thead class="align-left">
+                    <tr>
+                        <th>Name</th>
+                        <th>MAC Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interface in details.interfaces %}
+                        {% if interface.physical_address != '' %}
+                            <tr>
+                                <td>{{ interface.description }}</td>
+                                <td>{{ interface.physical_address }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <h2>Events</h2>
             <ul>
                 {% for event in events %}
                     <li>{{ event.message }}</li>
