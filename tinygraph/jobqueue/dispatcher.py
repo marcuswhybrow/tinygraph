@@ -12,6 +12,9 @@ class Dispatcher(object):
         super(Dispatcher, self).__init__(*args, **kwargs)
     
     def _connected(self):
+        if self._beanstalk is None:
+            return False
+            
         try:
             self._beanstalk.using()
         except beanstalkc.SocketError:
