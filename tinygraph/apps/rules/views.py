@@ -111,6 +111,7 @@ def package_instance_detail(request, device_slug, package_slug):
                                 if column['value_type'] == 'object_identifier':
                                     derived_name = definitions_cacher[value]
                                     if derived_name:
+                                        assert False, derived_name
                                         value = derived_name.split('.')[-1]
                             cells.append({
                                 'value': value,

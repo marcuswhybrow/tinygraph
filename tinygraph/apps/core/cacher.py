@@ -36,6 +36,6 @@ class BaseCacher(object):
         
         # If the value was not found in the cache then try the database
         if value is None:
-            value = self.find_item(key) or (None, None)
+            value = self.find_item(key)
 
         return value

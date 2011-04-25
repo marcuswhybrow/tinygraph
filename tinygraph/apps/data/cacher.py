@@ -23,7 +23,7 @@ class DataInstanceCacher(BaseCacher):
                 suffix=suffix
             ).values_list('value', 'created').latest()
         except DataInstance.DoesNotExist:
-            pass
+            return (None, None)
         else:
             # If a value was found in the database, set that as the value
             # in the cache
