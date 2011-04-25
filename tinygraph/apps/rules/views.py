@@ -27,9 +27,10 @@ def package_instance_detail(request, device_slug, package_slug):
     
     for package_instance_membership in package_instance_memberships:
         name = package_instance_membership.package_membership.data_object.derived_name
-        name_list = name.split('.')
+        identifier = package_instance_membership.package_membership.data_object.identifier
         
-        print name
+        name_list = name.split('.')
+        identifier_list = identifier.split('.')
         
         # Determine if this data_object is part of a table
         is_part_of_table = False
@@ -43,6 +44,8 @@ def package_instance_detail(request, device_slug, package_slug):
                     tables[full_table_name] = {
                         'name': table_name,
                         'full_name': full_table_name,
+                        'identifier': '.'.join(identifier.split('.')[:part_count + 1]),
+                        'entry_identifier': '.'.join(identifier.split('.')[:part_count + 2]),
                         'columns': [],
                         'rows': [],
                     }
@@ -57,6 +60,7 @@ def package_instance_detail(request, device_slug, package_slug):
                     table['columns'].append({
                         'full_name': full_column_name,
                         'name': column_name,
+                        'identifier': '.'.join(identifier.split('.')[:part_count + 2]),
                     })
                     break
                     
@@ -77,7 +81,7 @@ def package_instance_detail(request, device_slug, package_slug):
         for table in tables.values():
             index_column_derived_name = None
             for column in table['columns']:
-                if column['name'] == 'Index':
+                if column['identifier'][len(table['entry_identifier']):] == '.1':
                     index_column_derived_name = column['full_name']
                     break
             if index_column_derived_name:
