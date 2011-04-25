@@ -1,12 +1,13 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic.simple import direct_to_template
 from tinygraph.apps.devices.models import Device
-from tinygraph.apps.definitions.models import Package
+from tinygraph.apps.definitions.models import Package, DataObject
 from tinygraph.apps.rules.models import PackageInstance
 from tinygraph.apps.data.models import DataInstance, Poll
 from django.db.models import Count
 from django.core.cache import cache
 from tinygraph.apps.data.cacher import cacher
+from tinygraph.apps.definitions.cacher import cacher as definitions_cacher
 import datetime
 import itertools
 
@@ -26,6 +27,7 @@ def package_instance_detail(request, device_slug, package_slug):
     individuals = {}
     
     for package_instance_membership in package_instance_memberships:
+        value_type = package_instance_membership.package_membership.data_object.value_type
         name = package_instance_membership.package_membership.data_object.derived_name
         identifier = package_instance_membership.package_membership.data_object.identifier
         
@@ -61,6 +63,7 @@ def package_instance_detail(request, device_slug, package_slug):
                         'full_name': full_column_name,
                         'name': column_name,
                         'identifier': '.'.join(identifier.split('.')[:part_count + 2]),
+                        'value_type': value_type,
                     })
                     break
                     
@@ -100,9 +103,13 @@ def package_instance_detail(request, device_slug, package_slug):
                             else:
                                 value = cacher[(
                                     device.slug,
-                                    column['full_name'],
+                                    column['identifier'],
                                     index,
                                 )][0]
+                                if column['value_type'] == 'object_identifier':
+                                    derived_name = definitions_cacher[value]
+                                    if derived_name:
+                                        value = derived_name.split('.')[-1]
                                 cells.append(value)
                         table['rows'].append(cells)
     
