@@ -1,0 +1,35 @@
+{% extends "rules/rules_base.html" %}
+{% load graphing %}
+
+{% block content_area %}
+    <div id="path">
+        <h1>
+            <a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a>
+        </h1>
+        <span>/ <a href="{% url devices:package_instance_detail device_slug=device.slug package_slug=package.slug %}">{{ package.title }}</a></span>
+        <span>/ {{ short_derived_name }} [{{ suffix }}]</span>
+    </div>
+    
+    <div id="placeholder" style="width:100%;height:300px;"></div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" charset="utf-8">
+        var data = [{% for point in data.points %}[{{ point.x }}, {{ point.y }}]{% if not forloop.last %}, {% endif %}{% endfor %}];
+        
+        $.plot($("#placeholder"), [data], {
+            xaxis: {
+                mode: "time",
+                min: {{ data.start_time|timestamp }},
+                {# max: {{ data.end_time|timestamp }} #}
+            },
+            series: {
+                shadowSize: 1,
+                lines: {
+                    lineWidth: 1,
+                    steps: true
+                }
+            }
+        });
+    </script>
+{% endblock %}

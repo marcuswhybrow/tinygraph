@@ -41,7 +41,11 @@
                     {% for row in table.rows %}
                         <tr>
                             {% for cell in row %}
-                                <td>{{ cell }}</td>
+                                {% if cell.value_type == 'counter' %}
+                                    <td><a href="{% url devices:package_instance_membership_detail device_slug=device.slug package_slug=package.slug data_object_derived_name=cell.derived_name suffix=cell.suffix %}">{{ cell.value }}</a></td>
+                                {% else %}
+                                    <td>{{ cell.value }}</td>
+                                {% endif %}
                             {% endfor %}
                         </tr>
                     {% endfor %}
