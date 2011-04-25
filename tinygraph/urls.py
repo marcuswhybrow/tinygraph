@@ -27,5 +27,7 @@ urlpatterns += patterns('',
     (r'^devices/', include('devices.urls', namespace='devices')),
     (r'^data/', include('definitions.urls', namespace='definitions')),
     
+    url(r'^settings/', 'tinygraph.apps.core.views.settings', name='settings'),
+    
     url(r'^', include('dashboard.urls', namespace='dashboard')),
 )

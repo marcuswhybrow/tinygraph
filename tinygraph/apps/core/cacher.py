@@ -35,7 +35,4 @@ class BaseCacher(object):
         value = cache.get(_hash(cache_key))
         
         # If the value was not found in the cache then try the database
-        if value is None:
-            value = self.find_item(key)
-
-        return value
+        return value or self.find_item(key)

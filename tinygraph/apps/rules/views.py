@@ -105,7 +105,7 @@ def package_instance_detail(request, device_slug, package_slug):
                             else:
                                 value = cacher[(
                                     device.slug,
-                                    column['identifier'],
+                                    column['full_name'],
                                     index,
                                 )][0]
                                 if column['value_type'] == 'object_identifier':

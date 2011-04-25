@@ -52,6 +52,10 @@
     text-decoration: none
     @include text-shadow(rgba(0,0,0,0.3), -1px, -1px, 0)
 
+@mixin minibutton-down()
+    @include linear-gradient(color-stops(#3072b3, #599bdc))
+    border-color: #2a65a0 #518cc6 #518cc6
+
 @mixin icon($width, $height, $image)
     display: block
     text-indent: -99999px
@@ -61,6 +65,39 @@
     background: url($image) no-repeat top center
     
 // The SASS
+
+.minibutton
+    @include minibutton()
+    
+.minibutton:hover
+    display: inline-block
+    @include minibutton-hover()
+
+.minibutton:hover:active
+    @include minibutton-down()
+
+.minibutton-wrapper
+    @include clearfix()
+    .minibutton
+        float: left
+
+    .minibutton-trailer
+        height: 24px
+        padding-left: 10px
+        float: left
+        
+        .icon[src="/static/images/icons/ajax-ok.png"]
+            padding-top: 3px
+        
+        .icon[src="/static/images/icons/ajax-error.png"]
+            padding-top: 3px
+    
+        .message
+            display: inline-block
+            position: relative
+            top: -6px
+            
+            padding-left: 5px
 
 html
     overflow-y: auto

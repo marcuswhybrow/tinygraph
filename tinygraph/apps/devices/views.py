@@ -70,18 +70,23 @@ def device_detail(request, device_slug):
     
     slug = device.slug
     
-    num_interfaces = int(cacher[(slug, NUM_INTERFACES, '0')][0])
-    interfaces = [_get_interface_details(slug, index) for index in range(1, num_interfaces + 1)]
     
-    for interface in interfaces:
-        if interface['physical_address'] == '':
-            num_interfaces -= 1
+    num_interfaces = cacher[(slug, NUM_INTERFACES, '0')][0]
+    interfaces = None
+    if num_interfaces:
+        num_interfaces = int(num_interfaces)
+        interfaces = [_get_interface_details(slug, index) for index in range(1, num_interfaces + 1)]
+    
+        for interface in interfaces:
+            if interface['physical_address'] == '':
+                num_interfaces -= 1
     
     system_uptime, created = cacher[(slug, HOST_SYSTEM_UPTIME, '0')]
-    system_uptime = int(system_uptime) / 100
-    diff = datetime.datetime.now() - created
-    diff = datetime.timedelta(seconds=diff.seconds)
-    system_uptime = datetime.timedelta(seconds=system_uptime) + diff
+    if system_uptime:
+        system_uptime = int(system_uptime) / 100
+        diff = datetime.datetime.now() - created
+        diff = datetime.timedelta(seconds=diff.seconds)
+        system_uptime = datetime.timedelta(seconds=system_uptime) + diff
     
     details = {
         'number_of_interfaces': num_interfaces,

@@ -3,6 +3,7 @@ from django.views.generic.simple import direct_to_template
 from django.http import Http404, HttpResponse
 from tinygraph.apps.definitions.models import DataObject
 from tinygraph.apps.dashboard.models import Item, Board
+from django.core.cache import cache
 import simplejson
 import subprocess
 
@@ -88,4 +89,9 @@ def lookup_data_object_name(request):
         data['request_id'] = request_id
         data['data_objects'] = list(matches)
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
-        
+
+def reset_caches(request):
+    if request.is_ajax() and request.method == 'POST':
+        cache.clear()
+        return HttpResponse()
+    raise Http404

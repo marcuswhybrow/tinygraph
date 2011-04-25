@@ -14,13 +14,11 @@ def update_caches(sender, instance=None, created=None, **kwargs):
             instance.data_object.value_type = instance.value_type
             instance.data_object.save()
         
-        # If this is a non-incremental data type, then store this latest
-        # version in the cache
-        if instance.value_type != 'counter':
-            cache_key = (
-                instance.rule.device.slug,
-                instance.data_object.identifier,
-                instance.suffix
-            )
-            
-            cacher[cache_key] = (instance.value, instance.created)
+        # Store this latest version in the cache
+        cache_key = (
+            instance.rule.device.slug,
+            instance.data_object.derived_name,
+            instance.suffix
+        )
+        
+        cacher[cache_key] = (instance.value, instance.created)
