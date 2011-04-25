@@ -23,13 +23,13 @@
     </p>
     
     <div class="packages">
-        {% for package, package_instance in packages_map %}
-            <div packageInstancePK="{{ package_instance.pk }}" packagePK="{{ package.pk }}" class="package {% if package_instance.enabled %}enabled{% endif %}">
+        {% for package, package_instance_map in packages_map %}
+            <div packageInstancePK="{{ package_instance.pk }}" packagePK="{{ package.pk }}" class="package {% if package_instance_map.package_instance.enabled %}enabled{% endif %}">
                 <div class="inner">
-                    <input class="toggle" type="checkbox" name="{{ package.slug }}"{% if package_instance.enabled %} checked="true"{% endif %}>
+                    <input class="toggle" type="checkbox" name="{{ package.slug }}"{% if package_instance_map.package_instance.enabled %} checked="true"{% endif %}>
                     <h5>{{ package.title }}</h5>
                     <ul>
-                        {% for package_instance_membership in package_instance.memberships.all %}
+                        {% for package_instance_membership in package_instance_map.package_instance_memberships %}
                             <li pk="{{ package_instance_membership.pk }}">
                                 <div class="name" title="{{ package_instance_membership.package_membership.data_object }}">
                                     {{ package_instance_membership.package_membership.data_object }}

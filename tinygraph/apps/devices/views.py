@@ -159,12 +159,21 @@ def device_add(request):
 
 def device_data_object_list(request, device_slug):
     device = get_object_or_404(Device, slug=device_slug)
-    packages = Package.objects.all().select_related('devices')
+    packages = Package.objects.all().select_related()
     packages_map = [(package, device.get_package_instance(package)) for package in packages]
+    
+    new_map = []
+    for package, package_instance in packages_map:
+        package_instance_map = {
+            'package_instance': package_instance,
+            'package_instance_memberships': package_instance.memberships.select_related(),
+        }
+        new_map.append((package, package_instance_map))
+    
     return direct_to_template(request, 'devices/device_data_object_list.html', {
         'device': device,
         'new_device': 'new' in request.GET and request.GET['new'].lower() in ['', 'true'],
-        'packages_map': packages_map,
+        'packages_map': new_map,
     })
 
 def test(request):
