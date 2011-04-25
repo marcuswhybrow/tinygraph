@@ -8,12 +8,14 @@ from tinygraph.apps.definitions.utils import snmp_value_to_str, \
      snmp_name_to_str
 from django.conf import settings
 from tinygraph.tinygraphd.signals import pre_poll, post_poll, poll_error, \
-    value_change
+    value_change, poll_start, poll_stop
 from tinygraph.apps.rules.models import PackageInstanceMembership
 from functools import wraps
+from tinygraph.apps.data.models import Poll
 import django.dispatch
 import socket
 import logging
+import datetime
 
 SNMP_GETBULK_SIZE = getattr(settings, 'TINYGRAPH_SNMP_GETBULK_SIZE', 25)
 DEVICE_TRANSPORT_ERROR_MESSAGE = getattr(settings, 
@@ -48,6 +50,7 @@ class TinyGraphDaemon(PollDaemon):
         
         rule = context['rule']
         mvc = context['mvc']
+        poll = context['poll']
         
         if error_indication is not None:
             logger.warning('SNMP GETBULK error "%s" for OID "%s" on '
@@ -114,7 +117,7 @@ class TinyGraphDaemon(PollDaemon):
             # Create the DataInstance
             new_data_instance = DataInstance.objects.create(rule=rule,
                 data_object=data_object, suffix=str_suffix,
-                value=str_value, value_type=value_type)
+                value=str_value, value_type=value_type, poll=poll)
             
             if (value_type not in VARIABLE_DATA_VALUE_TYPES):
                 if prev_data_instance is not None and (new_data_instance.value
@@ -129,6 +132,9 @@ class TinyGraphDaemon(PollDaemon):
     @watch_for_exceptions
     def poll(self):
         """Called once for each poll (say every 5 minutes)"""
+        
+        poll_start.send(sender=self)
+        poll = Poll.objects.create(start=datetime.datetime.now())
         
         mvc = get_mib_view_controller()
         asyn_command_generator = cmdgen.AsynCommandGenerator()
@@ -163,11 +169,16 @@ class TinyGraphDaemon(PollDaemon):
                     (self._callback, {
                         'rule': rule,
                         'mvc': mvc,
+                        'poll': poll,
                     })
                 )
             
         # Blocks until all requests have returned
         asyn_command_generator.snmpEngine.transportDispatcher.runDispatcher()
         
+        poll.stop = datetime.datetime.now()
+        poll.save()
+        
         post_poll.send(sender=self, device=device)
+        poll_stop.send(sender=self)
                 

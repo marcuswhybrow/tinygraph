@@ -7,39 +7,44 @@
         <h1><a href="{{ device.get_absolute_url }}">{{ device.user_given_name }}</a></h1> <span>/ {{ package.title }}</span>
     </div>
     
-    {% if rules %}
-        {% for rule, data_objects in rules %}
-            <h4>{{ rule.data_object.derived_name }}</h4>
-            <table>
-                <thead>
+    {% if data.individuals %}
+        <table>
+            <thead class="align-left">
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for individual in data.individuals %}
                     <tr>
-                        <th>Data Object</th>
-                        <th>Suffix</th>
-                        <th>Value Type</th>
-                        <th>Value</th>
+                        <td>{{ individual.full_name }}</td>
+                        <td>{{ individual.value }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for key, data in data_objects %}
-                        <tr>
-                            <td>{{ key.data_object.derived_name|subtract:rule.data_object.derived_name }}</td>
-                            <td>{{ key.suffix }}</td>
-                            <td>{{ key.value_type }}</td>
-                            <td>
-                                {% if key.value_type in singular_value_types %}
-                                    {% if data %}{{ data }}{% else %}<em>no value</em>{% endif %}
-                                {% else %}
-                                    <ul>
-                                        {% for data_instance in data %}
-                                            <li>{{ data_instance.created}} - {{ data_instance.value }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
     {% endif %}
+    
+    {% for table in data.tables %}
+        <h3>{{ table.full_name }}</h3>
+        <table>
+            <thead class="align-left">
+                <tr>
+                    {% for column in table.columns %}
+                        <th>{{ column.name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in table.rows %}
+                    <tr>
+                        {% for cell in row %}
+                            <td>{{ cell }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
 {% endblock %}

@@ -1,5 +1,8 @@
 import django.dispatch
 
+poll_start = django.dispatch.Signal()
+poll_stop = django.dispatch.Signal()
+
 pre_poll = django.dispatch.Signal(providing_args=['device'])
 post_poll = django.dispatch.Signal(providing_args=['device'])
 

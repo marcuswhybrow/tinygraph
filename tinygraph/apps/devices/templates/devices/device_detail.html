@@ -71,7 +71,7 @@
             <ul>
                 {% for package_instance, package_instance_membership, package_instance_membership_counters in package_instances %}
                     <li>
-                        <h3>{{ package_instance.package.title }}</h3>
+                        <h3><a href="{% url devices:package_instance_detail device_slug=device.slug package_slug=package_instance.package.slug %}">{{ package_instance.package.title }}</a></h3>
                         <div class="body">
                             <h4>Values</h4>
                             <ul>

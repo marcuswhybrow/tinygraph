@@ -1,6 +1,6 @@
 from django.db import models
+from django.dispatch import receiver
 from tinygraph.apps.data.settings import DATA_VALUE_TYPES
-
 
 class DataInstance(models.Model):
     """Data collected for a Rule regarding a DataObject"""
@@ -26,9 +26,23 @@ class DataInstance(models.Model):
     
     value_type = models.CharField(max_length=100, choices=DATA_VALUE_TYPES)
     
+    poll = models.ForeignKey('data.Poll', related_name='instances')
+    
     class Meta:
         get_latest_by = 'created'
     
     def __unicode__(self):
-        return '%s %s[%s] = %s' % (self.rule.device, self.data_object, 
+        return u'%s %s[%s] = %s' % (self.rule.device, self.data_object, 
             self.suffix, self.value)
+
+class Poll(models.Model):
+    """A poll for DataInstance objects to belong to."""
+    
+    start = models.DateTimeField(null=True, blank=True)
+    stop = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        get_latest_by = 'start'
+    
+    def __unicode__(self):
+        return u'Poll, started %s, ended %s' % (self.start, self.stop)
