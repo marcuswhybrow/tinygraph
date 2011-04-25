@@ -72,21 +72,21 @@
                 {% for package_instance, package_instance_membership, package_instance_membership_counters in package_instances %}
                     <li>
                         <h3><a href="{% url devices:package_instance_detail device_slug=device.slug package_slug=package_instance.package.slug %}">{{ package_instance.package.title }}</a></h3>
-                        <div class="body">
-                            <h4>Values</h4>
-                            <ul>
-                                {% for package_instance_membership in package_instance_membership %}
-                                    <li>{{ package_instance_membership.package_membership.data_object.derived_name }}</li>
-                                {% endfor %}
-                            </ul>
-                            
-                            <h4>Counters</h4>
-                            <ul>
-                                {% for package_instance_membership_counter in package_instance_membership_counters %}
-                                    <li>{{ package_instance_membership_counter.package_membership.data_object.derived_name }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                        {# <div class="body"> #}
+                        {#     <h4>Values</h4> #}
+                        {#     <ul> #}
+                        {#         {% for package_instance_membership in package_instance_membership %} #}
+                        {#             <li>{{ package_instance_membership.package_membership.data_object.derived_name }}</li> #}
+                        {#         {% endfor %} #}
+                        {#     </ul> #}
+                        {#      #}
+                        {#     <h4>Counters</h4> #}
+                        {#     <ul> #}
+                        {#         {% for package_instance_membership_counter in package_instance_membership_counters %} #}
+                        {#             <li>{{ package_instance_membership_counter.package_membership.data_object.derived_name }}</li> #}
+                        {#         {% endfor %} #}
+                        {#     </ul> #}
+                        {# </div> #}
                     </li>
                 {% endfor %}
             </ul>
