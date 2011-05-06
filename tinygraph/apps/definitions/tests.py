@@ -5,6 +5,13 @@ from tinygraph.apps.devices.models import Device
 from tinygraph.apps.rules.models import PackageInstance, \
     PackageInstanceMembership
 
+class UsabilityTests(TestCase):
+    def test_pacakge_creation(self):
+        """
+        Tests that a package can be created by just specifying a title
+        """
+        Package.objects.create(title='Simple Title')
+
 class IntegrityTests(TestCase):
     def setUp(self):
         # Create an existing device
