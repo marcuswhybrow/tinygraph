@@ -90,8 +90,8 @@ def package_instance_detail(request, device_slug, package_slug):
                     index_column_derived_name = column['full_name']
                     break
             if index_column_derived_name:
-                print index_column_derived_name
                 instances = DataInstance.objects.filter(
+                    rule__device=device,
                     poll=last_poll,
                     data_object__derived_name=index_column_derived_name,
                 ).values('value', 'data_object__pk')
@@ -111,7 +111,6 @@ def package_instance_detail(request, device_slug, package_slug):
                                 if column['value_type'] == 'object_identifier':
                                     derived_name = definitions_cacher[value]
                                     if derived_name:
-                                        assert False, derived_name
                                         value = derived_name.split('.')[-1]
                             cells.append({
                                 'value': value,

@@ -56,21 +56,28 @@ def value_change_callback(sender, **kwargs):
 class Device(models.Model):
     """A device on the network"""
 
-    user_given_name = models.CharField(unique=True, max_length=100, help_text='A friendly name for this device which you will understand.')
+    user_given_name = models.CharField(unique=True, max_length=100,
+        help_text='A friendly name for this device which you will understand.')
 
     # 255 characters is the maximum length of a host name for DNS
-    user_given_address = models.CharField(max_length=255, help_text='An IP address or DNS name which will resolve into an IP address for this device.')
+    user_given_address = models.CharField(max_length=255, 
+        help_text='An IP address or DNS name which will resolve into an IP '
+        'address for this device.')
     
     ip_address = models.CharField(blank=True, max_length=39)
     fqdn = models.CharField(blank=True, max_length=255)
 
     slug = models.SlugField(unique=True, editable=False, db_index=True)
 
-    data_objects = models.ManyToManyField('definitions.DataObject', through='rules.Rule', related_name='devices')
-    packages = models.ManyToManyField('definitions.Package', through='rules.PackageInstance', related_name='devices')
+    data_objects = models.ManyToManyField('definitions.DataObject',
+        through='rules.Rule', related_name='devices')
+    packages = models.ManyToManyField('definitions.Package',
+        through='rules.PackageInstance', related_name='devices')
     
-    snmp_version = models.CharField(max_length=1, choices=SNMP_VERSIONS, help_text='2c recommended.')
-    snmp_port = models.PositiveIntegerField(blank=True, null=True, help_text='Leave blank for default (162).')
+    snmp_version = models.CharField(max_length=1, choices=SNMP_VERSIONS, 
+        help_text='2c recommended.')
+    snmp_port = models.PositiveIntegerField(blank=True, null=True, 
+        help_text='Leave blank for default (162).')
 
     def __unicode__(self):
         return self.user_given_name

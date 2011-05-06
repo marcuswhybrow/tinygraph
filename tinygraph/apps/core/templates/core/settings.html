@@ -1,0 +1,55 @@
+{% extends "core/core_base.html" %}
+
+{% block content_area %}
+    
+    <div id="path">
+        <h1>Settings</h1>
+    </div>
+    
+    <h2>The Cache</h2>
+    <p>
+        The cache makes the TinyGraph experience smoother by keeping stuff around
+        for the next time you need it, rather than retrieving it twice. You
+        may want to reset the cache if you think a problem has occurred.
+    </p>
+    
+    <div class="minibutton-wrapper">
+        <button id="reset-caches" type="button" class="minibutton">Reset the cache</button>
+        <span class="minibutton-trailer" style="display:none">
+            <img class="icon" src="">
+            <span class="message"></span>
+        </span>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            $('#reset-caches').click(function() {
+                var $trailer = $(this).siblings('.minibutton-trailer');
+                $trailer.find('img.icon').attr('src', '/static/images/icons/ajax-spinner.gif');
+                $trailer.find('.message').text('Reseting cache');
+                $.ajax({
+                    url: '{% url api:core:reset_caches %}',
+                    type: 'post',
+                    context: $trailer,
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function() {
+                        this.show();
+                        this.find('img.icon').attr('src', '/static/images/icons/ajax-ok.png');
+                        this.find('.message').text('Cache reset');
+                        this.delay(2000).fadeOut(1000);
+                    },
+                    error: function() {
+                        this.show();
+                        this.find('img.icon').attr('src', '/static/images/icons/ajax-error.png');
+                        this.find('.message').text('Error reseting cache');
+                        this.delay(2000).fadeOut(1000);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

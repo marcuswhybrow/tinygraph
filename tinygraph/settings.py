@@ -127,6 +127,9 @@ INSTALLED_APPS = (
     'dashboard',
     'api',
     'events',
+    
+    # Remove this!!!
+    'django_extensions',
 )
 
 # Tells pysnmp where the user uploaded (converted) mib files are
