@@ -154,8 +154,11 @@ def package_instance_membership_detail(request, device_slug, package_slug, data_
     cutoff = datetime.datetime.now() - datetime.timedelta(minutes=duration)
     new_minute = cutoff.minute - cutoff.minute % granularity
     start_time = datetime.datetime(cutoff.year, cutoff.month, cutoff.day, cutoff.hour, new_minute)
+    start_time = None
     
-    data = CounterPresenter(instances, granularity=datetime.timedelta(minutes=granularity), start_time=start_time)
+    end_time = datetime.datetime(year=2011, month=4, day=30)
+    
+    data = CounterPresenter(instances, granularity=datetime.timedelta(minutes=granularity), start_time=start_time, end_time=end_time)
     
     return direct_to_template(request, 'rules/package_instance_membership_detail.html', {
         'device': device,
