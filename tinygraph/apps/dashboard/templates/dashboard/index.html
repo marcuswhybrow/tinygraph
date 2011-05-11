@@ -746,7 +746,6 @@
                 $.stateBindings.addState('editing>movingDevices');
                 $('html').css('cursor', 'default');
                 $('#dep-connection-mode').removeClass('active');
-                
             }).bind('editing>drawingConnections>inProgress.stateDisabled', function(e) {
                 if (connectionPath != null) {
                     connectionPath.remove();
@@ -754,10 +753,10 @@
                 }
                 selectedDevice = null;
             }).bind('editing>removingDevices.stateEnabled', function(e) {
-                $.stateBindings.removeState('editing>drawingConnections');
                 $.stateBindings.removeState('editing>movingDevices');
                 $('#dep-remove').addClass('active');
             }).bind('editing>removingDevices.stateDisabled', function(e) {
+                $.stateBindings.addState('editing>movingDevices');
                 $('#dep-remove').removeClass('active');
             });
             
