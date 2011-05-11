@@ -448,6 +448,14 @@
                         }
                     }
                 },
+                'editing>removingDevices': {
+                    mouseup: function(e) {
+                        if (hoveredOverTile != null && hoveredOverTile.device != null) {
+                            hoveredOverTile.device.delete();
+                            hoveredOverTile.device = null;
+                        }
+                    }
+                },
                 'editing>movingDevices>inProgress': {
                     mousemove: function(e) {
                         movingDevice.translate(xChange, yChange);

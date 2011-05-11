@@ -35,6 +35,9 @@ Item.prototype.setRaphaelObj = function(raphaelObj) {
 Item.prototype.setPaper = function(paper) {
     this.paper = (paper === undefined) ? null : paper;
 };
+Item.prototype.delete = function() {
+    this.raphaelObj.remove();
+};
 
 
 // Tile
@@ -146,6 +149,7 @@ function Device(tile) {
     this.tile = (tile === undefined) ? null : tile;
     this.moving = false;
     this.raphaelObj = null;
+    this.connections = new Array();
 }
 Device.prototype = new Item();
 Device.prototype.translate = function(cx, cy) {
@@ -193,8 +197,19 @@ Device.prototype.updateConnections = function() {
     }
 };
 Device.prototype.connectTo = function(toDevice) {
-    return new Connection(this, toDevice);
+    var connection = new Connection(this, toDevice);;
+    this.connections.push(connection);
+    toDevice.connections.push(connection);
+    return connection;
 };
+Device.prototype.deleteSuper = Device.prototype.delete;
+Device.prototype.delete = function() {
+    this.deleteSuper();
+    
+    // Delete all of this devices connections with other devices.
+    for (var i = 0; i < this.interfaces.length; i++)
+        this.interfaces[i].delete();
+}
 
 
 // ServerDevice
