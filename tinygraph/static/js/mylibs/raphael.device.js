@@ -208,7 +208,12 @@ Device.prototype.delete = function() {
     
     // Delete all of this devices connections with other devices.
     for (var i = 0; i < this.interfaces.length; i++)
-        this.interfaces[i].delete();
+        this.connections[i].delete();
+    
+    $.ajax({
+        url: '/api/dashboard/item/' + this.pk + '/',
+        type: 'delete'
+    });
 }
 
 
@@ -330,4 +335,12 @@ Connection.prototype.getOtherDevice = function(device) {
 }
 Connection.prototype.translate = function(cx, cy) {
     this.raphaelObj.translate(cx, cy);
+};
+Connection.prototype.deleteSuper = Connection.prototype.delete;
+Connection.prototype.delete = function() {
+    this.deleteSuper();
+    $.ajax({
+        url: '/api/dashboard/connection/' + this.pk + '/',
+        type: 'delete'
+    });
 };

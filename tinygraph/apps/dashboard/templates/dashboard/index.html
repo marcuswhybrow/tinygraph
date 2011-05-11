@@ -121,10 +121,13 @@
             
             var fromDevice = null;
             var toDevice = null;
+            var connection = null;
             {% for connection in connections %}
                 fromDevice = getTile({{ connection.from_item.x }}, {{ connection.from_item.y }}).device;
                 toDevice = getTile({{ connection.to_item.x }}, {{ connection.to_item.y }}).device;
-                fromDevice.connectTo(toDevice);
+                connection = new Connection(fromDevice, toDevice, {{ connection.pk }});
+                fromDevice.connections.push(connection);
+                toDevice.connections.push(connection);
             {% endfor %}
             
             var current = dashboardConfig.paper.text(30, $window.height() - 30, '');
