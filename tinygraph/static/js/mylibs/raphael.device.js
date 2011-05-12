@@ -149,7 +149,6 @@ function Device(tile) {
     this.tile = (tile === undefined) ? null : tile;
     this.moving = false;
     this.raphaelObj = null;
-    this.connections = new Array();
 }
 Device.prototype = new Item();
 Device.prototype.translate = function(cx, cy) {
@@ -222,6 +221,7 @@ Device.prototype.delete = function() {
 
 function ServerDevice(pk) {
     this.interfaces = new Array();
+    this.connections = new Array();
     
     this.pk = pk;
     
@@ -247,6 +247,7 @@ ServerDevice.prototype = new Device();
 
 function SwitchDevice(pk) {
     this.interfaces = new Array();
+    this.connections = new Array();
     
     this.pk = pk;
     
