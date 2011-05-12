@@ -764,6 +764,7 @@
                 }
                 selectedDevice = null;
             }).bind('editing>removingDevices.stateEnabled', function(e) {
+                $.stateBindings.removeState('editing>drawingConnections');
                 $.stateBindings.removeState('editing>movingDevices');
                 $('#dep-remove').addClass('active');
             }).bind('editing>removingDevices.stateDisabled', function(e) {
