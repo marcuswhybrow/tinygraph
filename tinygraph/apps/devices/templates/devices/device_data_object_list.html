@@ -24,7 +24,7 @@
     
     <div class="packages">
         {% for package, package_instance_map in packages_map %}
-            <div packageInstancePK="{{ package_instance.pk }}" packagePK="{{ package.pk }}" class="package {% if package_instance_map.package_instance.enabled %}enabled{% endif %}">
+            <div packageInstancePK="{{ package_instance_map.package_instance.pk }}" packagePK="{{ package.pk }}" class="package {% if package_instance_map.package_instance.enabled %}enabled{% endif %}">
                 <div class="inner">
                     <input class="toggle" type="checkbox" name="{{ package.slug }}"{% if package_instance_map.package_instance.enabled %} checked="true"{% endif %}>
                     <h5>{{ package.title }}</h5>
@@ -79,33 +79,16 @@
                 
                 $p.find('.config input[type="checkbox"]').attr('disabled', !isEnabled)
                 
-                if (packageInstancePK === '') {
-                    $.ajax({
-                        url: PACKAGE_INSTANCE_URL,
-                        type: 'post',
-                        context: $p,
-                        data: {
-                            device: DEVICE_PK,
-                            package: packagePK,
-                            enabled: true,
-                            csrfmiddlewaretoken: CSRF_TOKEN
-                        },
-                        success: function(data) {
-                            this.attr('packageInstancePK', data['id']);
-                        }
-                    })
-                } else {
-                    $.ajax({
-                        url: PACKAGE_INSTANCE_URL + packageInstancePK + '/',
-                        type: 'put',
-                        context: $p,
-                        data: {
-                            enabled: isEnabled,
-                            csrfmiddlewaretoken: CSRF_TOKEN
-                        },
-                        dataType: 'json'
-                    });
-                }
+                $.ajax({
+                    url: PACKAGE_INSTANCE_URL + packageInstancePK + '/',
+                    type: 'put',
+                    context: $p,
+                    data: {
+                        enabled: isEnabled,
+                        csrfmiddlewaretoken: CSRF_TOKEN
+                    },
+                    dataType: 'json'
+                });
             });
             
             // ---------------------------------------------------------------

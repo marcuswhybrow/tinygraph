@@ -159,7 +159,7 @@ LOGGING = {
         'default': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'logs/default.log',
+            'filename': '/tmp/tinygraph.log',
             'formatter': 'standard',
         },  
     },
