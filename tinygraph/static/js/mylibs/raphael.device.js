@@ -240,6 +240,13 @@ function ServerDevice(pk) {
 }
 
 ServerDevice.prototype = new Device();
+ServerDevice.prototype.deleteSuper = ServerDevice.prototype.delete;
+ServerDevice.prototype.delete = function() {
+    this.deleteSuper();
+    $('.dep-device[devicePK="' + this.pk + '"]')
+        .removeClass('placed')
+        .addClass('not-placed');
+}
 
 
 // SwitchDevice
